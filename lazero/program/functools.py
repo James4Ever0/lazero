@@ -260,26 +260,4 @@ def skipExceptionVerbose(func): return skipException(func, debug_flag=True)
 def skipExceptionBreakpoint(func): return skipException(func, breakpoint_flag=True)
 def skipExceptionDebug(func): return skipException(func, breakpoint_flag=True, debug_flag=True)
 
-@skipException
-def someOtherShit():
-    amd=[1,2,3]
-    amd[4]
-    print("shit happens")
-
-def anotherShit():
-    @skipException
-    def mySuperFunction(d,e,f):
-        someOtherShit()
-        print("YOU WIN")
-        a = [1,2,3]
-        a[3] # will not continue execute the code down there
-        print("YOU WIN")
-        a[4]
-        print("INSIDE FUNCTION",d,e,f)
-        print("YOU WIN")
-    mySuperFunction(1,2,3)
-    # print(dir(mySuperFunction))
-
-anotherShit()
-
 # breakpoint()
