@@ -253,7 +253,6 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
                     if breakpoint_flag: breakpoint()
         if debug_flag:
             print("########## FUNCTION #########")
-
     return new_func
 
 def skipExceptionVerbose(func): return skipException(func, debug_flag=True)
