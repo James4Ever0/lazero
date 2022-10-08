@@ -127,58 +127,63 @@ def pickledFunction(
 from contextlib import suppress
 import traceback
 
-def skipException(func, debug_flag=False, breakpoint_flag=False):
 
+def skipException(func, debug_flag=False, breakpoint_flag=False):
     def space_counter(line):
         counter = 0
         for x in line:
-            if x == " ": counter+=1
-            else: break
+            if x == " ":
+                counter += 1
+            else:
+                break
         return counter
 
     def remove_extra_return(code):
         while True:
             if "\n\n" in code:
-                code = code.replace("\n\n","\n")
-            else: break
+                code = code.replace("\n\n", "\n")
+            else:
+                break
         return code
-    
+
     def isEmptyLine(line):
-        emptyChars = ["\n","\t","\r"," "]
+        emptyChars = ["\n", "\t", "\r", " "]
         length = len(line)
-        emptyCounts=0
+        emptyCounts = 0
         for char in line:
-            if char in emptyChars: emptyCounts += 1
+            if char in emptyChars:
+                emptyCounts += 1
         return emptyCounts == length
-    
+
     def getCodeBlocks(lines):
-        mBlocks=[]
+        mBlocks = []
         current_block = lines[0]
-        lines = lines+[""]
+        lines = lines + [""]
         keywords = [" ", "def", "async def", "with", "class", "@"]
         for line in lines[1:]:
             if sum([line.startswith(keyword) for keyword in keywords]):
-                current_block+="\n"
-                current_block+=line
+                current_block += "\n"
+                current_block += line
             else:
                 mBlocks.append(current_block)
                 current_block = line
         return mBlocks
-    
+
     def getExtendedLines(splited_code):
         splited_code = [x.rstrip() for x in splited_code]
-        splited_code = "\n".join(splited_code).replace("\\\n","")
+        splited_code = "\n".join(splited_code).replace("\\\n", "")
         splited_code = remove_extra_return(splited_code)
         splited_code = splited_code.split("\n")
         return splited_code
-    
 
     def new_func(*args, **kwargs):
         func_name = func.__name__
         func_code = dill.source.getsource(func)
         if debug_flag:
             print("########## FUNCTION CODE #########")
-            print(func_code) # do not use chained decorator since doing so will definitely fail everything?
+            print(
+                func_code
+            )  # do not use chained decorator since doing so will definitely fail everything?
             print("########## FUNCTION CODE #########")
             print("########## FUNCTION #########")
         # print(func_code)
@@ -193,19 +198,23 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
         except:
             raise Exception("Do not nesting the use of @skipException decorator")
         function_definition = splited_code[1]
-        function_args=function_definition[:-1].replace("def {}".format(func_name),"")
+        function_args = function_definition[:-1].replace("def {}".format(func_name), "")
         if debug_flag:
             print("FUNCTION ARGS:", function_args)
         kwdefaults = func.__defaults__
         pass_kwargs = {}
 
         if "=" in function_args:
-            assert kwdefaults!=None
+            assert kwdefaults != None
             arg_remains = function_args.split("=")[0]
-            kwarg_remains = function_args.replace(arg_remains,"")
-            kwarg_extra_names =[content.split(",")[-1].strip() for index, content in enumerate(kwarg_remains.split("=")) if index%2 ==1]
-            mfunctionArgsPrimitive = arg_remains.replace("(","").split(",")
-            kwarg_names = [mfunctionArgsPrimitive[-1].strip()]+kwarg_extra_names
+            kwarg_remains = function_args.replace(arg_remains, "")
+            kwarg_extra_names = [
+                content.split(",")[-1].strip()
+                for index, content in enumerate(kwarg_remains.split("="))
+                if index % 2 == 1
+            ]
+            mfunctionArgsPrimitive = arg_remains.replace("(", "").split(",")
+            kwarg_names = [mfunctionArgsPrimitive[-1].strip()] + kwarg_extra_names
             mfunctionArgs = mfunctionArgsPrimitive[:-1]
             if debug_flag:
                 print("PASSED KEYWORD ARGS:", kwargs)
@@ -217,11 +226,11 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
                 pass_kwargs[key] = kwargs[key]
         else:
             assert kwdefaults == None
-            mfunctionArgs = function_args.replace("(","").replace(")","").split(",")
+            mfunctionArgs = function_args.replace("(", "").replace(")", "").split(",")
         mfunctionArgs = [x.strip() for x in mfunctionArgs]
         mfunctionArgs = [x for x in mfunctionArgs if not isEmptyLine(x)]
         if debug_flag:
-            print("POSITIONAL ARGS:",mfunctionArgs)
+            print("POSITIONAL ARGS:", mfunctionArgs)
         assert len(args) == len(mfunctionArgs)
 
         for key, value in zip(mfunctionArgs, args):
@@ -250,13 +259,24 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
                     exec(block)
                 except:
                     traceback.print_exc()
-                    if breakpoint_flag: breakpoint()
+                    if breakpoint_flag:
+                        breakpoint()
         if debug_flag:
             print("########## FUNCTION #########")
+
     return new_func
 
-def skipExceptionVerbose(func): return skipException(func, debug_flag=True)
-def skipExceptionBreakpoint(func): return skipException(func, breakpoint_flag=True)
-def skipExceptionDebug(func): return skipException(func, breakpoint_flag=True, debug_flag=True)
+
+def skipExceptionVerbose(func):
+    return skipException(func, debug_flag=True)
+
+
+def skipExceptionBreakpoint(func):
+    return skipException(func, breakpoint_flag=True)
+
+
+def skipExceptionDebug(func):
+    return skipException(func, breakpoint_flag=True, debug_flag=True)
+
 
 # breakpoint()
