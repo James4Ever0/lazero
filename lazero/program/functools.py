@@ -1,5 +1,5 @@
 # print package name of this 'lazero.program.functools' package, please?
-# print('PATH',__path__)
+# print('PATH', __path__)
 # print('NAME', __name__)
 # # lazero.program.functools
 # def someFunction():
