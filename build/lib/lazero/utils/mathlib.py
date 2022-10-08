@@ -3,17 +3,51 @@
 
 from pykalman import KalmanFilter
 import numpy as np
-def superMean(mList:list,default=0):
-    if len(mList) == 0: return  default
+
+
+def checkMinMaxDict(value, minMaxDict, getMinMaxVal=False):
+    try:
+        assert [x for x in minMaxDict.keys() if x not in ["min", "max"]] == []
+    except:
+        print("PARAMETERS DUMP:", value, minMaxDict, getMinMaxVal)
+        breakpoint()
+
+    try:
+        minVal = minMaxDict.get("min", value)
+        maxVal = minMaxDict.get("max", value)
+        if minVal != value and maxVal != value:
+            assert minVal < maxVal
+        flag = value <= maxVal and value >= minVal
+        if getMinMaxVal:
+            return flag, (minVal, maxVal)
+        else:
+            return flag
+    except:
+        import traceback
+
+        traceback.print_exc()
+        print("WTF IS GOING ON WITH CHECK_MIN_MAX_DICT")
+        # breakpoint()
+        return False  # usually we have issue getting the number. it is not a number.
+
+
+def superMean(mList: list, default=0):
+    if len(mList) == 0:
+        return default
     return np.mean(mList)
 
-def superMax(mList:list,default=0):
-    if len(mList) == 0: return default
+
+def superMax(mList: list, default=0):
+    if len(mList) == 0:
+        return default
     return max(mList)
 
-def superMin(mList:list,default=0):
-    if len(mList) == 0: return default
+
+def superMin(mList: list, default=0):
+    if len(mList) == 0:
+        return default
     return min(mList)
+
 
 def uniq(mList, ordered=True, random=False):
     if ordered:
@@ -25,15 +59,18 @@ def uniq(mList, ordered=True, random=False):
         result = list(set(mList))
     if random:
         import random
+
         random.shuffle(result)
     return result
+
 
 def get1DArrayEMA(mArray, N=5):
     weights = np.exp(np.linspace(0, 1, N))
     weights = weights / np.sum(weights)
     ema = np.convolve(weights, mArray, mode="valid")
     return ema
-    
+
+
 def Kalman1D(observations, damping=0.2):
     # To return the smoothed time series data
     observation_covariance = damping
@@ -50,6 +87,8 @@ def Kalman1D(observations, damping=0.2):
     )
     pred_state, state_cov = kf.smooth(observations)
     return pred_state
+
+
 def getContinualNonSympyMergeResult(inputMSetCandidates):
     # basically the same example.
     # assume no overlapping here.
@@ -212,13 +251,14 @@ def getContinualMappedNonSympyMergeResultWithRangedEmpty(
     for key in newRangesDict.keys():
         mergedEmptySetName = "{}{}".format(concatSymbol, emptySetName)
         if mergedEmptySetName in key:
-            newKey = key.replace(mergedEmptySetName,"")
-            finalNewRangesDict.update({newKey:newRangesDict[key]})
+            newKey = key.replace(mergedEmptySetName, "")
+            finalNewRangesDict.update({newKey: newRangesDict[key]})
         elif key == emptySetName:
-            finalNewRangesDict.update({'empty':newRangesDict[key]})
+            finalNewRangesDict.update({"empty": newRangesDict[key]})
         else:
-            finalNewRangesDict.update({key:newRangesDict[key]})
+            finalNewRangesDict.update({key: newRangesDict[key]})
     return finalNewRangesDict
+
 
 def mergedRangesToSequential(renderDict):
     renderList = []
@@ -236,14 +276,19 @@ def mergedRangesToSequential(renderDict):
     # so this is arranged as such:
     # [(renderCommandString, commandTimeSpan), ...]
 
+
 def sequentialToMergedRanges(sequence):
     mergedRanges = {}
     for commandString, commandTimeSpan in sequence:
-        mergedRanges.update({commandString: mergedRanges.get(commandString,[])+[commandTimeSpan]})
+        mergedRanges.update(
+            {commandString: mergedRanges.get(commandString, []) + [commandTimeSpan]}
+        )
     mergedRanges = getContinualMappedNonSympyMergeResult(mergedRanges)
     return mergedRanges
 
+
 import bezier
+
 
 def bezierCurve(start=(0, 0), end=(1, 1), skew=0):
     # skew: (-0.5,0.5) otherwise this shit will look ugly.
@@ -294,26 +339,30 @@ def multiParameterExponentialNetwork(
             value += (1 - value) * evaluate_function(apply_item, curve, curve_params)
     return value
 
-def getCursorOfMaxAverageInWindow(referenceData, windowSize, dataDuration, superSampleRate=8):
-    assert windowSize<dataDuration
+
+def getCursorOfMaxAverageInWindow(
+    referenceData, windowSize, dataDuration, superSampleRate=8
+):
+    assert windowSize < dataDuration
     # we supersample this reference data?
     fp = referenceData
-    xp = np.linspace(0,dataDuration, len(fp))
-    interpolated_xp = np.linspace(0, dataDuration, len(fp)*superSampleRate)
+    xp = np.linspace(0, dataDuration, len(fp))
+    interpolated_xp = np.linspace(0, dataDuration, len(fp) * superSampleRate)
     fp = np.array(fp)
     interpolated_fp = []
     for x in interpolated_xp:
         interpolated_value = np.interp(x, xp, fp)
         interpolated_fp.append(interpolated_value)
-    
+
     interpolated_fp = np.array(interpolated_fp)
     moving_sum_span = 0
     for index, value in enumerate(interpolated_xp):
-        if value - windowSize >=0: break
+        if value - windowSize >= 0:
+            break
         moving_sum_span = index
-    moving_sum_span +=1
-    moving_sum = np.convolve(interpolated_fp, np.ones(moving_sum_span),'valid')
+    moving_sum_span += 1
+    moving_sum = np.convolve(interpolated_fp, np.ones(moving_sum_span), "valid")
     max_index = np.argmax(moving_sum)
     cursor = interpolated_fp[max_index]
-    cursor = min(dataDuration-windowSize,cursor)
+    cursor = min(dataDuration - windowSize, cursor)
     return cursor

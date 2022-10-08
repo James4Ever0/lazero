@@ -1,0 +1,1 @@
+lazero -i /root/Desktop/works/notes_ssh_keys/notes
