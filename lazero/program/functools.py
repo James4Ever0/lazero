@@ -3,7 +3,7 @@
 # print('NAME', __name__)
 # # lazero.program.functools
 # def someFunction():
-#     print('NAME',__name__)
+#     print('NAME', __name__)
 # lazero.program.functools
 # it is the same!
 # what about let's call it elsewhere?
