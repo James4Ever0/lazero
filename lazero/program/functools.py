@@ -159,7 +159,7 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
         mBlocks = []
         current_block = lines[0]
         lines = lines + [""]
-        keywords = [" ", "def", "async def", "with", "async with","class", "@"]
+        keywords = [" ", "def", "async", "with", "async with","class", "@"]
         # keywords = [" ", "def", "async def", "with", "async with","class", "@"]
         for line in lines[1:]:
             if sum([line.startswith(keyword) for keyword in keywords]):
