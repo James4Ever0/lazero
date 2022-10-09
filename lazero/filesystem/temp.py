@@ -3,6 +3,7 @@ import os
 import shutil
 import uuid
 
+
 class tmpdir(AbstractContextManager):
     """Context manager to suppress specified exceptions
 
@@ -42,14 +43,16 @@ class tmpdir(AbstractContextManager):
                 shutil.rmtree(tempdir)
         return False
 
+
 class tmpfile(AbstractContextManager):
-    def __init__(self, path=None,replace =False):
+    def __init__(self, path=None, replace=False):
         assert type(path) == str
         if not os.path.isabs(path):
             path = os.path.abspath(path)
         if os.path.exists(path):
             if replace:
                 import shutil
+
                 if os.path.isdir(path):
                     shutil.rmtree(path)
                 else:
@@ -58,11 +61,13 @@ class tmpfile(AbstractContextManager):
                 raise Exception("file %s already exists" % path)
         self._tmpdir = os.path.dirname(path)
         self._filepath = path
+
     def __enter__(self):
         print("allocating temporary directory: %s" % self._tmpdir)
         if not os.path.exists(self._tmpdir):
             os.makedirs(self._tmpdir)
         return self._filepath
+
     def __exit__(self, exctype, excinst, exctb):
         # try not to handle exceptions?
         tempdir = self._tmpdir
@@ -83,8 +88,6 @@ class tmpfile(AbstractContextManager):
 
 def getRandomFileNameUnderTempDirectoryWithExtension(extension, tempdir):
     while True:
-    filepath = os.path.join(
-            tempdir, ".".join([str(uuid.uuid4()), extension])
-        )
-        if os.path.exists(filepath):
+        filepath = os.path.join(tempdir, ".".join([str(uuid.uuid4()), extension]))
+        if not os.path.exists(filepath):
             return filepath
