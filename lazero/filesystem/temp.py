@@ -1,6 +1,7 @@
 from contextlib import AbstractContextManager
 import os
 import shutil
+import uuid
 
 class tmpdir(AbstractContextManager):
     """Context manager to suppress specified exceptions
