@@ -1,0 +1,1 @@
+def readFile(filename, encoding='utf-8')
