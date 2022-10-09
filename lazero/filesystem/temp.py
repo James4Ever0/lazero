@@ -86,7 +86,7 @@ class tmpfile(AbstractContextManager):
         return False
 
 
-def getRandomFileNameUnderTempDirectoryWithExtension(extension, tempdir):
+def getRandomFileNameUnderDirectoryWithExtension(extension, tempdir):
     while True:
         filepath = os.path.join(tempdir, ".".join([str(uuid.uuid4()), extension]))
         if not os.path.exists(filepath):
