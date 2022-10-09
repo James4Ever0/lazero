@@ -284,6 +284,7 @@ def skipExceptionDebug(func):
 from lazero.filesystem.temp import tmpdir
 from typing import Union
 from contextlib import nullcontext
+from types import GeneratorType
 
 
 def iterateWithTempDirectory(tempdir: Union[str, None] = None):
@@ -295,8 +296,11 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None):
 
     def inner(func):
         def wrapper(
-            generatorMaybe, iterate=False, **kwargs
+            generatorMaybe, iterate: Literal[False, True, "auto"] = False, **kwargs
         ):  # this wrapper will void function input signatures maybe? anyway let's do it!
+            if iterate == "auto":
+                iterate = type(generatorMaybe) == GeneratorType
+
             def iterator(generatorMaybe, **kwargs):
                 with contextManager:
                     for elem in generatorMaybe:
