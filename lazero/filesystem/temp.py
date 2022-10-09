@@ -95,7 +95,7 @@ def getRandomFileNameUnderDirectoryWithExtension(extension: str, directory: str)
         if not os.path.exists(filepath):
             return filepath
 
-def iterateWithTempDirectory(tempdir:Union[str, None]):
+def iterateWithTempDirectory(tempdir:Union[str, None]=None):
     # iterate is some added keyword.
     def inner(func):
         def wrapper(iterate=False): # this wrapper will void function input signatures maybe? anyway let's do it!
