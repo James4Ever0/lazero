@@ -1,4 +1,5 @@
 from contextlib import AbstractContextManager
+from ctypes import Union
 import os
 import shutil
 import uuid
@@ -93,3 +94,6 @@ def getRandomFileNameUnderDirectoryWithExtension(extension: str, directory: str)
         filepath = os.path.join(directory, ".".join([str(uuid.uuid4()), extension]))
         if not os.path.exists(filepath):
             return filepath
+
+def iterateWithTempDirectory(tempdir:Union[str, None]):
+    
