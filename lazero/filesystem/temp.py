@@ -79,6 +79,7 @@ class tmpfile(AbstractContextManager):
                     shutil.rmtree(tempdir)
         return False
 
-getRandomFileName = lambda extension: os.path.join(
+
+getRandomFileNameUnderTempDir = lambda extension: os.path.join(
             tempdir, ".".join([str(uuid.uuid4()), extension])
         )
