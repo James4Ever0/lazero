@@ -102,6 +102,7 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None):
         contextManager = nullcontext()
     else:
         contextManager = tmpdir(tempdir)
+
     def inner(func):
         def wrapper(
             generatorMaybe, iterate=False, **kwargs
