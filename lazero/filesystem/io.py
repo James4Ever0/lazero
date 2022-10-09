@@ -10,6 +10,6 @@ def readFileBinary(filename):
     with open(filename,'rb') as f:
         return f.read()
 
-def writeFileBinary(filename, contenencoding='utf-8'):
+def writeFileBinary(filename, content, mode=):
     with open(filename, 'wb+') as f:
         f.write(content)
