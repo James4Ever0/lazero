@@ -114,7 +114,7 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None):
             if iterate:
                 return iterator(generatorMaybe, **kwargs)
             else:
-                with tmpdir(tempdir):
+                with contextManager:
                     return func(generatorMaybe, **kwargs)
 
         return wrapper
