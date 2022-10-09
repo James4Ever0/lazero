@@ -284,7 +284,7 @@ def skipExceptionDebug(func):
 from lazero.filesystem.temp import tmpdir
 from typing import Union
 from contextlib import nullcontext
-
+from types import GeneratorType
 
 def iterateWithTempDirectory(tempdir: Union[str, None] = None):
     # iterate is some added keyword.
