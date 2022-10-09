@@ -281,3 +281,29 @@ def skipExceptionDebug(func):
 
 
 # breakpoint()
+
+def iterateWithTempDirectory(tempdir: Union[str, None] = None):
+    # iterate is some added keyword.
+    if tempdir is None:
+        contextManager = nullcontext()
+    else:
+        contextManager = tmpdir(tempdir)
+
+    def inner(func):
+        def wrapper(
+            generatorMaybe, iterate=False, **kwargs
+        ):  # this wrapper will void function input signatures maybe? anyway let's do it!
+            def iterator(generatorMaybe, **kwargs):
+                with contextManager:
+                    for elem in generatorMaybe:
+                        yield func(elem, **kwargs)
+
+            if iterate:
+                return iterator(generatorMaybe, **kwargs)
+            else:
+                with contextManager:
+                    return func(generatorMaybe, **kwargs)
+
+        return wrapper
+
+    return inner
