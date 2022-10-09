@@ -1,0 +1,2 @@
+[console_scripts]
+lazero = lazero.__main__:main
