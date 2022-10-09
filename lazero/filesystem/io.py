@@ -19,6 +19,7 @@ def writeFileBinary(filename, content, mode="wb+"):
 
 import pickle
 import dill
+from typing import Literal
 backends = {'pickle': pickle, 'dill': dill}
 def readPythonObjectFromFile(filename, backend=''):
     data = readFileBinary(filename)
