@@ -101,7 +101,7 @@ def iterateWithTempDirectory(tempdir:Union[str, None]=None):
         def wrapper(generatorMaybe,iterate=False,**kwargs): # this wrapper will void function input signatures maybe? anyway let's do it!
             def iterator(generatorMaybe, **kwargs):
                 for elem in generatorMaybe:
-                    yield func(elem,)
+                    yield func(elem,**kwargs)
             if iterate:
                 
             return func
