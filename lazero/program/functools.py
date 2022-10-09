@@ -295,8 +295,8 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None):
         contextManager = tmpdir(tempdir)
 
     def inner(func):
-        def wrapper( # default to be auto.
-            generatorMaybe, iterate: Literal[False, True, "auto"] = 'auto', **kwargs
+        def wrapper(  # default to be auto. otherwise why you use this?
+            generatorMaybe, iterate: Literal[False, True, "auto"] = "auto", **kwargs
         ):  # this wrapper will void function input signatures maybe? anyway let's do it!
             if iterate == "auto":
                 iterate = type(generatorMaybe) == GeneratorType
