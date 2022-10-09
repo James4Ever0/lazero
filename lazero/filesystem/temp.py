@@ -86,7 +86,7 @@ class tmpfile(AbstractContextManager):
         return False
 
 
-def getRandomFileNameUnderDirectoryWithExtension(extension, directory):
+def getRandomFileNameUnderDirectoryWithExtension(extension:str, directory:str):
     assert os.path.exists(directory)
     assert os.path.isdir(directory)
     while True:
