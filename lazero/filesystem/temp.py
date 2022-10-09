@@ -103,7 +103,7 @@ def iterateWithTempDirectory(tempdir:Union[str, None]=None):
                 for elem in generatorMaybe:
                     yield func(elem,**kwargs)
             if iterate:
-                return iterator(generator)
+                return iterator(generatorMaybe,)
             return func
     
     return inner
