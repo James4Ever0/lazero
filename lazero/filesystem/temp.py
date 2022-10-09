@@ -86,4 +86,5 @@ def getRandomFileNameUnderTempDirectoryWithExtension(extension, tempdir):
     filepath = os.path.join(
             tempdir, ".".join([str(uuid.uuid4()), extension])
         )
-        if os.path.exists(filepath)
+        if os.path.exists(filepath):
+            return filepath
