@@ -8,7 +8,7 @@ async def get(url, processor=lambda x: x, params={}):
     async with aiohttp.ClientSession() as session:
         async with session.get(url, params=params) as response:
             try:
-                result = await processor(response)
+                result = await result
             return result
 
 from lazero.program.functools import pickledFunction
