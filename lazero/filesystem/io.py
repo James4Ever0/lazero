@@ -1,5 +1,5 @@
-def readFile(filename, encoding='utf-8', mode=):
-    with open(filename, 'r+',encoding=encoding) as f:
+def readFile(filename, encoding='utf-8', mode='r+'):
+    with open(filename, mode,encoding=encoding) as f:
         return f.read()
 
 def writeFile(filename, content, encoding='utf-8', mode=):
