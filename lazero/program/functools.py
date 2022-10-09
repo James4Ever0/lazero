@@ -287,7 +287,7 @@ from contextlib import nullcontext
 from types import GeneratorType
 
 # generators create generators. that's it.
-def iterateGeneratorWithTempDirectory(tempdir: Union[str, None] = None):
+def iterateWithTempDirectory(tempdir: Union[str, None] = None):
     # iterate is some added keyword.
     if tempdir is None:
         contextManager = lambda: nullcontext()
