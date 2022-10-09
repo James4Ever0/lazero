@@ -299,7 +299,7 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None, target=):
             generatorMaybe, iterate: Literal[False, True, "auto"] = "auto", **kwargs
         ):  # this wrapper will void function input signatures maybe? anyway let's do it!
             if iterate == "auto":
-                iterate = type(generatorMaybe) == GeneratorType
+                iterate = type(generatorMaybe) == type
 
             def iterator(generatorMaybe, **kwargs):
                 for elem in generatorMaybe:
