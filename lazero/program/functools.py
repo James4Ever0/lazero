@@ -309,7 +309,7 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None):
             if iterate:
                 return iterator(generatorMaybe, **kwargs)
             else:
-                with contextManager:
+                with contextManager():
                     return func(generatorMaybe, **kwargs)
 
         return wrapper
