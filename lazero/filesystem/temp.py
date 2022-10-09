@@ -104,6 +104,8 @@ def iterateWithTempDirectory(tempdir:Union[str, None]=None):
                     yield func(elem,**kwargs)
             if iterate:
                 return iterator(generatorMaybe,**kwargs)
+            else:
+                with tmpdir
             return func
     
     return inner
