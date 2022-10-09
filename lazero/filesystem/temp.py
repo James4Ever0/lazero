@@ -1,4 +1,4 @@
-from contextlib import AbstractContextManager
+from contextlib import nullcontext
 from ctypes import Union
 import os
 import shutil
