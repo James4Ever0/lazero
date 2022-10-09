@@ -3,4 +3,5 @@ def readFile(filename, encoding='utf-8'):
         return f.read()
 
 def writeFile(filename, content, encoding='utf-8'):
-    with open(filename, encoding='encoding) as f:
+    with open(filename, encoding=encoding) as f:
+        f.write(content)
