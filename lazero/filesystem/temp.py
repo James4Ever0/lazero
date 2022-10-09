@@ -1,5 +1,5 @@
 from contextlib import nullcontext
-from ctypes import Union
+from typing import Union
 import os
 import shutil
 import uuid
