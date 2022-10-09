@@ -290,9 +290,9 @@ from types import GeneratorType
 def iterateWithTempDirectory(tempdir: Union[str, None] = None):
     # iterate is some added keyword.
     if tempdir is None:
-        contextManager = nullcontext()
+        contextManager = lambda:nullcontext()
     else:
-        contextManager = tmpdir(tempdir)
+        contextManager = lambda:tmpdir(tempdir)
 
     def inner(func):
         def wrapper(  # default to be auto. otherwise why you use this?
