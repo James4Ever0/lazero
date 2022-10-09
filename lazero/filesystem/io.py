@@ -21,4 +21,5 @@ import pickle
 import dill
 
 def readPythonObjectFromFile(filename):
-    data = 
+    data = readFileBinary(filename)
+    return pickle.loads(data)
