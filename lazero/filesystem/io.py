@@ -26,5 +26,5 @@ def readPythonObjectFromFile(filename, backend:Literal['pickle', 'dill']='dill')
     return backends[backend].loads(data)
 
 def readPythonObjectToFile(filename, pythonObject, backend:Literal['pickle', 'dill']='dill'):
-    data = 
-    return backends[backend].dumps(pythonObject)
+    data = backends[backend].dumps(pythonObject)
+    
