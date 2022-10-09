@@ -5,7 +5,7 @@ from lazero.network.asyncio import concurrentGet
 url = "http://127.0.0.1:8932"
 urlList = [url]*10
 
-result = concurrentGet(urlList) # unable to load the raw thing.
+# result = concurrentGet(urlList) # unable to load the raw thing. we can see that.
 # result = concurrentGet(urlList, processor = lambda x: dir(x))
 print(result)
 # object ClientResponse can't be used in 'await' expression
