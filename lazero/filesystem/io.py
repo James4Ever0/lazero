@@ -6,8 +6,8 @@ def writeFile(filename, content, encoding='utf-8'):
     with open(filename, 'w+',encoding=encoding) as f:
         f.write(content)
 
-def readFileBinary(filename, encoding='utf-8'):
-    with open(filename, encoding=encoding) as f:
+def readFileBinary(filename):
+    with open(filename,'rb') as f:
         return f.read()
 
 def writeFileBinary(filename, content, encoding='utf-8'):
