@@ -21,6 +21,6 @@ import pickle
 import dill
 from typing import Literal
 backends = {'pickle': pickle, 'dill': dill}
-def readPythonObjectFromFile(filename, backend:Literal['pickle', 'dill']=''):
+def readPythonObjectFromFile(filename, backend:Literal['pickle', 'dill']='dill'):
     data = readFileBinary(filename)
-    return pickle.loads(data)
+    return backends[backend].loads(data)
