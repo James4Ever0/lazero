@@ -1,2 +1,2 @@
 from test_commons import *
-from lazero.network.
+from lazero.network.asyncio.
