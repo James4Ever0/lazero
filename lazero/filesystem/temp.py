@@ -98,7 +98,7 @@ def getRandomFileNameUnderDirectoryWithExtension(extension: str, directory: str)
 def iterateWithTempDirectory(tempdir:Union[str, None]):
     # iterate is some added keyword.
     def inner(func):
-        def wrapper(iterate=False): # this wrapper will void warranty.
+        def wrapper(iterate=False): # this wrapper will void warranty. anyway let's do it!
             return func
     
     return inner
