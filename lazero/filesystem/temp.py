@@ -95,17 +95,25 @@ def getRandomFileNameUnderDirectoryWithExtension(extension: str, directory: str)
         if not os.path.exists(filepath):
             return filepath
 
-def iterateWithTempDirectory(tempdir:Union[str, None]=None):
+
+def iterateWithTempDirectory(tempdir: Union[str, None] = None):
     # iterate is some added keyword.
+    contextManager = 
     def inner(func):
-        def wrapper(generatorMaybe,iterate=False,**kwargs): # this wrapper will void function input signatures maybe? anyway let's do it!
+        def wrapper(
+            generatorMaybe, iterate=False, **kwargs
+        ):  # this wrapper will void function input signatures maybe? anyway let's do it!
             def iterator(generatorMaybe, **kwargs):
-                for elem in generatorMaybe:
-                    yield func(elem,**kwargs)
+                with tmpdir(tempdir):
+                    for elem in generatorMaybe:
+                        yield func(elem, **kwargs)
+
             if iterate:
-                return iterator(generatorMaybe,**kwargs)
+                return iterator(generatorMaybe, **kwargs)
             else:
-                with tmpdir
-            return func
-    
+                with tmpdir(tempdir):
+                    return func(generatorMaybe, **kwargs)
+
+        return wrapper
+
     return inner
