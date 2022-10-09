@@ -99,6 +99,6 @@ def iterateWithTempDirectory(tempdir:Union[str, None]):
     # iterate is some added keyword.
     def inner(func):
         def wrapper():
-            
+            return func
     
     return inner
