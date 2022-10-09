@@ -96,4 +96,7 @@ def getRandomFileNameUnderDirectoryWithExtension(extension: str, directory: str)
             return filepath
 
 def iterateWithTempDirectory(tempdir:Union[str, None]):
+    # iterate is some added keyword.
+    def inner(func):
     
+    return inner
