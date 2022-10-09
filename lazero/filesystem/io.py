@@ -27,4 +27,4 @@ def readPythonObjectFromFile(filename, backend:Literal['pickle', 'dill']='dill')
 
 def writePythonObjectToFile(filename, pythonObject, backend:Literal['pickle', 'dill']='dill'):
     data = backends[backend].dumps(pythonObject)
-    eadFileBinary(filename,data)
+    writeFileBinary(filename,data)
