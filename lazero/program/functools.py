@@ -287,7 +287,7 @@ from contextlib import nullcontext
 from types import GeneratorType
 
 # generators create generators. that's it.
-def iterateWithTempDirectory(tempdir: Union[str, None] = None, target=):
+def iterateWithTempDirectory(tempdir: Union[str, None] = None, target=GeneratorType):
     # iterate is some added keyword.
     if tempdir is None:
         contextManager = lambda: nullcontext()
@@ -299,7 +299,7 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None, target=):
             generatorMaybe, iterate: Literal[False, True, "auto"] = "auto", **kwargs
         ):  # this wrapper will void function input signatures maybe? anyway let's do it!
             if iterate == "auto":
-                iterate = type(generatorMaybe) == type
+                iterate = type(generatorMaybe) == targetType
 
             def iterator(generatorMaybe, **kwargs):
                 for elem in generatorMaybe:
