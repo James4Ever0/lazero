@@ -98,8 +98,12 @@ def getRandomFileNameUnderDirectoryWithExtension(extension: str, directory: str)
 def iterateWithTempDirectory(tempdir:Union[str, None]=None):
     # iterate is some added keyword.
     def inner(func):
-        def wrapper(*args,iterate=False,**kwargs): # this wrapper will void function input signatures maybe? anyway let's do it!
+        def wrapper(generatorMaybe,iterate=False,**kwargs): # this wrapper will void function input signatures maybe? anyway let's do it!
+            def iterator(generatorMaybe, **kwargs):
+                for elem in generatorMaybe:
+                    yield func(elem,)
             if iterate:
+                
             return func
     
     return inner
