@@ -13,7 +13,7 @@ def readFileBinary(filename, mode="rb"):
         return f.read()
 
 
-def writeFileBinary(filename, content, mode="wb+"):
+def writeFileBinary(filename, content, mode="wb"):
     with open(filename, mode) as f:
         f.write(content)
 
