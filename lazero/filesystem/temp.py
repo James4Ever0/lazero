@@ -99,7 +99,7 @@ def getRandomFileNameUnderDirectoryWithExtension(extension: str, directory: str)
 def iterateWithTempDirectory(tempdir: Union[str, None] = None):
     # iterate is some added keyword.
     if tempdir is None:
-        contextManager = 
+        contextManager = AbstractContextManager()
     contextManager = 
     def inner(func):
         def wrapper(
