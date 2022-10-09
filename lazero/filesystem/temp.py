@@ -80,7 +80,7 @@ class tmpfile(AbstractContextManager):
         return False
 
 
-def getRandomFileNameUnderTempDirectoryWithExtension(extension):
+def getRandomFileNameUnderTempDirectoryWithExtension(extension, tempdir):
     return os.path.join(
             tempdir, ".".join([str(uuid.uuid4()), extension])
         )
