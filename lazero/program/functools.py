@@ -302,8 +302,8 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None):
                 iterate = type(generatorMaybe) == GeneratorType
 
             def iterator(generatorMaybe, **kwargs):
-                    for elem in generatorMaybe:
-                with contextManager:
+                for elem in generatorMaybe:
+                    with contextManager():
                         yield func(elem, **kwargs)
 
             if iterate:
