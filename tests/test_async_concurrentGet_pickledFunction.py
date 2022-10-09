@@ -7,3 +7,4 @@ urlList = [url]*10
 
 result = concurrentGet(urlList)
 print(result)
+# object ClientResponse can't be used in 'await' expression
