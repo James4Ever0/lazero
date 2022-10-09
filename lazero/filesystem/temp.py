@@ -99,6 +99,7 @@ def iterateWithTempDirectory(tempdir:Union[str, None]=None):
     # iterate is some added keyword.
     def inner(func):
         def wrapper(*args,iterate=False,**kwargs): # this wrapper will void function input signatures maybe? anyway let's do it!
+            if iterate:
             return func
     
     return inner
