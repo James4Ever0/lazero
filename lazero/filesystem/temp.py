@@ -101,13 +101,13 @@ def iterateWithTempDirectory(tempdir: Union[str, None] = None):
     if tempdir is None:
         contextManager = nullcontext()
     else:
-        contextManager = 
+        contextManager = tmpdir(tempdir)
     def inner(func):
         def wrapper(
             generatorMaybe, iterate=False, **kwargs
         ):  # this wrapper will void function input signatures maybe? anyway let's do it!
             def iterator(generatorMaybe, **kwargs):
-                with :
+                with contextManager:
                     for elem in generatorMaybe:
                         yield func(elem, **kwargs)
 
