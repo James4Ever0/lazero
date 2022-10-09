@@ -11,5 +11,5 @@ def readFileBinary(filename):
         return f.read()
 
 def writeFileBinary(filename, content, encoding='utf-8'):
-    with open(filename, encoding=encoding) as f:
+    with open(filename, 'wb+') as f:
         f.write(content)
