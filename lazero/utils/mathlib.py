@@ -1,6 +1,21 @@
 # not overriding math.
 # do some ranged stuff here...
 
+def getTruncatedNormalDistribution(std, mean, start, end, evaluate=False):
+
+    # std, mean = gaussian_args["std"], gaussian_args["mean"]
+    scale, loc = std, mean
+    myclip_a, myclip_b = mintime, maxtime
+    from scipy.stats import truncnorm
+
+    a, b = (myclip_a - loc) / scale, (myclip_b - loc) / scale
+    randVar = truncnorm(a, b)
+    randomFunction = lambda: randVar.rvs(1)[0] * scale + loc
+    if evaluate:
+        return randomFunction()
+    return randomFunction
+
+
 from pykalman import KalmanFilter
 import numpy as np
 
