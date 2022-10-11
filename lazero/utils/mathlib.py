@@ -1,11 +1,14 @@
 # not overriding math.
 # do some ranged stuff here...
 
+
 def getTruncatedNormalDistribution(std, mean, start, end, evaluate=False):
 
     # std, mean = gaussian_args["std"], gaussian_args["mean"]
+    assert start < end
+    assert std > 0
     scale, loc = std, mean
-    myclip_a, myclip_b = mintime, maxtime
+    myclip_a, myclip_b = start, end
     from scipy.stats import truncnorm
 
     a, b = (myclip_a - loc) / scale, (myclip_b - loc) / scale
