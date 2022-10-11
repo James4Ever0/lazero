@@ -87,12 +87,15 @@ class tmpfile(AbstractContextManager):
         return False
 
 
-def getRandomFileNameUnderDirectoryWithExtension(extension: str, directory: str, check: bool=True):
+def getRandomFileNameUnderDirectoryWithExtension(
+    extension: str, directory: str, check: bool = True
+):
+    extension = extension.split(".")[-1]
     if check:
+        assert len(extension) > 0
         assert os.path.exists(directory)
         assert os.path.isdir(directory)
     while True:
         filepath = os.path.join(directory, ".".join([str(uuid.uuid4()), extension]))
         if not os.path.exists(filepath):
             return filepath
-
