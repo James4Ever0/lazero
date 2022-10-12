@@ -128,7 +128,9 @@ from contextlib import suppress
 import traceback
 
 
-def skipException(func, debug_flag=False, breakpoint_flag=False):
+def skipException(
+    func, debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3
+):
     def space_counter(line):
         counter = 0
         for x in line:
@@ -281,6 +283,7 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
         newLines = [line[minIndent:] for line in actualCode]
         codeBlocks = getCodeBlocks(newLines)
         for block in codeBlocks:
+            no_exception = False
             if debug_flag:
                 print("##########CODEBLOCK##########")
                 print(block)
@@ -288,13 +291,21 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
             if not debug_flag:
                 with suppress(Exception):
                     exec(block)
+                    no_exception = True
             else:
                 try:
                     exec(block)
+                    no_exception = True
                 except:
                     traceback.print_exc()
                     if breakpoint_flag:
                         breakpoint()
+            if not no_exception:
+                print("##########DELAY AFTER EXCEPTION##########")
+                import time
+
+                time.sleep(delayAfterException)
+                print("##########DELAY AFTER EXCEPTION##########")
         if debug_flag:
             print("########## FUNCTION #########")
 
