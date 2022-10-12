@@ -129,7 +129,7 @@ import traceback
 
 
 def skipException(
-    debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3
+    debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3, defaultReturn=None
 ):
     def wrapper(func):
         def space_counter(line):
@@ -309,7 +309,7 @@ def skipException(
                     print("##########DELAY AFTER EXCEPTION##########")
             if debug_flag:
                 print("########## FUNCTION #########")
-
+            return defaultReturn
         return new_func
     return wrapper
 
