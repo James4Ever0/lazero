@@ -212,7 +212,7 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
         func_name = func.__name__
         func_code = dill.source.getsource(func)
         # reformat the func code via our dearly autopep8-black formatter.
-        func_code = reformatCode(func_code)
+        func_code = reformatCode(func_code, debug=debug_flag)
         if debug_flag:
             print("########## FUNCTION CODE #########")
             print(
