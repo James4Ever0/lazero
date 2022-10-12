@@ -292,13 +292,21 @@ def skipException(
                     print("##########CODEBLOCK##########")
                     print(block)
                     print("##########CODEBLOCK##########")
-                if not debug_flag:
+                if block.startswith('return '):
+                    returnName = "var_"+str(uuid.uuid4()).replace("-",'_')
+                    block = "{} = {}".format(returnName,block[len('return '):])
+                    exec(block)
+                    value = locals().get(returnName)
+                    return value
+                elif block == "return":
+                    return
+                elif not debug_flag:
                     with suppress(Exception):
                         exec(block)
                         no_exception = True
                 else:
                     try:
-                        exec(block)
+                        exec(block) #return outside of function?
                         no_exception = True
                     except:
                         traceback.print_exc()
