@@ -128,7 +128,9 @@ from contextlib import suppress
 import traceback
 
 
-def skipException(func, debug_flag=False, breakpoint_flag=False):
+def skipException(
+    func, debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3
+):
     def space_counter(line):
         counter = 0
         for x in line:
@@ -177,9 +179,42 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
         splited_code = splited_code.split("\n")
         return splited_code
 
+    def reformatCode(func_code, MAXINT=10000000000, debug=False):
+        # with open("test.py", "r") as f:
+        code = func_code
+
+        # need binary data.
+        code_encoded = code.encode("utf-8")
+
+        import subprocess
+
+        command = (
+            "autopep8 --max-line-length {MAXINT} - | black -l {MAXINT} -C -".format(
+                MAXINT=MAXINT
+            )
+        )
+        commandLine = ["bash", "-c", command]
+        result = subprocess.run(commandLine, input=code_encoded, capture_output=True)
+        try:
+            assert result.returncode == 0
+            code_formatted = result.stdout.decode("utf-8")
+        except:
+            if debug:
+                import traceback
+
+                traceback.print_exc()
+                print("STDOUT", result.stdout)
+                print("STDERR", result.stderr)
+            code_formatted = code
+        if debug:
+            print(code_formatted)
+        return code_formatted
+
     def new_func(*args, **kwargs):
         func_name = func.__name__
         func_code = dill.source.getsource(func)
+        # reformat the func code via our dearly autopep8-black formatter.
+        func_code = reformatCode(func_code, debug=debug_flag)
         if debug_flag:
             print("########## FUNCTION CODE #########")
             print(
@@ -248,6 +283,7 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
         newLines = [line[minIndent:] for line in actualCode]
         codeBlocks = getCodeBlocks(newLines)
         for block in codeBlocks:
+            no_exception = False
             if debug_flag:
                 print("##########CODEBLOCK##########")
                 print(block)
@@ -255,13 +291,21 @@ def skipException(func, debug_flag=False, breakpoint_flag=False):
             if not debug_flag:
                 with suppress(Exception):
                     exec(block)
+                    no_exception = True
             else:
                 try:
                     exec(block)
+                    no_exception = True
                 except:
                     traceback.print_exc()
                     if breakpoint_flag:
                         breakpoint()
+            if not no_exception:
+                print("##########DELAY AFTER EXCEPTION##########")
+                import time
+
+                time.sleep(delayAfterException)
+                print("##########DELAY AFTER EXCEPTION##########")
         if debug_flag:
             print("########## FUNCTION #########")
 
