@@ -129,9 +129,10 @@ import traceback
 
 
 def skipException(
-    debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3, defaultReturn=None
+    debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3, defaultReturn=None, global_variables:dict={}, local_variables:dict={}
 ):
     def wrapper(func):
+        myExec = lambda command: exec(command, globals()|global_variables, locals()|local_variables) # new way of merging dicts in python 3.9, more 'functional'?
         def space_counter(line):
             counter = 0
             for x in line:
@@ -271,10 +272,10 @@ def skipException(
             assert len(args) == len(mfunctionArgs)
 
             for key, value in zip(mfunctionArgs, args):
-                exec("{} = {}".format(key, value))
+                myExec("{} = {}".format(key, value))
             if kwdefaults is not None:
                 for key, value in pass_kwargs.items():
-                    exec("{} = {}".format(key, value))
+                    myExec("{} = {}".format(key, value))
             actualCode = splited_code[2:]
             actualCode = [x for x in actualCode if not isEmptyLine(x)]
             minIndent = min([space_counter(line) for line in actualCode])
@@ -291,11 +292,11 @@ def skipException(
                     print("##########CODEBLOCK##########")
                 if not debug_flag:
                     with suppress(Exception):
-                        exec(block)
+                        myExec(block)
                         no_exception = True
                 else:
                     try:
-                        exec(block)
+                        myExec(block)
                         no_exception = True
                     except:
                         traceback.print_exc()
