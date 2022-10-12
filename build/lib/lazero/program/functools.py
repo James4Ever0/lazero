@@ -129,9 +129,12 @@ import traceback
 
 
 def skipException(
-    debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3, defaultReturn=None
+    debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3, defaultReturn=None, global_variables:dict={}, local_variables:dict={}
 ):
     def wrapper(func):
+        globals().update(global_variables)
+        locals().update(local_variables)
+        # myExec = lambda command, myGlobals, myLocals: exec(command) # new way of merging dicts in python 3.9, more 'functional'?
         def space_counter(line):
             counter = 0
             for x in line:
@@ -289,13 +292,21 @@ def skipException(
                     print("##########CODEBLOCK##########")
                     print(block)
                     print("##########CODEBLOCK##########")
-                if not debug_flag:
+                if block.startswith('return '):
+                    returnName = "var_"+str(uuid.uuid4()).replace("-",'_')
+                    block = "{} = {}".format(returnName,block[len('return '):])
+                    exec(block)
+                    value = locals().get(returnName)
+                    return value
+                elif block == "return":
+                    return
+                elif not debug_flag:
                     with suppress(Exception):
                         exec(block)
                         no_exception = True
                 else:
                     try:
-                        exec(block)
+                        exec(block) #return outside of function?
                         no_exception = True
                     except:
                         traceback.print_exc()
@@ -362,4 +373,17 @@ def iterateWithTempDirectory(
 
         return wrapper
 
+    return inner
+
+
+def suppressException(showException=True, defaultReturn=None):
+    def inner(func):
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except:
+                if showException:
+                    traceback.print_exc()
+            return defaultReturn
+        return wrapper
     return inner

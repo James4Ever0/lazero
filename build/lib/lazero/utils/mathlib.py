@@ -1,7 +1,6 @@
 # not overriding math.
 # do some ranged stuff here...
 
-
 def getTruncatedNormalDistribution(std, mean, start, end, evaluate=False):
 
     # std, mean = gaussian_args["std"], gaussian_args["mean"]

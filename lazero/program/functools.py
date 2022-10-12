@@ -374,3 +374,16 @@ def iterateWithTempDirectory(
         return wrapper
 
     return inner
+
+
+def suppressException(showException=True, defaultReturn=None):
+    def inner(func):
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except:
+                if showException:
+                    traceback.print_exc()
+            return defaultReturn
+        return wrapper
+    return inner
