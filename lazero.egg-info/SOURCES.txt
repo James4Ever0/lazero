@@ -21,6 +21,7 @@ lazero/network/proxy/__init__.py
 lazero/network/proxy/clash.py
 lazero/program/__init__.py
 lazero/program/functools.py
+lazero/program/subprocess.py
 lazero/program/threading.py
 lazero/search/__init__.py
 lazero/search/api.py
