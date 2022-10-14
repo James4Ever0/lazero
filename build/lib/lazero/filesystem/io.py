@@ -35,3 +35,13 @@ def writePythonObjectToFile(
 ):
     data = backends[backend].dumps(pythonObject)
     writeFileBinary(filename, data)
+
+import json
+def writeJsonObjectToFile(filename, jsonObject, ensure_ascii=False, indent=4):
+    content = json.dumps(jsonObject, ensure_ascii=ensure_ascii, indent=indent)
+    writeFile(filename, content)
+
+def readJsonObjectFromFile(filename):
+    content = readFile(filename)
+    jsonObject = json.loads(content)
+    return jsonObject
