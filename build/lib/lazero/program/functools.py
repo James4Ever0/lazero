@@ -129,7 +129,12 @@ import traceback
 
 
 def skipException(
-    debug_flag=False, breakpoint_flag=False, delayAfterException: int = 3, defaultReturn=None, global_variables:dict={}, local_variables:dict={}
+    debug_flag=False,
+    breakpoint_flag=False,
+    delayAfterException: int = 3,
+    defaultReturn=None,
+    global_variables: dict = {},
+    local_variables: dict = {},
 ):
     def wrapper(func):
         globals().update(global_variables)
@@ -198,7 +203,9 @@ def skipException(
                 )
             )
             commandLine = ["bash", "-c", command]
-            result = subprocess.run(commandLine, input=code_encoded, capture_output=True)
+            result = subprocess.run(
+                commandLine, input=code_encoded, capture_output=True
+            )
             try:
                 assert result.returncode == 0
                 code_formatted = result.stdout.decode("utf-8")
@@ -238,7 +245,9 @@ def skipException(
             except:
                 raise Exception("Do not nesting the use of @skipException decorator")
             function_definition = splited_code[1]
-            function_args = function_definition[:-1].replace("def {}".format(func_name), "")
+            function_args = function_definition[:-1].replace(
+                "def {}".format(func_name), ""
+            )
             if debug_flag:
                 print("FUNCTION ARGS:", function_args)
             kwdefaults = func.__defaults__
@@ -266,7 +275,9 @@ def skipException(
                     pass_kwargs[key] = kwargs[key]
             else:
                 assert kwdefaults == None
-                mfunctionArgs = function_args.replace("(", "").replace(")", "").split(",")
+                mfunctionArgs = (
+                    function_args.replace("(", "").replace(")", "").split(",")
+                )
             mfunctionArgs = [x.strip() for x in mfunctionArgs]
             mfunctionArgs = [x for x in mfunctionArgs if not isEmptyLine(x)]
             if debug_flag:
@@ -292,9 +303,9 @@ def skipException(
                     print("##########CODEBLOCK##########")
                     print(block)
                     print("##########CODEBLOCK##########")
-                if block.startswith('return '):
-                    returnName = "var_"+str(uuid.uuid4()).replace("-",'_')
-                    block = "{} = {}".format(returnName,block[len('return '):])
+                if block.startswith("return "):
+                    returnName = "var_" + str(uuid.uuid4()).replace("-", "_")
+                    block = "{} = {}".format(returnName, block[len("return ") :])
                     exec(block)
                     value = locals().get(returnName)
                     return value
@@ -306,7 +317,7 @@ def skipException(
                         no_exception = True
                 else:
                     try:
-                        exec(block) #return outside of function?
+                        exec(block)  # return outside of function?
                         no_exception = True
                     except:
                         traceback.print_exc()
@@ -321,7 +332,9 @@ def skipException(
             if debug_flag:
                 print("########## FUNCTION #########")
             return defaultReturn
+
         return new_func
+
     return wrapper
 
 
@@ -376,14 +389,32 @@ def iterateWithTempDirectory(
     return inner
 
 
-def suppressException(showException=True, defaultReturn=None):
+import time
+
+
+def suppressException(
+    showException=True,
+    defaultReturn=None,
+    tries: int = 1,
+    delay: float = 3,
+    debug: bool = True,
+):
+    if tries < 1:
+        tries = 1
+
     def inner(func):
         def wrapper(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except:
-                if showException:
-                    traceback.print_exc()
+            for index in range(tries):
+                if debug:
+                    print("try times: %d" % index)
+                try:
+                    return func(*args, **kwargs)
+                except:
+                    if showException:
+                        traceback.print_exc()
+                    time.sleep(delay)
             return defaultReturn
+
         return wrapper
+
     return inner
