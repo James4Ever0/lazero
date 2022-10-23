@@ -33,7 +33,7 @@ def listFilesInDirectory(directory, debug=False):
     for filepath in filepaths:
         yield filepath
 
-from lazero.filimport getHomeDirectory
+from lazero.filesystem.env import getHomeDirectory
 
 lazeroCachePath = os.path.join(getHomeDirectory(), ".lazero")
 if not os.path.exists(lazeroCachePath):
