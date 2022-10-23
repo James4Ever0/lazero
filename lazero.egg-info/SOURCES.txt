@@ -8,6 +8,7 @@ lazero.egg-info/dependency_links.txt
 lazero.egg-info/entry_points.txt
 lazero.egg-info/top_level.txt
 lazero/filesystem/__init__.py
+lazero/filesystem/env.py
 lazero/filesystem/io.py
 lazero/filesystem/temp.py
 lazero/network/__init__.py
