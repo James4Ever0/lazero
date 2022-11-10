@@ -1,10 +1,6 @@
 from reloading import reloading
 import json
 
-@reloading
-def jsonify(jsonObj):
-    return json.loads(json.dumps(jsonObj))
-
 
 @reloading
 def jsonWalk(jsonObj, location=[]):
