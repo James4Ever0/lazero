@@ -3,6 +3,7 @@ import json
 
 # it's json-like object, not json serializable object!
 
+
 @reloading
 def jsonWalk(jsonObj, location=[]):
     # this is not tuple. better convert it first?
@@ -137,8 +138,9 @@ def jsonTupleToList(jsonObj2, copy=True):
 
 
 @reloading
-def jsonify(jsonObj, copy=True, refine=False,
-    isInstance = lambda obj: obj == ...):  # remove ellipsis
+def jsonify(
+    jsonObj, copy=True, refine=False, isInstance=lambda obj: obj == ...
+):  # remove ellipsis
     jsonObj2 = jsonTupleToList(jsonObj, copy=copy)
     jsonObj2 = jsonDeleteAllInstances(jsonObj2, isInstance, copy=copy)
     if refine:
