@@ -83,8 +83,10 @@ def jsonUpdate(jsonObj, location=[], update_content=None):
 @reloading
 def jsonify(jsonObj): # remove ellipsis
     jsonObj2 = jsonObj.copy()
+    candidates = []
     for key, value in jsonWalk(jsonObj2):
         if value == ...:
             # delete that thing! but how to delete these things once for all?
             candidates.append(key)
+    
     return json.loads(json.dumps(jsonObj2))
