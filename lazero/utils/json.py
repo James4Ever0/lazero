@@ -115,6 +115,9 @@ def jsonTupleToList(jsonObj):
     candidates = []
     for key, value in jsonWalk(jsonObj):
         if type(value) == tuple:
+            candidates.append(key)
+    for candidate in candidates:
+        
 
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
