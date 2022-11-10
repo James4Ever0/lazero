@@ -95,7 +95,7 @@ def jsonDeleteObject(jsonObj, location: list):
 import typing
 # what the fuck is going on here?
 # ImportError: cannot import name 'jsonDeleteAllinstances' from 'lazero.utils.json' (/root/Desktop/works/lazero/lazero/utils/json.py)
-
+# how to reload module actually, making from <module> import <object> work?
 
 @reloading
 def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bool]):
