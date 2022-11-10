@@ -88,7 +88,7 @@ def jsonDeleteObject(jsonObj, location: list):
         obj = obj[key]
     del obj[location[-1]]
     return jsonObj
-
+# how to reload module directly
 @reloading
 def jsonDeleteAllInstances(jsonObj, isInstance):
     jsonObj2 = jsonObj.copy()
@@ -100,7 +100,7 @@ def jsonDeleteAllInstances(jsonObj, isInstance):
     candidates.sort(key=lambda x: -x[-1] if type(x[-1]) == int else 1)
     for candidate in candidates:
         jsonObj2 = jsonDeleteObject(jsonObj, candidate)
-    return 
+    return jsonObj2
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
 
