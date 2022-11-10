@@ -1,6 +1,8 @@
 from reloading import reloading
 import json
 
+# it's json-like object, not json serializable object!
+
 
 @reloading
 def jsonWalk(jsonObj, location=[]):
@@ -93,13 +95,20 @@ def jsonDeleteObject(jsonObj, location: list):
 
 # how to reload module directly, so we can include this function as well?
 import typing
+
 # what the fuck is going on here?
 # ImportError: cannot import name 'jsonDeleteAllinstances' from 'lazero.utils.json' (/root/Desktop/works/lazero/lazero/utils/json.py)
 # how to reload module actually, making from <module> import <object> work?
 
+
 @reloading
-def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bool]):
-    jsonObj2 = jsonObj.copy()
+def jsonDeleteAllInstances(
+    jsonObj, isInstance: typing.Callable[[typing.Any], bool], copy=True
+):
+    if copy:
+        jsonObj2 = jsonObj.copy()
+    else:
+        jsonObj2 = jsonObj
     candidates = []
     for key, value in jsonWalk(jsonObj2):
         if isInstance(value):
@@ -112,7 +121,29 @@ def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bo
 
 
 @reloading
-def jsonify(jsonObj):  # remove ellipsis
-    isInstance = lambda obj: obj == ...
-    jsonObj2 = jsonDeleteAllInstances(jsonObj, isInstance)
-    return json.loads(json.dumps(jsonObj2))
+def jsonTupleToList(jsonObj2, copy=True):
+    if copy:
+        jsonObj = jsonObj2.copy()
+    else:
+        jsonObj = jsonObj2
+    candidates = []
+    for key, value in jsonWalk(jsonObj):
+        if type(value) == tuple:
+            candidates.append(key)
+    for candidate in candidates:
+        data = jsonLocate(jsonObj, candidate)
+        data = list(data)
+        jsonObj = jsonUpdate(jsonObj, candidate, data)
+    return jsonObj
+
+
+@reloading
+def jsonify(
+    jsonObj, copy=True, refine=False, isInstance=lambda obj: obj == ...
+):  # remove ellipsis
+    jsonObj2 = jsonTupleToList(jsonObj, copy=copy)
+    jsonObj2 = jsonDeleteAllInstances(jsonObj2, isInstance, copy=copy)
+    if refine:
+        return json.loads(json.dumps(jsonObj2))
+    else:
+        return jsonObj2
