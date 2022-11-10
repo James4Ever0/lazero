@@ -88,7 +88,8 @@ def jsonDeleteObject(jsonObj, location: list):
         obj = obj[key]
     del obj[location[-1]]
     return jsonObj
-# how to reload module directly
+
+# how to reload module directly?
 @reloading
 def jsonDeleteAllInstances(jsonObj, isInstance):
     jsonObj2 = jsonObj.copy()
