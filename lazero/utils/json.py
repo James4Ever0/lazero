@@ -98,7 +98,7 @@ import typing
 # how to reload module actually, making from <module> import <object> work?
 
 @reloading
-def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bool]):
+def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bool], copy=):
     jsonObj2 = jsonObj.copy()
     candidates = []
     for key, value in jsonWalk(jsonObj2):
