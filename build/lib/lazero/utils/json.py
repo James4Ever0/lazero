@@ -1,10 +1,6 @@
 from reloading import reloading
 import json
 
-@reloading
-def jsonify(jsonObj):
-    return json.loads(json.dumps(jsonObj))
-
 
 @reloading
 def jsonWalk(jsonObj, location=[]):
@@ -83,3 +79,25 @@ def jsonUpdate(jsonObj, location=[], update_content=None):
             raise Exception("Unsupported JSON update target type:", type(jsonObj))
     return update_content
 
+
+def jsonDeleteObject(jsonObj, location: list):
+    assert len(location) > 0
+    obj = jsonObj
+    for key in location[:-1]:
+        obj = obj.get(key)
+    del obj[location[-1]]
+    return jsonObj
+
+
+@reloading
+def jsonify(jsonObj):  # remove ellipsis
+    jsonObj2 = jsonObj.copy()
+    candidates = []
+    for key, value in jsonWalk(jsonObj2):
+        if value == ...:
+            # delete that thing! but how to delete these things once for all?
+            candidates.append(key)
+    candidates.sort(key=lambda x: -x[-1] if type(x[-1]) == int else 1)
+    for candidate in candidates:
+        jsonObj2 = jsonDeleteObject(jsonObj, candidate)
+    return json.loads(json.dumps(jsonObj2))
