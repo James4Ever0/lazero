@@ -1,6 +1,7 @@
 from reloading import reloading
 import json
 
+# it's json-like object, not json serializable object!
 
 @reloading
 def jsonWalk(jsonObj, location=[]):
