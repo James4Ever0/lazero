@@ -88,5 +88,5 @@ def jsonify(jsonObj): # remove ellipsis
         if value == ...:
             # delete that thing! but how to delete these things once for all?
             candidates.append(key)
-    
+    candidates.sort()
     return json.loads(json.dumps(jsonObj2))
