@@ -112,5 +112,5 @@ def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bo
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
     isInstance=lambda obj: obj==...
-    jsonObj2 = json
+    jsonObj2 = jsonDeleteAllInstances
     return json.loads(json.dumps(jsonObj2))
