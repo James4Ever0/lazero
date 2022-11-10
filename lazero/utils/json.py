@@ -92,5 +92,6 @@ def jsonify(jsonObj): # remove ellipsis
     for candidate in candidates:
         obj = jsonObj2
         for key in candidate[:-1]:
-            obj = obj.get()
+            obj = obj.get(key)
+        
     return json.loads(json.dumps(jsonObj2))
