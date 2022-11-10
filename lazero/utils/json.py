@@ -82,5 +82,6 @@ def jsonUpdate(jsonObj, location=[], update_content=None):
 
 @reloading
 def jsonify(jsonObj): # remove ellipsis
-    jsonObj = jsonObj.copy()
-    return json.loads(json.dumps(jsonObj))
+    jsonObj2 = jsonObj.copy()
+    
+    return json.loads(json.dumps(jsonObj2))
