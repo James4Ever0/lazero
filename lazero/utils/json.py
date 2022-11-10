@@ -83,7 +83,7 @@ def jsonUpdate(jsonObj, location=[], update_content=None):
 def jsonDeleteObject(jsonObj, location: list):
     assert len(location) > 0
     obj = jsonObj
-    print(location, obj)
+    # print(location, obj)
     for key in location[:-1]:
         obj = obj[key]
     del obj[location[-1]]
