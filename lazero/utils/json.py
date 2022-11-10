@@ -118,6 +118,7 @@ def jsonTupleToList(jsonObj):
             candidates.append(key)
     for candidate in candidates:
         data = 
+        data = list(data)
         jsonObj = jsonUpdate(jsonObj, candidate, jsonLocate(jsonObj,))
 
 @reloading
