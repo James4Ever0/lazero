@@ -79,6 +79,7 @@ def jsonUpdate(jsonObj, location=[], update_content=None):
             raise Exception("Unsupported JSON update target type:", type(jsonObj))
     return update_content
 
+
 @reloading
 def jsonDeleteObject(jsonObj, location: list):
     assert len(location) > 0
@@ -89,10 +90,13 @@ def jsonDeleteObject(jsonObj, location: list):
     del obj[location[-1]]
     return jsonObj
 
+
 # how to reload module directly, so we can include this function as well?
 import typing
+
+
 @reloading
-def jsonDeleteAllInstances(jsonObj, isInstance:typing.Callable[[typing.Any],bool]):
+def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bool]):
     jsonObj2 = jsonObj.copy()
     candidates = []
     for key, value in jsonWalk(jsonObj2):
@@ -103,6 +107,8 @@ def jsonDeleteAllInstances(jsonObj, isInstance:typing.Callable[[typing.Any],bool
     for candidate in candidates:
         jsonObj2 = jsonDeleteObject(jsonObj, candidate)
     return jsonObj2
+
+
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
     return json.loads(json.dumps(jsonObj2))
