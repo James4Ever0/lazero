@@ -94,13 +94,5 @@ def jsonDeleteAllInstances(jsonObj, isInstance):
 
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
-    jsonObj2 = jsonObj.copy()
-    candidates = []
-    for key, value in jsonWalk(jsonObj2):
-        if isInstance(value) == ...:
-            # delete that thing! but how to delete these things once for all?
-            candidates.append(key)
-    candidates.sort(key=lambda x: -x[-1] if type(x[-1]) == int else 1)
-    for candidate in candidates:
-        jsonObj2 = jsonDeleteObject(jsonObj, candidate)
+
     return json.loads(json.dumps(jsonObj2))
