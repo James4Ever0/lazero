@@ -120,6 +120,7 @@ def jsonTupleToList(jsonObj):
         data = jsonLocate(jsonObj,candidate)
         data = list(data)
         jsonObj = jsonUpdate(jsonObj, candidate, data)
+    return jsonObj
 
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
