@@ -49,7 +49,7 @@ def jsonLocate(jsonObj, location=[]):
 
 
 @reloading
-def jsonUpdate(jsonObj, location=[], update_content=None, delete_content=False):
+def jsonUpdate(jsonObj, location=[], update_content=None, delete=):
     if location != []:
         if type(jsonObj) == dict:
             target = {
