@@ -85,5 +85,5 @@ def jsonify(jsonObj): # remove ellipsis
     jsonObj2 = jsonObj.copy()
     for key, value in jsonWalk(jsonObj2):
         if value == ...:
-            # delete that thing!
+            # delete that thing! but how to delete these things once for all?
     return json.loads(json.dumps(jsonObj2))
