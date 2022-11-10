@@ -104,5 +104,4 @@ def jsonDeleteAllInstances(jsonObj, isInstance):
     return jsonObj2
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
-
     return json.loads(json.dumps(jsonObj2))
