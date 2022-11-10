@@ -84,7 +84,7 @@ def jsonDeleteObject(jsonObj, location: list):
     assert len(location) > 0
     obj = jsonObj
     for key in location[:-1]:
-        obj = obj.get(key)
+        obj = obj[key]
     del obj[location[-1]]
     return jsonObj
 
