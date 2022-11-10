@@ -79,3 +79,7 @@ def jsonUpdate(jsonObj, location=[], update_content=None):
             raise Exception("Unsupported JSON update target type:", type(jsonObj))
     return update_content
 
+
+@reloading
+def jsonify(jsonObj, removeEllipsis=True):
+    return json.loads(json.dumps(jsonObj))
