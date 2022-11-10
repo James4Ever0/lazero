@@ -93,9 +93,11 @@ def jsonDeleteObject(jsonObj, location: list):
 
 # how to reload module directly, so we can include this function as well?
 import typing
+
 # what the fuck is going on here?
 # ImportError: cannot import name 'jsonDeleteAllinstances' from 'lazero.utils.json' (/root/Desktop/works/lazero/lazero/utils/json.py)
 # how to reload module actually, making from <module> import <object> work?
+
 
 @reloading
 def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bool]):
@@ -113,7 +115,7 @@ def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bo
 
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
-    jsonObj2=json.loads(json.dumps(jsonObj))
+    jsonObj2 = json.loads(json.dumps(jsonObj))
     isInstance = lambda obj: obj == ...
     jsonObj2 = jsonDeleteAllInstances(jsonObj2, isInstance)
-    return json.loads(json.dumps(jsonObj2
+    return jsonObj2
