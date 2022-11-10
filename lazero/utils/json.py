@@ -112,6 +112,7 @@ def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bo
 
 @reloading
 def jsonTupleToList(jsonObj):
+    candidates = []
     for key, value in jsonWalk(jsonObj):
         if type(value) == tuple:
 
