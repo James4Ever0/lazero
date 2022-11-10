@@ -17,3 +17,4 @@ def generatorUnwrap(generator, level=1):
     else:
         for x in generator:
             yield generatorUnwrap(x, level=level-1)
+

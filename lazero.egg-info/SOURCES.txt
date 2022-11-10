@@ -42,6 +42,7 @@ lazero/search/whoosh/search.py
 lazero/utils/__init__.py
 lazero/utils/importers.py
 lazero/utils/inspectors.py
+lazero/utils/json.py
 lazero/utils/logger.py
 lazero/utils/mathlib.py
 lazero/utils/tools.py
