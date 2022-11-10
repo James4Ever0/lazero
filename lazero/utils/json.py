@@ -112,7 +112,7 @@ def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bo
 
 @reloading
 def jsonTupleToList(jsonObj):
-    for key, value in jsonObj.items():
+    for key, value in jsonWalk(jsonObj)
 
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
