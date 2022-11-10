@@ -90,6 +90,6 @@ def jsonify(jsonObj): # remove ellipsis
             candidates.append(key)
     candidates.sort(key=lambda x: -x[-1] if type(x[-1]) == int else 1)
     for candidate in candidates:
-        
-        jsonObj2.get()
+
+        obj = jsonObj2.get()
     return json.loads(json.dumps(jsonObj2))
