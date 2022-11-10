@@ -90,6 +90,7 @@ def jsonDeleteObject(jsonObj, location: list):
     return jsonObj
 
 # how to reload module directly, so we can include this function as well?
+import typing
 @reloading
 def jsonDeleteAllInstances(jsonObj, isInstance):
     jsonObj2 = jsonObj.copy()
