@@ -96,6 +96,7 @@ import typing
 # what the fuck is going on here?
 # ImportError: cannot import name 'jsonDeleteAllinstances' from 'lazero.utils.json' (/root/Desktop/works/lazero/lazero/utils/json.py)
 
+
 @reloading
 def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bool]):
     jsonObj2 = jsonObj.copy()
