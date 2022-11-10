@@ -79,7 +79,7 @@ def jsonUpdate(jsonObj, location=[], update_content=None):
             raise Exception("Unsupported JSON update target type:", type(jsonObj))
     return update_content
 
-
+@reloading
 def jsonDeleteObject(jsonObj, location: list):
     assert len(location) > 0
     obj = jsonObj
