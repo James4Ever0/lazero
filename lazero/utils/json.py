@@ -130,8 +130,8 @@ def jsonTupleToList(jsonObj2,copy=True):
     return jsonObj
 
 @reloading
-def jsonify(jsonObj):  # remove ellipsis
+def jsonify(jsonObj, copy=copy):  # remove ellipsis
     isInstance = lambda obj: obj == ...
-    jsonObj2 = jsonTupleToList(jsonObj)
-    jsonObj2 = jsonDeleteAllInstances(jsonObj2, isInstance)
+    jsonObj2 = jsonTupleToList(jsonObj, copy=copy)
+    jsonObj2 = jsonDeleteAllInstances(jsonObj2, isInstance, copy=copy)
     return json.loads(json.dumps(jsonObj2))
