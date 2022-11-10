@@ -92,7 +92,7 @@ def jsonDeleteObject(jsonObj, location: list):
 # how to reload module directly, so we can include this function as well?
 import typing
 @reloading
-def jsonDeleteAllInstances(jsonObj, isInstance):
+def jsonDeleteAllInstances(jsonObj, isInstance:typing.):
     jsonObj2 = jsonObj.copy()
     candidates = []
     for key, value in jsonWalk(jsonObj2):
