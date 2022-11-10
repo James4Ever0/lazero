@@ -111,7 +111,7 @@ def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bo
     return jsonObj2
 
 @reloading
-def jsonTupleToList(jsonObj2):
+def jsonTupleToList(jsonObj2,copy=False):
     jsonObj = jsonObj2.copy()
     candidates = []
     for key, value in jsonWalk(jsonObj):
