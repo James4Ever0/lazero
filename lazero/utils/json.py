@@ -90,7 +90,7 @@ def jsonDeleteObject(jsonObj, location: list):
     return jsonObj
 
 @reloading
-def jsonDeleteAllInstances(jsonObj, instance):
+def jsonDeleteAllInstances(jsonObj, isinstance):
 
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
