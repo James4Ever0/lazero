@@ -89,6 +89,7 @@ def jsonDeleteObject(jsonObj, location: list):
     del obj[location[-1]]
     return jsonObj
 
+@reloading
 
 
 @reloading
