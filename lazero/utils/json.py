@@ -93,12 +93,16 @@ def jsonDeleteObject(jsonObj, location: list):
 
 # how to reload module directly, so we can include this function as well?
 import typing
+
 # what the fuck is going on here?
 # ImportError: cannot import name 'jsonDeleteAllinstances' from 'lazero.utils.json' (/root/Desktop/works/lazero/lazero/utils/json.py)
 # how to reload module actually, making from <module> import <object> work?
 
+
 @reloading
-def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bool], copy=True):
+def jsonDeleteAllInstances(
+    jsonObj, isInstance: typing.Callable[[typing.Any], bool], copy=True
+):
     if copy:
         jsonObj2 = jsonObj.copy()
     else:
@@ -113,8 +117,9 @@ def jsonDeleteAllInstances(jsonObj, isInstance: typing.Callable[[typing.Any], bo
         jsonObj2 = jsonDeleteObject(jsonObj, candidate)
     return jsonObj2
 
+
 @reloading
-def jsonTupleToList(jsonObj2,copy=True):
+def jsonTupleToList(jsonObj2, copy=True):
     if copy:
         jsonObj = jsonObj2.copy()
     else:
@@ -124,10 +129,11 @@ def jsonTupleToList(jsonObj2,copy=True):
         if type(value) == tuple:
             candidates.append(key)
     for candidate in candidates:
-        data = jsonLocate(jsonObj,candidate)
+        data = jsonLocate(jsonObj, candidate)
         data = list(data)
         jsonObj = jsonUpdate(jsonObj, candidate, data)
     return jsonObj
+
 
 @reloading
 def jsonify(jsonObj, copy=True, refine=False):  # remove ellipsis
