@@ -100,6 +100,7 @@ def jsonDeleteAllInstances(jsonObj, isInstance):
     candidates.sort(key=lambda x: -x[-1] if type(x[-1]) == int else 1)
     for candidate in candidates:
         jsonObj2 = jsonDeleteObject(jsonObj, candidate)
+    return 
 @reloading
 def jsonify(jsonObj):  # remove ellipsis
 
