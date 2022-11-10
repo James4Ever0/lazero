@@ -137,8 +137,8 @@ def jsonTupleToList(jsonObj2, copy=True):
 
 
 @reloading
-def jsonify(jsonObj, copy=True, refine=False):  # remove ellipsis
-    isInstance = lambda obj: obj == ...
+def jsonify(jsonObj, copy=True, refine=False,
+    isInstance = lambda obj: obj == ...):  # remove ellipsis
     jsonObj2 = jsonTupleToList(jsonObj, copy=copy)
     jsonObj2 = jsonDeleteAllInstances(jsonObj2, isInstance, copy=copy)
     if refine:
