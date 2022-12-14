@@ -33,6 +33,7 @@ def listFilesInDirectory(directory, debug=False):
     for filepath in filepaths:
         yield filepath
 
+
 from lazero.filesystem.env import getHomeDirectory
 
 lazeroCachePath = os.path.join(getHomeDirectory(), ".lazero")
@@ -67,9 +68,14 @@ def getValueByKeyFromDatabase(
     db = UnQLite(databasePath)
     return db[key]
 
+
 import json
-def getLineStartEndInFileByConvLineIndexOriginalFromDatabase(line_index_original:int):
-    start_end_json_string = getValueByKeyFromDatabase(str(line_index_original)).decode('utf-8')
+
+
+def getLineStartEndInFileByConvLineIndexOriginalFromDatabase(line_index_original: int):
+    start_end_json_string = getValueByKeyFromDatabase(str(line_index_original)).decode(
+        "utf-8"
+    )
     start_end_json = json.loads(start_end_json_string)
     start, end = start_end_json
     return start, end

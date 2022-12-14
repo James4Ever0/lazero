@@ -33,6 +33,7 @@ def listFilesInDirectory(directory, debug=False):
     for filepath in filepaths:
         yield filepath
 
+
 from lazero.filesystem.env import getHomeDirectory
 
 lazeroCachePath = os.path.join(getHomeDirectory(), ".lazero")
@@ -67,15 +68,17 @@ def getValueByKeyFromDatabase(
     db = UnQLite(databasePath)
     return db[key]
 
+
 import json
-def getLineStartEndInFileByConvLineIndexOriginalFromDatabase(line_index_original:int):
-    start_end_json_string = getValueByKeyFromDatabase(str(line_index_original)).decode('utf-8')
+
+
+def getLineStartEndInFileByConvLineIndexOriginalFromDatabase(line_index_original: int):
+    start_end_json_string = getValueByKeyFromDatabase(str(line_index_original)).decode(
+        "utf-8"
+    )
     start_end_json = json.loads(start_end_json_string)
     start, end = start_end_json
     return start, end
-
-from lazero.search.txtai.index import txtaiIndexer
-from lazero.search.whoosh.index import whooshIndexer
 
 
 def mainIndexer(
@@ -85,6 +88,9 @@ def mainIndexer(
         "txtai": os.path.join(lazeroCachePath, "txtai_index"),
     },
 ):
+    from lazero.search.txtai.index import txtaiIndexer
+    from lazero.search.whoosh.index import whooshIndexer
+
     assert os.path.exists(directory)
     assert os.path.isdir(directory)
     assert os.path.isabs(directory)
