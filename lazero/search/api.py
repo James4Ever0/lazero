@@ -74,9 +74,6 @@ def getLineStartEndInFileByConvLineIndexOriginalFromDatabase(line_index_original
     start, end = start_end_json
     return start, end
 
-from lazero.search.txtai.index import txtaiIndexer
-from lazero.search.whoosh.index import whooshIndexer
-
 
 def mainIndexer(
     directory,
@@ -85,6 +82,9 @@ def mainIndexer(
         "txtai": os.path.join(lazeroCachePath, "txtai_index"),
     },
 ):
+    from lazero.search.txtai.index import txtaiIndexer
+    from lazero.search.whoosh.index import whooshIndexer
+
     assert os.path.exists(directory)
     assert os.path.isdir(directory)
     assert os.path.isabs(directory)
