@@ -1,7 +1,8 @@
 
 def waitForServerUp(port, message, timeout=1, maxtime=-1):
     import requests
-    while True:
+    mtime = maxtime
+    while mtime !=0:
         try:
             url = "http://localhost:{}".format(port)
             with requests.get(url, timeout=timeout, proxies=None) as r:
