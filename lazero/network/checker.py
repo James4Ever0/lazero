@@ -4,7 +4,7 @@ def waitForServerUp(port, message, timeout=1, maxtime=-1):
     mtime = maxtime
     while mtime !=0:
         try:
-            if mtime 
+            if maxtime !=
             url = "http://localhost:{}".format(port)
             with requests.get(url, timeout=timeout, proxies=None) as r:
                 if type(message) == str:
