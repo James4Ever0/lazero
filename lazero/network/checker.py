@@ -17,6 +17,7 @@ def waitForServerUp(port, message, timeout=1, maxtime=-1,host='localhost'):
                 assert text == message
                 print("SERVER AT PORT %d IS UP" % port)
                 # break
+                return True
             # better just return
         except:
             import traceback
@@ -27,3 +28,4 @@ def waitForServerUp(port, message, timeout=1, maxtime=-1,host='localhost'):
             import time
 
             time.sleep(1)
+    return False
