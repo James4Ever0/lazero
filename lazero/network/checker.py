@@ -6,7 +6,7 @@ def waitForServerUp(port, message, timeout=1, maxtime=-1):
         try:
             if mflag:
                 mtime -= 1
-                print("")
+                print("{} chances remains for server {} at {}")
             url = "http://localhost:{}".format(port)
             with requests.get(url, timeout=timeout, proxies=None) as r:
                 if type(message) == str:
