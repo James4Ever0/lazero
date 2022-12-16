@@ -2,7 +2,7 @@
 def waitForServerUp(port, message, timeout=1, maxtime=-1):
     import requests
     mtime = maxtime
-    while mtime !=0:
+    while (mtime !=0):
         try:
             if mtime 
             url = "http://localhost:{}".format(port)
