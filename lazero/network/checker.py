@@ -1,4 +1,4 @@
-def waitForServerUp(port, message, timeout=1, maxtime=-1,host=localhost):
+def waitForServerUp(port, message, timeout=1, maxtime=-1,host='localhost'):
     import requests
 
     mtime = maxtime if (mflag := maxtime > 0) else 1
