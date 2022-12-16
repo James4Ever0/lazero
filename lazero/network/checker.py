@@ -1,5 +1,5 @@
 
-def waitForServerUp(port, message, timeout=1, maxtime=-1):
+def waitForServerUp(port, message, timeout=1, maxtime=0):
     import requests
     mtime = maxtime
     while mtime !=0:
