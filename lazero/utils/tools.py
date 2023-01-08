@@ -18,4 +18,4 @@ def generatorUnwrap(generator, level=1):
         for x in generator:
             yield generatorUnwrap(x, level=level-1)
 
-def iterator
+def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1):
