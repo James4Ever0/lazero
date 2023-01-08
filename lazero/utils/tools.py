@@ -26,3 +26,4 @@ def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1):
             yield init_data
     yield_counter = 
     while True:
+        
