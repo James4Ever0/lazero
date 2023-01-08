@@ -32,7 +32,8 @@ def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1):
         else:
             for _ in range(1+repeat):
                 yield next_data
-            next_data = iterator.__next__()
+            try:
+                next_data = iterator.__next__()
             yield_counter += 1
             if max_iter >=0:
                 if yield_counter >= max_iter:
