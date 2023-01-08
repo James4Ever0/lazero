@@ -29,3 +29,4 @@ def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1):
         if repeat <0:
             yield init_data
         else:
+            next_data = iterator.__next__()
