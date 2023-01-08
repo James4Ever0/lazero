@@ -23,4 +23,5 @@ def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1):
     init_data = iterator.__next__()
     if init_repeat >0:
         for _ in range(init_repeat):
-            
+            yield init_data
+    
