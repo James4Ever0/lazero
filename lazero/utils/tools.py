@@ -20,10 +20,10 @@ def generatorUnwrap(generator, level=1):
 
 def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1):
     # we use yield here.
-    init_data = iterator.__next__()
+    next_data = iterator.__next__()
     if init_repeat >0:
         for _ in range(init_repeat):
-            yield init_data
+            yield next_data
     yield_counter = 
     while True:
         if repeat <0:
