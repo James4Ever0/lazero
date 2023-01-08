@@ -19,4 +19,5 @@ def generatorUnwrap(generator, level=1):
             yield generatorUnwrap(x, level=level-1)
 
 def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1):
+    # we use yield here.
     
