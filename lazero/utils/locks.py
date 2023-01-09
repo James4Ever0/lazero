@@ -1,4 +1,6 @@
 
 
-def redisLockSet(lockName:str,):
+def redisLockAcquire(lockName:str,):
     return acquired
+
+def redisLockUnset
