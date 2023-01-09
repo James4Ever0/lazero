@@ -18,7 +18,7 @@ def generatorUnwrap(generator, level=1):
         for x in generator:
             yield generatorUnwrap(x, level=level-1)
 from typing import Callable
-def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1,before_yield:Callable=lambda:None, after_yield:Callable=lambda:None):
+def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1,before_yield:Callable=lambda:None, after_yield:Callable=lambda:None, before_next:Callable=lambda:None, after_next:Callable=lambda:None):
     # we use yield here.
     next_data = iterator.__next__()
     if init_repeat >0:
