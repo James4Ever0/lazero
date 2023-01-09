@@ -3,4 +3,5 @@
 def redisLockAcquire(lockName:str,):
     return acquired
 
-def redisLockUnset
+def redisLockRelease(lockName:str):
+    return released
