@@ -20,7 +20,9 @@ def generatorUnwrap(generator, level=1):
 from typing import Callable
 def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1,before_yield:Callable=lambda:None, after_yield:Callable=lambda:None, before_next:Callable=lambda:None, after_next:Callable=lambda:None):
     # we use yield here.
+    before_next()
     next_data = iterator.__next__()
+    after_next()
     if init_repeat >0:
         for _ in range(init_repeat):
             before_yield()
@@ -39,7 +41,9 @@ def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1,be
                 yield next_data
                 after_yield()
             try:
+                before_next()
                 next_data = iterator.__next__()
+                after_next()
             except StopIteration:
                 break
             yield_counter += 1
