@@ -23,18 +23,21 @@ def iteratorWrapper(iterator,init_repeat:int=0, repeat:int=0, max_iter:int=-1,be
     next_data = iterator.__next__()
     if init_repeat >0:
         for _ in range(init_repeat):
-            
+            before_yield()
             yield next_data
+            after_yield()
     yield_counter = 0
     while True:
         if repeat <0:
             while True:
-                
+                before_yield()
                 yield next_data
+                after_yield()
         else:
             for _ in range(1+repeat):
-                
+                before_yield()
                 yield next_data
+                after_yield()
             try:
                 next_data = iterator.__next__()
             except StopIteration:
