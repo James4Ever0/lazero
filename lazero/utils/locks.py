@@ -1,6 +1,6 @@
 
 
-def redisLockAcquire(lockName:str,):
+def redisLockAcquire(lockName:str):
     return acquired
 
 def redisLockRelease(lockName:str):
