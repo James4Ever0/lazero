@@ -1,0 +1,10 @@
+{
+    "summary": "This code uses the TinyDB library to create and interact with a no-SQL database. It inserts data, searches for specific values, and prints the results. This is a limited implementation compared to SQL databases which offer more advanced features.",
+    "details": [
+        {
+            "comment": "This code uses the TinyDB library to create and interact with a no-SQL database. It inserts data, searches for specific values, and prints the results. This is a limited implementation compared to SQL databases which offer more advanced features.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_tiny_db.py\":0-21",
+            "content": "from tinydb import TinyDB, Query\ndb = TinyDB(\"./db.json\") # in memory?\n# db = TinyDB('/path/to/db.json')\n# we use upsert instead?\ndb.insert({'name':'sampleName', 'start':0, 'end':20})\n# no deduplication?\ndb.insert({'name':'sampleName2', 'start':21, 'end':40})\ndb.insert({'name':'withOriginalLine', 'value':True})\ndb.insert({\"path\":'abcdefg'})\nUser = Query()\n# this thing is a limited implementation of no-sql database. SQL is advanced.\n# point = 15\n# result = db.search((User.start <= point) & (User.end >= point))\n# print(\"RESULT:\", result)\nresult = db.search((User.name == 'withOriginalLine'))\nprint('RESULT:', result)\nresult = db.search((User.path == 'abcdefg'))\nprint('RESULT:', result)"
+        }
+    ]
+}

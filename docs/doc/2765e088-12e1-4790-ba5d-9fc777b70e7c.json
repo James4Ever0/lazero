@@ -1,0 +1,10 @@
+{
+    "summary": "This function runs a command with specified options and returns the output as JSON if successful, or an empty dictionary and error information if not.",
+    "details": [
+        {
+            "comment": "This function runs a command with specified options and returns the output as JSON if successful, or an empty dictionary and error information if not.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/program/subprocess.py\":0-28",
+            "content": "from typing import Union\nimport json, subprocess, traceback\ndef runCommandGetJson(\n    commandLine: list[str],\n    timeout: int = 5,\n    debug: bool = False,\n    shell: bool = False,\n    workingDirectory: Union[str, None] = None,\n):\n    try:\n        result = subprocess.run(\n            commandLine,\n            timeout=timeout,\n            capture_output=True,\n            shell=shell,\n            cwd=workingDirectory,\n        )\n        assert result.returncode == 0\n        stdout = result.stdout\n        stdout = stdout.decode(\"utf-8\")\n        output = json.loads(stdout)\n        return True, output\n    except:\n        if debug:\n            traceback.print_exc()\n    return False, {}"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code is attempting to use the `concurrentGet` function from the `lazero.network.asyncio` module to retrieve data from a list of URLs and process it using the `type()` or `dir()` functions as processors. However, the code encounters an issue when trying to await a ClientResponse object, which can't be used in 'await' expressions.",
+    "details": [
+        {
+            "comment": "This code is attempting to use the `concurrentGet` function from the `lazero.network.asyncio` module to retrieve data from a list of URLs and process it using the `type()` or `dir()` functions as processors. However, the code encounters an issue when trying to await a ClientResponse object, which can't be used in 'await' expressions.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_async_concurrentGet_pickledFunction.py\":0-13",
+            "content": "from test_commons import *\nfrom lazero.network.asyncio import concurrentGet\n# need json. what do you want?\nurl = \"http://127.0.0.1:8932\"\nurlList = [url]*10\n# result = concurrentGet(urlList) # unable to load the raw thing. we can see that.\n# at least we can have the type, dir.\nresult = concurrentGet(urlList, processor = lambda x: type(x))\n# result = concurrentGet(urlList, processor = lambda x: dir(x))\nprint(result)\n# object ClientResponse can't be used in 'await' expression\n# so what?"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Importing necessary modules and changing the working directory to the parent folder, modifying the PYTHONPATH and disabling proxy settings.",
+    "details": [
+        {
+            "comment": "Importing necessary modules and changing the working directory to the parent folder, modifying the PYTHONPATH and disabling proxy settings.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_commons.py\":0-8",
+            "content": "import sys\nimport os\nos.chdir(\"../\")\nsys.path.insert(0, \".\")  # you should use 'prepend' instead of 'append'\n# sys.path.insert(0,\"/root/Desktop/works/pyjom/symlinks/lazero/\") # you should use 'prepend' instead of 'append'\n# ignore the global proxy now, we are not going to use that.\nos.environ[\"http_proxy\"] = \"\"\nos.environ[\"https_proxy\"] = \"\""
+        }
+    ]
+}

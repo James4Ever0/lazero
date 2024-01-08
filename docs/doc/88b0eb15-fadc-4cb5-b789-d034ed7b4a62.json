@@ -1,0 +1,15 @@
+{
+    "summary": "The function waits for a server on the specified port and checks for a response with options for timeout, maximum time, and host. If successful, it returns True; otherwise, prints an error message or returns False after 1 second if unsuccessful.",
+    "details": [
+        {
+            "comment": "This function waits for a server to be up on the specified port and checks if it responds with the expected message. It has options for timeout, maximum time, and host. If the server is up, it returns True; otherwise, it prints an error message.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/network/checker.py\":0-26",
+            "content": "def waitForServerUp(port, message, timeout=1, maxtime=-1,host='localhost'):\n    import requests\n    mtime = maxtime if (mflag := maxtime > 0) else 1\n    while mtime > 0:\n        try:\n            if mflag:\n                mtime -= 1\n                print(f\"{mtime} chances remains for server {port} at {host}\")\n            url = \"http://{}:{}\".format(host,port)\n            with requests.get(url, timeout=timeout, proxies=None) as r:\n                if type(message) == str:\n                    text = r.text.strip('\"').strip(\"'\")\n                else:\n                    text = r.json()\n                print(\"SERVER AT PORT %d RESPONDS:\" % port, [text])\n                assert text == message\n                print(\"SERVER AT PORT %d IS UP\" % port)\n                # break\n                return True\n            # better just return\n        except:\n            import traceback\n            traceback.print_exc()\n            print(\"SERVER AT PORT %d MIGHT NOT BE UP\" % port)\n            print(\"EXPECTED MESSAGE:\", [message])"
+        },
+        {
+            "comment": "Waits for 1 second before returning False.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/network/checker.py\":27-30",
+            "content": "            import time\n            time.sleep(1)\n    return False"
+        }
+    ]
+}

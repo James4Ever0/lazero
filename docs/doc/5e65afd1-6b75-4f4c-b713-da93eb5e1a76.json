@@ -1,0 +1,15 @@
+{
+    "summary": "The code provides functions for reading and writing files in various formats including text, binary data, and Python objects using pickle or dill serialization libraries. It also supports reading JSON objects from files.",
+    "details": [
+        {
+            "comment": "This code defines various functions for reading and writing files in different formats, such as text (UTF-8 encoded) or binary data. It also includes functionality for reading and writing Python objects using either pickle or dill serialization libraries. The code imports the necessary libraries (pickle, dill, and json) and sets up a dictionary to switch between them based on the specified backend.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/filesystem/io.py\":0-40",
+            "content": "def readFile(filename, encoding=\"utf-8\", mode=\"r\"):\n    with open(filename, mode, encoding=encoding) as f:\n        return f.read()\ndef writeFile(filename, content, encoding=\"utf-8\", mode=\"w+\"):\n    with open(filename, mode, encoding=encoding) as f:\n        f.write(content)\ndef readFileBinary(filename, mode=\"rb\"):\n    with open(filename, mode) as f:\n        return f.read()\ndef writeFileBinary(filename, content, mode=\"wb\"):\n    with open(filename, mode) as f:\n        f.write(content)\nimport pickle\nimport dill\nfrom typing import Literal\nbackends = {\"pickle\": pickle, \"dill\": dill}\ndef readPythonObjectFromFile(filename, backend: Literal[\"pickle\", \"dill\"] = \"dill\"):\n    data = readFileBinary(filename)\n    return backends[backend].loads(data)\ndef writePythonObjectToFile(\n    filename, pythonObject, backend: Literal[\"pickle\", \"dill\"] = \"dill\"\n):\n    data = backends[backend].dumps(pythonObject)\n    writeFileBinary(filename, data)\nimport json\ndef writeJsonObjectToFile(filename, jsonObject, ensure_ascii=False, indent=4):\n    content = json.dumps(jsonObject, ensure_ascii=ensure_ascii, indent=indent)"
+        },
+        {
+            "comment": "Reads a JSON object from file.\nReads the file content, then parses it as JSON.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/filesystem/io.py\":41-46",
+            "content": "    writeFile(filename, content)\ndef readJsonObjectFromFile(filename):\n    content = readFile(filename)\n    jsonObject = json.loads(content)\n    return jsonObject"
+        }
+    ]
+}

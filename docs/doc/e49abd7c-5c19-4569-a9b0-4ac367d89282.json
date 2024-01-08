@@ -1,0 +1,10 @@
+{
+    "summary": "lazero is a Python package collecting useful functions for AI development, aiming to be rewritten as an AGI agent and working with AI tasks without limitations.",
+    "details": [
+        {
+            "comment": "lazero is a Python package collecting useful functions for AI development, aiming to be rewritten as an AGI agent and working with AI tasks without limitations.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/README.md\":0-6",
+            "content": "aim to be rewritten as some AGI agent, lazero is intended to collect some util functions as a python package for further use, speed up development and glue with existing AI libraries and AGI algorithms.\nthe roadmap is as follows:\n- collect and rewrite some basic utils\n- integrate it with other libraries or projects\n- work with AGI related tasks\n- serve it and run it freely, without (virtually) any hardware or software limitations"
+        }
+    ]
+}

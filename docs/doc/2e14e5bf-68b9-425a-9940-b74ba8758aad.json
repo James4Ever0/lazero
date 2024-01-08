@@ -1,0 +1,10 @@
+{
+    "summary": "Testing database storage and retrieval of a key-value pair.",
+    "details": [
+        {
+            "comment": "Testing database storage and retrieval of a key-value pair.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_noqlite.py\":0-17",
+            "content": "from test_commons import *\nfrom lazero.search.api import getValueByKeyFromDatabase, storeKeyValuePairsToDatabase\nkeyValuePairs = [(\"test\", \"value\")]\ntry:\n    # after first test, check if data persists.\n    result = getValueByKeyFromDatabase(\"test\")\n    print(\"RESULT:\", result)  # binary. need to decode.\nexcept:\n    import traceback\n    traceback.print_exc()\nfor _ in range(2):\n    storeKeyValuePairsToDatabase(keyValuePairs)\n    result = getValueByKeyFromDatabase(\"test\")\n    print(\"RESULT:\", result)  # binary. need to decode.\n    # there is only one such result. unique.\n    # still we only have one such result."
+        }
+    ]
+}

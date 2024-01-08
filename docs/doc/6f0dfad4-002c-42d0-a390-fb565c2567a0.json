@@ -1,0 +1,10 @@
+{
+    "summary": "Importing all modules from lazero.filesystem.temp to this file, possibly duplicating functionality or causing conflicts.",
+    "details": [
+        {
+            "comment": "Importing all modules from lazero.filesystem.temp to this file, possibly duplicating functionality or causing conflicts.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/filesystem/__init__.py\":0-1",
+            "content": "from lazero.filesystem.temp import *\n# are you sure this is correct? might lead to the same goddamn problem."
+        }
+    ]
+}

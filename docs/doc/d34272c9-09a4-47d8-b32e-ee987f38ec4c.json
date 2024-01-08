@@ -1,0 +1,10 @@
+{
+    "summary": "Imports all modules from lazero.program.threading.",
+    "details": [
+        {
+            "comment": "Imports all modules from lazero.program.threading.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/program/__init__.py\":0-0",
+            "content": "from lazero.program.threading import *"
+        }
+    ]
+}

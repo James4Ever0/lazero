@@ -1,0 +1,15 @@
+{
+    "summary": "The code utilizes requests library to define a class for network progress bar communication, initializes server and updates progress using HTTP GET requests, but may encounter an error during the update process.",
+    "details": [
+        {
+            "comment": "Imports requests and defines a class for network progress bar communication. Initializes server, resets, and updates progress with HTTP GET requests.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/network/progressbar/client.py\":0-24",
+            "content": "import requests\nclass netProgressbar:\n    def __init__(self, port = 8576, timeout=1,message = 'progressbar server'):\n        from lazero.network import waitForServerUp\n        self.port = port\n        self.message = message\n        self.timeout=timeout\n        waitForServerUp(port=port, message=message)\n    def reset(self, total:int):\n        try:\n            with requests.get('http://localhost:{}/reset'.format(self.port),proxies=None,params = {'total':total}, timeout=self.timeout) as conn:\n                print(\"connection status:\", conn)\n        except:\n            import traceback\n            traceback.print_exc()\n            print(\"error when resetting netProgressbar\")\n    def update(self,progress:int=1, info=\"\"):\n        info = str(info)\n        try:\n            with requests.get('http://localhost:8576/update',proxies=None, params={'progress':progress,'info':info}, timeout=self.timeout) as conn:\n                print(\"connection status:\", conn)\n        except:\n            import traceback\n            traceback.print_exc()"
+        },
+        {
+            "comment": "This code prints an error message indicating an issue while updating the network progress bar.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/network/progressbar/client.py\":25-25",
+            "content": "            print(\"error when updating netProgressbar\")"
+        }
+    ]
+}

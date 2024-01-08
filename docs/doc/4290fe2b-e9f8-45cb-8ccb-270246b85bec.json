@@ -1,0 +1,10 @@
+{
+    "summary": "Running lazero indexer on notes directory.",
+    "details": [
+        {
+            "comment": "Running lazero indexer on notes directory.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_search_index_notable.sh\":0-0",
+            "content": "lazero -i /root/Desktop/works/notes_ssh_keys/notes"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Initializing a function to set the OpenCV library path for Python3.9 site-packages, checking if there's only one .so file and inserting it into sys.path.",
+    "details": [
+        {
+            "comment": "Initializing a function to set the OpenCV library path for Python3.9 site-packages, checking if there's only one .so file and inserting it into sys.path.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/utils/importers.py\":0-10",
+            "content": "def cv2_custom_build_init(site_packages_path=\"/usr/local/lib/python3.9/site-packages\"):\n    import pathlib, sys\n    site_path = pathlib.Path(site_packages_path)\n    cv2_libs_dir = (\n        site_path / \"cv2\" / f\"python-{sys.version_info.major}.{sys.version_info.minor}\"\n    )\n    print(cv2_libs_dir)\n    cv2_libs = sorted(cv2_libs_dir.glob(\"*.so\"))\n    if len(cv2_libs) == 1:\n        print(\"INSERTING:\", cv2_libs[0].parent)\n        sys.path.insert(1, str(cv2_libs[0].parent))"
+        }
+    ]
+}

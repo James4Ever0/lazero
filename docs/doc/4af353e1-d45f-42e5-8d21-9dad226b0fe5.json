@@ -1,0 +1,10 @@
+{
+    "summary": "This code is importing necessary modules, creating a text panel with the text \"myText\" wrapped and styled as red. The panel has a height of 4, title '0.9' aligned to the right, subtitle 'jq_man.log' aligned to the left, and both are stylized green. Finally, it prints the panel using the Console module.",
+    "details": [
+        {
+            "comment": "This code is importing necessary modules, creating a text panel with the text \"myText\" wrapped and styled as red. The panel has a height of 4, title '0.9' aligned to the right, subtitle 'jq_man.log' aligned to the left, and both are stylized green. Finally, it prints the panel using the Console module.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_textual_panel.py\":1-17",
+            "content": "from rich.panel import Panel\nfrom rich.console import Console\nfrom rich.text import Text\ntext = \"myText\"*200 # it will be wrapped.\npanel = Panel(\n            # this style is strange. we should alter it in some way.\n            Text(text, style='red'), # you may render this ahead.\n            height=4,\n            title='0.9', # score.\n            title_align='right',\n            subtitle='jq_man.log', # which you want first?\n            subtitle_align='left',\n            style='green'\n        )\nconsole = Console()\nconsole.print(panel)"
+        }
+    ]
+}

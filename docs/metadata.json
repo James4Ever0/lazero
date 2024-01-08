@@ -1,0 +1,260 @@
+{
+    "url": {
+        "full": "https://github.com/james4ever0/lazero",
+        "partial": "james4ever0/lazero"
+    },
+    "file_mapping": {
+        "0": {
+            "filepath": "/README.md",
+            "entry_id": 0,
+            "language_id": "markdown"
+        },
+        "1": {
+            "filepath": "/install.sh",
+            "entry_id": 4,
+            "language_id": "shell"
+        },
+        "2": {
+            "filepath": "/setup.py",
+            "entry_id": 8,
+            "language_id": "python"
+        },
+        "3": {
+            "filepath": "/signal_2.sh",
+            "entry_id": 14,
+            "language_id": "shell"
+        },
+        "4": {
+            "filepath": "/test_exit.sh",
+            "entry_id": 18,
+            "language_id": "shell"
+        },
+        "5": {
+            "filepath": "/lazero/__main__.py",
+            "entry_id": 22,
+            "language_id": "python"
+        },
+        "6": {
+            "filepath": "/lazero/filesystem/__init__.py",
+            "entry_id": 28,
+            "language_id": "python"
+        },
+        "7": {
+            "filepath": "/lazero/filesystem/env.py",
+            "entry_id": 32,
+            "language_id": "python"
+        },
+        "8": {
+            "filepath": "/lazero/filesystem/io.py",
+            "entry_id": 36,
+            "language_id": "python"
+        },
+        "9": {
+            "filepath": "/lazero/filesystem/temp.py",
+            "entry_id": 42,
+            "language_id": "python"
+        },
+        "10": {
+            "filepath": "/lazero/network/__init__.py",
+            "entry_id": 52,
+            "language_id": "python"
+        },
+        "11": {
+            "filepath": "/lazero/network/asyncio.py",
+            "entry_id": 56,
+            "language_id": "python"
+        },
+        "12": {
+            "filepath": "/lazero/network/checker.py",
+            "entry_id": 62,
+            "language_id": "python"
+        },
+        "13": {
+            "filepath": "/lazero/network/downloader.py",
+            "entry_id": 68,
+            "language_id": "python"
+        },
+        "14": {
+            "filepath": "/lazero/network/progressbar/client.py",
+            "entry_id": 92,
+            "language_id": "python"
+        },
+        "15": {
+            "filepath": "/lazero/network/progressbar/server.py",
+            "entry_id": 98,
+            "language_id": "python"
+        },
+        "16": {
+            "filepath": "/lazero/network/proxy/clash.py",
+            "entry_id": 104,
+            "language_id": "python"
+        },
+        "17": {
+            "filepath": "/lazero/program/__init__.py",
+            "entry_id": 116,
+            "language_id": "python"
+        },
+        "18": {
+            "filepath": "/lazero/program/functools.py",
+            "entry_id": 120,
+            "language_id": "python"
+        },
+        "19": {
+            "filepath": "/lazero/program/subprocess.py",
+            "entry_id": 152,
+            "language_id": "python"
+        },
+        "20": {
+            "filepath": "/lazero/program/threading.py",
+            "entry_id": 156,
+            "language_id": "python"
+        },
+        "21": {
+            "filepath": "/lazero/search/api.py",
+            "entry_id": 160,
+            "language_id": "python"
+        },
+        "22": {
+            "filepath": "/lazero/search/index.py",
+            "entry_id": 170,
+            "language_id": "python"
+        },
+        "23": {
+            "filepath": "/lazero/search/postprocessing.py",
+            "entry_id": 184,
+            "language_id": "python"
+        },
+        "24": {
+            "filepath": "/lazero/search/preprocessing.py",
+            "entry_id": 192,
+            "language_id": "python"
+        },
+        "25": {
+            "filepath": "/lazero/search/search.py",
+            "entry_id": 212,
+            "language_id": "python"
+        },
+        "26": {
+            "filepath": "/lazero/search/terminal_interface.py",
+            "entry_id": 226,
+            "language_id": "python"
+        },
+        "27": {
+            "filepath": "/lazero/search/txtai/index.py",
+            "entry_id": 268,
+            "language_id": "python"
+        },
+        "28": {
+            "filepath": "/lazero/search/txtai/model.py",
+            "entry_id": 272,
+            "language_id": "python"
+        },
+        "29": {
+            "filepath": "/lazero/search/txtai/search.py",
+            "entry_id": 276,
+            "language_id": "python"
+        },
+        "30": {
+            "filepath": "/lazero/search/whoosh/index.py",
+            "entry_id": 284,
+            "language_id": "python"
+        },
+        "31": {
+            "filepath": "/lazero/search/whoosh/model.py",
+            "entry_id": 288,
+            "language_id": "python"
+        },
+        "32": {
+            "filepath": "/lazero/search/whoosh/search.py",
+            "entry_id": 294,
+            "language_id": "python"
+        },
+        "33": {
+            "filepath": "/lazero/utils/__init__.py",
+            "entry_id": 304,
+            "language_id": "python"
+        },
+        "34": {
+            "filepath": "/lazero/utils/importers.py",
+            "entry_id": 308,
+            "language_id": "python"
+        },
+        "35": {
+            "filepath": "/lazero/utils/inspectors.py",
+            "entry_id": 312,
+            "language_id": "python"
+        },
+        "36": {
+            "filepath": "/lazero/utils/json.py",
+            "entry_id": 316,
+            "language_id": "python"
+        },
+        "37": {
+            "filepath": "/lazero/utils/logger.py",
+            "entry_id": 328,
+            "language_id": "python"
+        },
+        "38": {
+            "filepath": "/lazero/utils/mathlib.py",
+            "entry_id": 332,
+            "language_id": "python"
+        },
+        "39": {
+            "filepath": "/lazero/utils/tools.py",
+            "entry_id": 362,
+            "language_id": "python"
+        },
+        "40": {
+            "filepath": "/tests/test_async_concurrentGet_pickledFunction.py",
+            "entry_id": 368,
+            "language_id": "python"
+        },
+        "41": {
+            "filepath": "/tests/test_commons.py",
+            "entry_id": 372,
+            "language_id": "python"
+        },
+        "42": {
+            "filepath": "/tests/test_noqlite.py",
+            "entry_id": 376,
+            "language_id": "python"
+        },
+        "43": {
+            "filepath": "/tests/test_search.py",
+            "entry_id": 380,
+            "language_id": "python"
+        },
+        "44": {
+            "filepath": "/tests/test_search_index.py",
+            "entry_id": 384,
+            "language_id": "python"
+        },
+        "45": {
+            "filepath": "/tests/test_search_index_notable.sh",
+            "entry_id": 388,
+            "language_id": "shell"
+        },
+        "46": {
+            "filepath": "/tests/test_textual_panel.py",
+            "entry_id": 392,
+            "language_id": "python"
+        },
+        "47": {
+            "filepath": "/tests/test_tiny_db.py",
+            "entry_id": 396,
+            "language_id": "python"
+        },
+        "48": {
+            "filepath": "/tests/test_view_db_search.py",
+            "entry_id": 400,
+            "language_id": "python"
+        },
+        "49": {
+            "filepath": "/tests/test_walk_dirs.py",
+            "entry_id": 404,
+            "language_id": "python"
+        }
+    },
+    "project_name": "lazero",
+    "split_count": 5
+}

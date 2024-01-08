@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a function \"whooshIndexer\" that indexes files in a given directory using Whoosh search library. It creates or updates an index at the specified indexDirectory, removes existing index if necessary, and prints progress during indexing and completion.",
+    "details": [
+        {
+            "comment": "This code defines a function \"whooshIndexer\" that indexes files in a given directory using Whoosh search library. It creates or updates an index at the specified indexDirectory, removes existing index if necessary, and prints progress during indexing and completion.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/search/whoosh/index.py\":0-26",
+            "content": "import progressbar\nimport shutil\nimport os\nfrom lazero.search.api import lazeroCachePath\nfrom lazero.search.index import indexFilesInDirectory\nfrom lazero.search.whoosh.model import createIndexFromDataGenerator\ndef whooshIndexer(\n    directory,\n    indexDirectory=os.path.join(lazeroCachePath, \"whoosh_index\"),\n    removeExists=True,\n    debug=False,\n):\n    iterator = indexFilesInDirectory(\n        directory, removeExists=removeExists, withFileName=True\n    )\n    if debug:\n        iterator = progressbar.progressbar(iterator)\n    if os.path.exists(indexDirectory) and removeExists:\n        shutil.rmtree(indexDirectory)\n    print(\"whoosh indexing directory %s at %s\" % (directory, indexDirectory))\n    createIndexFromDataGenerator(\n        enumerate(iterator),\n        indexDirectory,\n    )\n    print(\"whoosh index saved\")"
+        }
+    ]
+}

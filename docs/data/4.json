@@ -1,0 +1,44 @@
+{
+    "400": {
+        "file_id": 48,
+        "content": "/tests/test_view_db_search.py",
+        "type": "filepath"
+    },
+    "401": {
+        "file_id": 48,
+        "content": "Testing 100 keys' values from the database and printing their indexes and values.",
+        "type": "summary"
+    },
+    "402": {
+        "file_id": 48,
+        "content": "from test_commons import *\nfrom lazero.search.api import getValueByKeyFromDatabase\nfrom lazero.utils.logger import sprint\nfor index in range(100):\n    value = getValueByKeyFromDatabase(str(index)+\"_content\").decode(\"utf8\")\n    print(\"INDEX:\", index)\n    sprint('VALUE:', value)",
+        "type": "code",
+        "location": "/tests/test_view_db_search.py:1-7"
+    },
+    "403": {
+        "file_id": 48,
+        "content": "Testing 100 keys' values from the database and printing their indexes and values.",
+        "type": "comment"
+    },
+    "404": {
+        "file_id": 49,
+        "content": "/tests/test_walk_dirs.py",
+        "type": "filepath"
+    },
+    "405": {
+        "file_id": 49,
+        "content": "Code walks through directories and prints file paths.",
+        "type": "summary"
+    },
+    "406": {
+        "file_id": 49,
+        "content": "import os\nfrom test_commons import *\nif __name__ == \"__main__\":\n    for (root, dirs, files) in os.walk('.', topdown=True):\n        print(\"The root is: \")\n        print(root)\n        print(\"The directories are: \")\n        print(dirs)\n        print(\"The files are: \")\n        # print(files)\n        for fileName in files:\n            relativeFilePath = os.path.join(root, fileName)\n            absoluteFilePath = os.path.abspath(relativeFilePath)\n            print(absoluteFilePath)\n        print('--------------------------------')",
+        "type": "code",
+        "location": "/tests/test_walk_dirs.py:1-16"
+    },
+    "407": {
+        "file_id": 49,
+        "content": "Code walks through directories and prints file paths.",
+        "type": "comment"
+    }
+}

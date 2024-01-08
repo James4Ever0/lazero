@@ -1,0 +1,15 @@
+{
+    "summary": "This command-line utility, using argparse module, allows users to search for files, create indexes, and show FFmpeg filters. The code executes functions based on user input and lists filters with help display if successful; exits with status 255 on error, pipes output into less for easier viewing.",
+    "details": [
+        {
+            "comment": "This code is a command-line utility that allows users to search for files, create search indexes, and show FFmpeg filters. It uses the argparse module to handle user input from command-line arguments. The code then executes different functions depending on the provided arguments.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/__main__.py\":0-23",
+            "content": "import os\nimport argparse\ndef main():\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"-s\",\"--search\", action='store_true', default=False)\n    parser.add_argument(\"-i\",\"--index\", type=str,help='create search index for files in given directory', default=None)\n    parser.add_argument(\"-f\",'--ffmpeg-filters', help=\"show ffmpeg filters\", action=\"store_true\", default=False)\n    parser.add_argument('-r','--randomize', help='randomize output', action='store_true', default=False)\n    flags = parser.parse_args()\n    # print(dir(flags))\n    randomize=False\n    if flags.index:\n        from lazero.search.api import mainIndexer\n        mainIndexer(flags.index)\n    elif flags.search:\n        from lazero.search.terminal_interface import run\n        run() # default to search for our dearly documents.\n    elif flags.ffmpeg_filters:\n        if flags.randomize:\n            randomize=True\n        if randomize:\n            command = \"\"\"ffmpeg -filters 2>/dev/null | grep \"\\\\->\" | awk '{print $2}' | shuf | xargs -"
+        },
+        {
+            "comment": "This code is running a FFmpeg command to list filters and display help for each one. If there's an error, it exits with a status of 255. The output is piped into less for easier viewing.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/__main__.py\":23-30",
+            "content": "iabc bash -e -c \"ffmpeg -h filter=abc 2>/dev/null ; echo '________________________________________';echo;if [ $? -ne 0 ] ; then exit 255; fi\" | less\"\"\"\n        else:\n            command = \"\"\"ffmpeg -filters 2>/dev/null | grep \"\\\\->\" | awk '{print $2}' | xargs -I abc bash -c \"ffmpeg -h filter=abc 2>/dev/null ; echo '________________________________________'; echo ; if [ $? -ne 0 ] ; then exit 255; fi\" | less\"\"\"\n        # os.system(command)\n        import subprocess\n        subprocess.run(command, shell=True)\n    else:\n        parser.print_help()"
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "summary": "Code imports modules and defines schema for Whoosh indexing, creates an index directory if needed, iterates through dataGenerator to create and write index entries with content and filePath, while creating four versions of a processed line but missing path.",
+    "details": [
+        {
+            "comment": "This code imports necessary modules and defines a schema for Whoosh indexing. It creates an index directory if it doesn't exist, then iterates through dataGenerator to create and write index entries with given content and filePath.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/search/whoosh/model.py\":0-31",
+            "content": "from whoosh.fields import Schema, TEXT, STORED\nfrom jieba.analyse import ChineseAnalyzer\nanalyzer = ChineseAnalyzer()\nschema = Schema(\n    # path=TEXT(stored=True, analyzer=analyzer), # maybe this is not needed, since you will have it anyway\n    path_m1=TEXT(stored=True, analyzer=analyzer),\n    path_m2=TEXT(stored=True, analyzer=analyzer),\n    path_m3=TEXT(stored=True, analyzer=analyzer),\n    path_m4=TEXT(stored=True, analyzer=analyzer),\n    content=TEXT(stored=True, analyzer=analyzer),\n    index=STORED(),\n)\nfrom whoosh.index import create_in\nimport os\nfrom lazero.search.preprocessing import getFourVersionsOfProcessedLine\ndef createIndexFromDataGenerator(\n    dataGenerator, indexDirectory, indexname=\"article_index\"\n):\n    if not os.path.exists(indexDirectory):\n        os.mkdir(indexDirectory)\n    ix = create_in(indexDirectory, schema, indexname=indexname)\n    writer = ix.writer()\n    for (\n        index,\n        (content, filePath),\n    ) in dataGenerator:  # as required you need to pass the data in given form."
+        },
+        {
+            "comment": "Creates four versions of a processed line and adds them to the writer, missing a path.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/search/whoosh/model.py\":32-38",
+            "content": "        altered_paths = getFourVersionsOfProcessedLine(filePath)  # make it explicit.\n        path_altered = {\n            \"path_m{}\".format(index + 1): altered_paths[index] for index in range(4)\n        }\n        writer.add_document(content=content, index=index, **path_altered) # no path? really?\n        # writer.add_document(path=filePath, content=content, index=index, **path_altered)\n    writer.commit()"
+        }
+    ]
+}

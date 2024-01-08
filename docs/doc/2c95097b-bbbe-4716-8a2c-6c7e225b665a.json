@@ -1,0 +1,10 @@
+{
+    "summary": "This function inspects an object by checking if it has a \"__dict__\" attribute. If so, it uses pprint to print its variables. Otherwise, it iterates through the keys of the object, evaluating each key as code and printing the result, while also handling any exceptions that may occur.",
+    "details": [
+        {
+            "comment": "This function inspects an object by checking if it has a \"__dict__\" attribute. If so, it uses pprint to print its variables. Otherwise, it iterates through the keys of the object, evaluating each key as code and printing the result, while also handling any exceptions that may occur.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/utils/inspectors.py\":0-15",
+            "content": "def inspectObject(obj):\n    keys = dir(obj)\n    if \"__dict__\" in keys:\n        import pprint\n        pprint.pprint(vars(obj))\n    else:\n        for key in keys:\n            code = \"obj.{}\".format(key)\n            try:\n                subObj = eval(code)\n                print(code, subObj)\n            except:\n                import traceback\n                traceback.print_exc()\n                print(\"ERROR WHEN PRINTING {}\".format(code))\n            print(\"_\"*30)"
+        }
+    ]
+}

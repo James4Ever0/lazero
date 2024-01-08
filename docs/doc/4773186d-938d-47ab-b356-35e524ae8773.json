@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports the threading module and defines two functions, startThread and asyncThread. StartThread creates a new thread with target function, arguments, and keyword arguments, while daemon is set to False. AsyncThread wraps a function to create a new thread using startThread, allowing for asynchronous execution. The code also includes some comments discussing the naming issue and the location of related function-related stuff.",
+    "details": [
+        {
+            "comment": "Code imports the threading module and defines two functions, startThread and asyncThread. StartThread creates a new thread with target function, arguments, and keyword arguments, while daemon is set to False. AsyncThread wraps a function to create a new thread using startThread, allowing for asynchronous execution. The code also includes some comments discussing the naming issue and the location of related function-related stuff.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/program/threading.py\":1-16",
+            "content": "import threading\ndef startThread(target, args=(), kwargs={}):\n    thread = threading.Thread(target=target, args=args, kwargs=kwargs, daemon=False)\n    thread.start()\ndef asyncThread(func):\n    def new_func(*args, **kwargs):\n        startThread(func, args=args, kwargs=kwargs)\n    return new_func\n# from lazero.program.functools import someFunction\n# someFunction()\n# lazero.program.functools\n# the name still won't change! fuck.\n# how to get the function related stuff?"
+        }
+    ]
+}

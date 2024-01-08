@@ -1,0 +1,15 @@
+{
+    "summary": "The comments describe a progress bar endpoint in FastAPI, supporting opening, closing, and updating through '/open', '/update', and '/close' routes.",
+    "details": [
+        {
+            "comment": "1. Server endpoint for the progress bar\n2. Defines functions for opening, closing, and updating the progress bar\n3. Sets up a FastAPI application\n4. Handles resetting the progress bar on \"/reset\" route\n5. Updates progress on \"/update\" route",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/network/progressbar/server.py\":0-45",
+            "content": "# try to update progressbar via network.\nfrom fastapi import FastAPI\napp = FastAPI()\nfrom tqdm import tqdm\nt = None\n@app.get('/')\ndef hello():\n    return 'progressbar server'\n# not routing this to network.\ndef close_progressbar():\n    global t\n    if t is not None:\n        try:\n            t.close()\n            return {'msg':'success'}\n        except:\n            import traceback\n            traceback.print_exc()\n            print('error closing progressbar')\n            return {'msg':'error closing progressbar'}\n@app.get('/reset')\ndef reset(total: int, name:str='random task'): # pass the iteration count\n    global t\n    close_progressbar()\n    print('processing:', name)\n    t = tqdm(total=total)\n    return {'msg':'success'}\n@app.get('/update')\ndef update_progressbar(progress: int=1, info:str=\"\"):\n    global t\n    if info !=\"\":\n        print('update info:', info)\n    if t is not None:\n        try:\n            t.clear()\n            t.update(progress)\n            return {'msg':'success'}\n        except:\n            import traceback"
+        },
+        {
+            "comment": "Handles progressbar update requests and closes the progressbar upon '/close' request.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/network/progressbar/server.py\":46-57",
+            "content": "            traceback.print_exc()\n            print(\"error when updating progessbar\")\n            return {'msg':'error when updating progessbar'}\n    else:\n        print('no progressbar available')\n        return {'msg':'no progressbar available'}\n@app.get('/close')\ndef close():\n    close_progressbar()\n    return {'msg':'success'}"
+        }
+    ]
+}

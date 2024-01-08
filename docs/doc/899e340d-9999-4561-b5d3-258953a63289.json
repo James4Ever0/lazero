@@ -1,0 +1,15 @@
+{
+    "summary": "This code defines an asynchronous HTTP GET request function and a concurrent GET function using Python's aiohttp library, allowing for sending GET requests with optional parameters and processing response data. It also enables making concurrent GET requests to multiple URLs and applying specified processors to the responses.",
+    "details": [
+        {
+            "comment": "This code defines an asynchronous HTTP GET request function and a concurrent GET function using aiohttp library in Python. The get() function allows for sending GET requests with optional parameters and a custom processor for the response data. The concurrentGet() function uses the asyncio event loop to make concurrent GET requests to multiple URLs, applying a specified processor to the responses.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/network/asyncio.py\":0-34",
+            "content": "import aiohttp\nimport asyncio\n# from contextlib import closing\n# clearly it is not clean enough.\n# also i worry about the memory leakage, open file limit exceeding.\nasync def get(url, processor=lambda x: x, params={}):\n    async with aiohttp.ClientSession() as session:\n        async with session.get(url, params=params) as response:\n            result = processor(response)\n            try:\n                result = await result\n            except:\n                ...\n            return result\nfrom lazero.program.functools import pickledFunction\n# let's test this first?\n@pickledFunction(\n    __name__, debug=False\n)  # use pickle to store args/kwargs, return values, within the same directory.\ndef concurrentGet(\n    url_list,\n    processor=lambda x: x,\n    params={},\n    debug=False,\n    # child_process=True\n):\n    # with closing(asyncio.get_event_loop()) as loop:  # this closing is not working properly.\n    loop = (\n        asyncio.get_event_loop()\n    )  # this event loop is already running! fuck. we must use some 'magic' method here..."
+        },
+        {
+            "comment": "Creates multiple async requests, gathers results concurrently, and returns them",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/network/asyncio.py\":35-45",
+            "content": "    multiple_requests = [\n        get(url, processor=processor, params=params) for url in url_list\n    ]\n    results = loop.run_until_complete(asyncio.gather(*multiple_requests))\n    if debug:\n        print(\"Results: %s\" % results)\n    return results\nif __name__ == \"__main__\":\n    concurrentGet()"
+        }
+    ]
+}

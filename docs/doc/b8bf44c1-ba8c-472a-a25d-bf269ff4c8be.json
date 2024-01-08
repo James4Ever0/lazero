@@ -1,0 +1,10 @@
+{
+    "summary": "Exits the script with a status code of 2.",
+    "details": [
+        {
+            "comment": "Exits the script with a status code of 2.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/signal_2.sh\":0-0",
+            "content": "exit 2"
+        }
+    ]
+}

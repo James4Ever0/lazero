@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines two functions, \"sprint\" and \"traceError\". The \"sprint\" function prints its arguments with a line of underscores for separation. The \"traceError\" function uses the \"traceback\" module to print an error message and then calls the \"sprint\" function to print the message again. If the \"_breakpoint\" parameter is True, it also returns the result of the \"breakpoint()\" function (but \"breakpoint\" is not defined in this code).",
+    "details": [
+        {
+            "comment": "This code defines two functions, \"sprint\" and \"traceError\". The \"sprint\" function prints its arguments with a line of underscores for separation. The \"traceError\" function uses the \"traceback\" module to print an error message and then calls the \"sprint\" function to print the message again. If the \"_breakpoint\" parameter is True, it also returns the result of the \"breakpoint()\" function (but \"breakpoint\" is not defined in this code).",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/utils/logger.py\":0-9",
+            "content": "def sprint(*args, **kwargs):\n    print(*args, **kwargs)\n    print(\"_\"*30)\ndef traceError(errorMsg:str=\"error!\", _breakpoint:bool=False):\n    import traceback\n    traceback.print_exc()\n    sprint(errorMsg)\n    if _breakpoint:\n        return breakpoint()"
+        }
+    ]
+}

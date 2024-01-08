@@ -1,0 +1,536 @@
+{
+    "0": {
+        "file_id": 0,
+        "content": "/README.md",
+        "type": "filepath"
+    },
+    "1": {
+        "file_id": 0,
+        "content": "lazero is a Python package collecting useful functions for AI development, aiming to be rewritten as an AGI agent and working with AI tasks without limitations.",
+        "type": "summary"
+    },
+    "2": {
+        "file_id": 0,
+        "content": "aim to be rewritten as some AGI agent, lazero is intended to collect some util functions as a python package for further use, speed up development and glue with existing AI libraries and AGI algorithms.\nthe roadmap is as follows:\n- collect and rewrite some basic utils\n- integrate it with other libraries or projects\n- work with AGI related tasks\n- serve it and run it freely, without (virtually) any hardware or software limitations",
+        "type": "code",
+        "location": "/README.md:1-7"
+    },
+    "3": {
+        "file_id": 0,
+        "content": "lazero is a Python package collecting useful functions for AI development, aiming to be rewritten as an AGI agent and working with AI tasks without limitations.",
+        "type": "comment"
+    },
+    "4": {
+        "file_id": 1,
+        "content": "/install.sh",
+        "type": "filepath"
+    },
+    "5": {
+        "file_id": 1,
+        "content": "Removing previous build and related files, changing directory, uninstalling lazero, then reinstalling it.",
+        "type": "summary"
+    },
+    "6": {
+        "file_id": 1,
+        "content": "rm -rf build\nrm -rf lazero.egg-info\ncd ..\nyes | pip3 uninstall lazero\npip3 install ./lazero ",
+        "type": "code",
+        "location": "/install.sh:1-5"
+    },
+    "7": {
+        "file_id": 1,
+        "content": "Removing previous build and related files, changing directory, uninstalling lazero, then reinstalling it.",
+        "type": "comment"
+    },
+    "8": {
+        "file_id": 2,
+        "content": "/setup.py",
+        "type": "filepath"
+    },
+    "9": {
+        "file_id": 2,
+        "content": "The code sets up a Python package \"lazero\" using setuptools, specifying version, author, description, and dependencies. It is alpha status for education audience, supports Python 2 & 3 on POSIX Linux & MacOS X, and now includes support for Microsoft Windows.",
+        "type": "summary"
+    },
+    "10": {
+        "file_id": 2,
+        "content": "from setuptools import setup, find_packages\nVERSION = '0.0.1' \nDESCRIPTION = 'lazero'\nLONG_DESCRIPTION = 'AGI package'\n# Setting up\nsetup(\n       # the name must match the folder name 'verysimplemodule'\n        name=\"lazero\", \n        version=VERSION,\n        author=\"Jason Dsouza\",\n        author_email=\"<youremail@email.com>\",\n        description=DESCRIPTION,\n        long_description=LONG_DESCRIPTION,\n        packages=find_packages(),\n        install_requires=[], # add any additional packages that \n        # needs to be installed along with your package. Eg: 'caer'\n        entry_points ={\n            'console_scripts': [\n                'lazero = lazero.__main__:main'\n            ]\n        },\n        keywords=['python', 'first package'],\n        classifiers= [\n            \"Development Status :: 3 - Alpha\",\n            \"Intended Audience :: Education\",\n            \"Programming Language :: Python :: 2\",\n            \"Programming Language :: Python :: 3\",\n            \"Operating System :: POSIX :: Linux\",\n            \"Operating System :: MacOS :: MacOS X\",",
+        "type": "code",
+        "location": "/setup.py:1-31"
+    },
+    "11": {
+        "file_id": 2,
+        "content": "This code is setting up a Python package named \"lazero\" using setuptools. It specifies the package version, author information, and description. It also includes an entry point for running the package as a console script called 'lazero'. The package can be installed with additional dependencies specified in install_requires. It is classified as alpha status, education audience, supports Python 2 and 3, and runs on POSIX Linux and MacOS X.",
+        "type": "comment"
+    },
+    "12": {
+        "file_id": 2,
+        "content": "            \"Operating System :: Microsoft :: Windows\",\n        ]\n)",
+        "type": "code",
+        "location": "/setup.py:32-34"
+    },
+    "13": {
+        "file_id": 2,
+        "content": "This code is specifying the operating system as \"Microsoft Windows\" in the setup process.",
+        "type": "comment"
+    },
+    "14": {
+        "file_id": 3,
+        "content": "/signal_2.sh",
+        "type": "filepath"
+    },
+    "15": {
+        "file_id": 3,
+        "content": "Exits the script with a status code of 2.",
+        "type": "summary"
+    },
+    "16": {
+        "file_id": 3,
+        "content": "exit 2",
+        "type": "code",
+        "location": "/signal_2.sh:1-1"
+    },
+    "17": {
+        "file_id": 3,
+        "content": "Exits the script with a status code of 2.",
+        "type": "comment"
+    },
+    "18": {
+        "file_id": 4,
+        "content": "/test_exit.sh",
+        "type": "filepath"
+    },
+    "19": {
+        "file_id": 4,
+        "content": "Launches signal_2.sh, checks for non-zero exit code, and outputs \"shit\" if encountered.",
+        "type": "summary"
+    },
+    "20": {
+        "file_id": 4,
+        "content": "# bash  signal_2.sh\necho hello\nif [ $? -ne 0 ]; then echo shit; fi",
+        "type": "code",
+        "location": "/test_exit.sh:1-3"
+    },
+    "21": {
+        "file_id": 4,
+        "content": "Launches signal_2.sh, checks for non-zero exit code, and outputs \"shit\" if encountered.",
+        "type": "comment"
+    },
+    "22": {
+        "file_id": 5,
+        "content": "/lazero/__main__.py",
+        "type": "filepath"
+    },
+    "23": {
+        "file_id": 5,
+        "content": "This command-line utility, using argparse module, allows users to search for files, create indexes, and show FFmpeg filters. The code executes functions based on user input and lists filters with help display if successful; exits with status 255 on error, pipes output into less for easier viewing.",
+        "type": "summary"
+    },
+    "24": {
+        "file_id": 5,
+        "content": "import os\nimport argparse\ndef main():\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"-s\",\"--search\", action='store_true', default=False)\n    parser.add_argument(\"-i\",\"--index\", type=str,help='create search index for files in given directory', default=None)\n    parser.add_argument(\"-f\",'--ffmpeg-filters', help=\"show ffmpeg filters\", action=\"store_true\", default=False)\n    parser.add_argument('-r','--randomize', help='randomize output', action='store_true', default=False)\n    flags = parser.parse_args()\n    # print(dir(flags))\n    randomize=False\n    if flags.index:\n        from lazero.search.api import mainIndexer\n        mainIndexer(flags.index)\n    elif flags.search:\n        from lazero.search.terminal_interface import run\n        run() # default to search for our dearly documents.\n    elif flags.ffmpeg_filters:\n        if flags.randomize:\n            randomize=True\n        if randomize:\n            command = \"\"\"ffmpeg -filters 2>/dev/null | grep \"\\\\->\" | awk '{print $2}' | shuf | xargs -",
+        "type": "code",
+        "location": "/lazero/__main__.py:1-24"
+    },
+    "25": {
+        "file_id": 5,
+        "content": "This code is a command-line utility that allows users to search for files, create search indexes, and show FFmpeg filters. It uses the argparse module to handle user input from command-line arguments. The code then executes different functions depending on the provided arguments.",
+        "type": "comment"
+    },
+    "26": {
+        "file_id": 5,
+        "content": "iabc bash -e -c \"ffmpeg -h filter=abc 2>/dev/null ; echo '________________________________________';echo;if [ $? -ne 0 ] ; then exit 255; fi\" | less\"\"\"\n        else:\n            command = \"\"\"ffmpeg -filters 2>/dev/null | grep \"\\\\->\" | awk '{print $2}' | xargs -I abc bash -c \"ffmpeg -h filter=abc 2>/dev/null ; echo '________________________________________'; echo ; if [ $? -ne 0 ] ; then exit 255; fi\" | less\"\"\"\n        # os.system(command)\n        import subprocess\n        subprocess.run(command, shell=True)\n    else:\n        parser.print_help()",
+        "type": "code",
+        "location": "/lazero/__main__.py:24-31"
+    },
+    "27": {
+        "file_id": 5,
+        "content": "This code is running a FFmpeg command to list filters and display help for each one. If there's an error, it exits with a status of 255. The output is piped into less for easier viewing.",
+        "type": "comment"
+    },
+    "28": {
+        "file_id": 6,
+        "content": "/lazero/filesystem/__init__.py",
+        "type": "filepath"
+    },
+    "29": {
+        "file_id": 6,
+        "content": "Importing all modules from lazero.filesystem.temp to this file, possibly duplicating functionality or causing conflicts.",
+        "type": "summary"
+    },
+    "30": {
+        "file_id": 6,
+        "content": "from lazero.filesystem.temp import *\n# are you sure this is correct? might lead to the same goddamn problem.",
+        "type": "code",
+        "location": "/lazero/filesystem/__init__.py:1-2"
+    },
+    "31": {
+        "file_id": 6,
+        "content": "Importing all modules from lazero.filesystem.temp to this file, possibly duplicating functionality or causing conflicts.",
+        "type": "comment"
+    },
+    "32": {
+        "file_id": 7,
+        "content": "/lazero/filesystem/env.py",
+        "type": "filepath"
+    },
+    "33": {
+        "file_id": 7,
+        "content": "This function returns the home directory of the user.",
+        "type": "summary"
+    },
+    "34": {
+        "file_id": 7,
+        "content": "import os\ndef getHomeDirectory():\n    # https://pythonguides.com/get-current-directory-python/#:~:text=Get%20current%20directory%20Python%201%20To%20get%20the,can%20use%20another%20function%20called%20basename%20from%20os.path.\n    return os.path.expanduser(\"~\")  # well we borrow this from web.",
+        "type": "code",
+        "location": "/lazero/filesystem/env.py:1-4"
+    },
+    "35": {
+        "file_id": 7,
+        "content": "This function returns the home directory of the user.",
+        "type": "comment"
+    },
+    "36": {
+        "file_id": 8,
+        "content": "/lazero/filesystem/io.py",
+        "type": "filepath"
+    },
+    "37": {
+        "file_id": 8,
+        "content": "The code provides functions for reading and writing files in various formats including text, binary data, and Python objects using pickle or dill serialization libraries. It also supports reading JSON objects from files.",
+        "type": "summary"
+    },
+    "38": {
+        "file_id": 8,
+        "content": "def readFile(filename, encoding=\"utf-8\", mode=\"r\"):\n    with open(filename, mode, encoding=encoding) as f:\n        return f.read()\ndef writeFile(filename, content, encoding=\"utf-8\", mode=\"w+\"):\n    with open(filename, mode, encoding=encoding) as f:\n        f.write(content)\ndef readFileBinary(filename, mode=\"rb\"):\n    with open(filename, mode) as f:\n        return f.read()\ndef writeFileBinary(filename, content, mode=\"wb\"):\n    with open(filename, mode) as f:\n        f.write(content)\nimport pickle\nimport dill\nfrom typing import Literal\nbackends = {\"pickle\": pickle, \"dill\": dill}\ndef readPythonObjectFromFile(filename, backend: Literal[\"pickle\", \"dill\"] = \"dill\"):\n    data = readFileBinary(filename)\n    return backends[backend].loads(data)\ndef writePythonObjectToFile(\n    filename, pythonObject, backend: Literal[\"pickle\", \"dill\"] = \"dill\"\n):\n    data = backends[backend].dumps(pythonObject)\n    writeFileBinary(filename, data)\nimport json\ndef writeJsonObjectToFile(filename, jsonObject, ensure_ascii=False, indent=4):\n    content = json.dumps(jsonObject, ensure_ascii=ensure_ascii, indent=indent)",
+        "type": "code",
+        "location": "/lazero/filesystem/io.py:1-41"
+    },
+    "39": {
+        "file_id": 8,
+        "content": "This code defines various functions for reading and writing files in different formats, such as text (UTF-8 encoded) or binary data. It also includes functionality for reading and writing Python objects using either pickle or dill serialization libraries. The code imports the necessary libraries (pickle, dill, and json) and sets up a dictionary to switch between them based on the specified backend.",
+        "type": "comment"
+    },
+    "40": {
+        "file_id": 8,
+        "content": "    writeFile(filename, content)\ndef readJsonObjectFromFile(filename):\n    content = readFile(filename)\n    jsonObject = json.loads(content)\n    return jsonObject",
+        "type": "code",
+        "location": "/lazero/filesystem/io.py:42-47"
+    },
+    "41": {
+        "file_id": 8,
+        "content": "Reads a JSON object from file.\nReads the file content, then parses it as JSON.",
+        "type": "comment"
+    },
+    "42": {
+        "file_id": 9,
+        "content": "/lazero/filesystem/temp.py",
+        "type": "filepath"
+    },
+    "43": {
+        "file_id": 9,
+        "content": "The code introduces a context manager class, \"tmpdir\", for handling temporary directories and files. It features two functions: one generates random file names and cleans up temporary files/directories, while the other checks if a file path exists and returns it if not.",
+        "type": "summary"
+    },
+    "44": {
+        "file_id": 9,
+        "content": "from contextlib import nullcontext, AbstractContextManager\nfrom typing import Union\nimport os\nimport shutil\nimport uuid\nclass tmpdir(AbstractContextManager):\n    \"\"\"Context manager to suppress specified exceptions\n    After the exception is suppressed, execution proceeds with the next\n    statement following the with statement.\n         with suppress(FileNotFoundError):\n             os.remove(somefile)\n         # Execution still resumes here if the file was already removed\n    \"\"\"\n    def __init__(self, path=None):\n        assert type(path) == str\n        if not os.path.isabs(path):\n            path = os.path.abspath(path)\n        self._tmpdir = path\n    def __str__(self):\n        return os.path.abspath(self._tmpdir)\n    def __repr__(self):\n        return os.path.abspath(self._tmpdir)\n    def __enter__(self):\n        print(\"temporary directory: %s\" % self._tmpdir)\n        if os.path.exists(self._tmpdir):\n            shutil.rmtree(self._tmpdir)\n        os.makedirs(self._tmpdir)\n        return self._tmpdir\n    def __exit__(self, exctype, excinst, exctb):",
+        "type": "code",
+        "location": "/lazero/filesystem/temp.py:1-38"
+    },
+    "45": {
+        "file_id": 9,
+        "content": "The code defines a context manager class, \"tmpdir\", that handles temporary directory operations. It takes a path parameter and checks if it's an absolute path. If not, it converts it to an absolute path. The \"__enter__\" method is used to create the temporary directory by removing any existing files or directories at the specified path, then making new ones. The path of the temporary directory is printed. The \"__exit__\" method is a placeholder for handling any exceptions that may occur within the context managed by this class.",
+        "type": "comment"
+    },
+    "46": {
+        "file_id": 9,
+        "content": "        # try not to handle exceptions?\n        tempdir = self._tmpdir\n        print(\"cleaning tempdir: %s\" % tempdir)\n        if os.path.exists(tempdir):\n            if os.path.isdir(tempdir):\n                shutil.rmtree(tempdir)\n        return False\nclass tmpfile(AbstractContextManager):\n    def __init__(self, path=None, replace=False):\n        assert type(path) == str\n        if not os.path.isabs(path):\n            path = os.path.abspath(path)\n        if os.path.exists(path):\n            if replace:\n                import shutil\n                if os.path.isdir(path):\n                    shutil.rmtree(path)\n                else:\n                    os.remove(path)\n            else:\n                raise Exception(\"file %s already exists\" % path)\n        self._tmpdir = os.path.dirname(path)\n        self._filepath = path\n    def __enter__(self):\n        print(\"allocating temporary directory: %s\" % self._tmpdir)\n        if not os.path.exists(self._tmpdir):\n            os.makedirs(self._tmpdir)\n        return self._filepath",
+        "type": "code",
+        "location": "/lazero/filesystem/temp.py:39-70"
+    },
+    "47": {
+        "file_id": 9,
+        "content": "Creates a temporary file and directory, handles exceptions if file already exists and allows for replacement.",
+        "type": "comment"
+    },
+    "48": {
+        "file_id": 9,
+        "content": "    def __exit__(self, exctype, excinst, exctb):\n        # try not to handle exceptions?\n        tempdir = self._tmpdir\n        tempfile = self._filepath\n        print(\"cleaning tempfile: %s\" % tempdir)\n        if os.path.exists(tempfile):\n            if os.path.isfile(tempfile):\n                os.remove(tempfile)\n            elif os.path.isdir(tempfile):\n                shutil.rmtree(tempfile)\n        if os.path.exists(tempdir):\n            if os.path.isdir(tempdir):\n                if os.listdir(tempdir) == []:\n                    print(\"removing empty tempdir: %s\" % tempdir)\n                    shutil.rmtree(tempdir)\n        return False\ndef getRandomFileNameUnderDirectoryWithExtension(\n    extension: str, directory: str, check: bool = True\n):\n    extension = extension.split(\".\")[-1]\n    if check:\n        assert len(extension) > 0\n        assert os.path.exists(directory)\n        assert os.path.isdir(directory)\n    while True:\n        filepath = os.path.join(directory, \".\".join([str(uuid.uuid4()), extension]))",
+        "type": "code",
+        "location": "/lazero/filesystem/temp.py:72-99"
+    },
+    "49": {
+        "file_id": 9,
+        "content": "This code defines a function that generates a random file name under a specified directory with a specific extension, and another function to handle cleanup of temporary files and directories.",
+        "type": "comment"
+    },
+    "50": {
+        "file_id": 9,
+        "content": "        if not os.path.exists(filepath):\n            return filepath",
+        "type": "code",
+        "location": "/lazero/filesystem/temp.py:100-101"
+    },
+    "51": {
+        "file_id": 9,
+        "content": "Checking if the file path exists, returns the filepath if not.",
+        "type": "comment"
+    },
+    "52": {
+        "file_id": 10,
+        "content": "/lazero/network/__init__.py",
+        "type": "filepath"
+    },
+    "53": {
+        "file_id": 10,
+        "content": "Importing modules from lazero.network.downloader and lazero.network.checker for network operations.",
+        "type": "summary"
+    },
+    "54": {
+        "file_id": 10,
+        "content": "from lazero.network.downloader import *\nfrom lazero.network.checker import *",
+        "type": "code",
+        "location": "/lazero/network/__init__.py:1-2"
+    },
+    "55": {
+        "file_id": 10,
+        "content": "Importing modules from lazero.network.downloader and lazero.network.checker for network operations.",
+        "type": "comment"
+    },
+    "56": {
+        "file_id": 11,
+        "content": "/lazero/network/asyncio.py",
+        "type": "filepath"
+    },
+    "57": {
+        "file_id": 11,
+        "content": "This code defines an asynchronous HTTP GET request function and a concurrent GET function using Python's aiohttp library, allowing for sending GET requests with optional parameters and processing response data. It also enables making concurrent GET requests to multiple URLs and applying specified processors to the responses.",
+        "type": "summary"
+    },
+    "58": {
+        "file_id": 11,
+        "content": "import aiohttp\nimport asyncio\n# from contextlib import closing\n# clearly it is not clean enough.\n# also i worry about the memory leakage, open file limit exceeding.\nasync def get(url, processor=lambda x: x, params={}):\n    async with aiohttp.ClientSession() as session:\n        async with session.get(url, params=params) as response:\n            result = processor(response)\n            try:\n                result = await result\n            except:\n                ...\n            return result\nfrom lazero.program.functools import pickledFunction\n# let's test this first?\n@pickledFunction(\n    __name__, debug=False\n)  # use pickle to store args/kwargs, return values, within the same directory.\ndef concurrentGet(\n    url_list,\n    processor=lambda x: x,\n    params={},\n    debug=False,\n    # child_process=True\n):\n    # with closing(asyncio.get_event_loop()) as loop:  # this closing is not working properly.\n    loop = (\n        asyncio.get_event_loop()\n    )  # this event loop is already running! fuck. we must use some 'magic' method here...",
+        "type": "code",
+        "location": "/lazero/network/asyncio.py:1-35"
+    },
+    "59": {
+        "file_id": 11,
+        "content": "This code defines an asynchronous HTTP GET request function and a concurrent GET function using aiohttp library in Python. The get() function allows for sending GET requests with optional parameters and a custom processor for the response data. The concurrentGet() function uses the asyncio event loop to make concurrent GET requests to multiple URLs, applying a specified processor to the responses.",
+        "type": "comment"
+    },
+    "60": {
+        "file_id": 11,
+        "content": "    multiple_requests = [\n        get(url, processor=processor, params=params) for url in url_list\n    ]\n    results = loop.run_until_complete(asyncio.gather(*multiple_requests))\n    if debug:\n        print(\"Results: %s\" % results)\n    return results\nif __name__ == \"__main__\":\n    concurrentGet()",
+        "type": "code",
+        "location": "/lazero/network/asyncio.py:36-46"
+    },
+    "61": {
+        "file_id": 11,
+        "content": "Creates multiple async requests, gathers results concurrently, and returns them",
+        "type": "comment"
+    },
+    "62": {
+        "file_id": 12,
+        "content": "/lazero/network/checker.py",
+        "type": "filepath"
+    },
+    "63": {
+        "file_id": 12,
+        "content": "The function waits for a server on the specified port and checks for a response with options for timeout, maximum time, and host. If successful, it returns True; otherwise, prints an error message or returns False after 1 second if unsuccessful.",
+        "type": "summary"
+    },
+    "64": {
+        "file_id": 12,
+        "content": "def waitForServerUp(port, message, timeout=1, maxtime=-1,host='localhost'):\n    import requests\n    mtime = maxtime if (mflag := maxtime > 0) else 1\n    while mtime > 0:\n        try:\n            if mflag:\n                mtime -= 1\n                print(f\"{mtime} chances remains for server {port} at {host}\")\n            url = \"http://{}:{}\".format(host,port)\n            with requests.get(url, timeout=timeout, proxies=None) as r:\n                if type(message) == str:\n                    text = r.text.strip('\"').strip(\"'\")\n                else:\n                    text = r.json()\n                print(\"SERVER AT PORT %d RESPONDS:\" % port, [text])\n                assert text == message\n                print(\"SERVER AT PORT %d IS UP\" % port)\n                # break\n                return True\n            # better just return\n        except:\n            import traceback\n            traceback.print_exc()\n            print(\"SERVER AT PORT %d MIGHT NOT BE UP\" % port)\n            print(\"EXPECTED MESSAGE:\", [message])",
+        "type": "code",
+        "location": "/lazero/network/checker.py:1-27"
+    },
+    "65": {
+        "file_id": 12,
+        "content": "This function waits for a server to be up on the specified port and checks if it responds with the expected message. It has options for timeout, maximum time, and host. If the server is up, it returns True; otherwise, it prints an error message.",
+        "type": "comment"
+    },
+    "66": {
+        "file_id": 12,
+        "content": "            import time\n            time.sleep(1)\n    return False",
+        "type": "code",
+        "location": "/lazero/network/checker.py:28-31"
+    },
+    "67": {
+        "file_id": 12,
+        "content": "Waits for 1 second before returning False.",
+        "type": "comment"
+    },
+    "68": {
+        "file_id": 13,
+        "content": "/lazero/network/downloader.py",
+        "type": "filepath"
+    },
+    "69": {
+        "file_id": 13,
+        "content": "The code features a `download_external` function, utilizing lazero network downloader for efficient file downloads, multithreading, error handling, progress updates with tqdm, and race condition prevention.",
+        "type": "summary"
+    },
+    "70": {
+        "file_id": 13,
+        "content": "# from argparse import ArgumentParser\nimport requests\nimport enum\nimport os\nfrom tqdm import tqdm\nclass sizeUnit(enum.Enum):\n    # class to store the various units\n    BYTES = 1\n    KB = 2\n    MB = 3\n    GB = 4\ndef unitConvertor(sizeInBytes, unit):\n    # Cinverts the file unit\n    if unit == sizeUnit.KB:\n        return sizeInBytes / 1024\n    elif unit == sizeUnit.MB:\n        return sizeInBytes / (1024 * 1024)\n    elif unit == sizeUnit.GB:\n        return sizeInBytes / (1024 * 1024 * 1024)\n    else:\n        return sizeInBytes\ndef fileSize(filePath, size_type):\n    \"\"\"File size in KB, MB and GB\"\"\"\n    size = os.path.getsize(filePath)\n    return unitConvertor(size, size_type)\ndef pyCURLFileSizeProbe(url):\n    from io import StringIO\n    STATUS_OK = (200, 203, 206)\n    STATUS_ERROR = range(400, 600)\n    import pycurl\n    ss = StringIO()\n    curl = pycurl.Curl()\n    curl.setopt(pycurl.FOLLOWLOCATION, 1)\n    curl.setopt(pycurl.MAXREDIRS, 5)\n    curl.setopt(pycurl.CONNECTTIMEOUT, 30)\n    curl.setopt(pycurl.TIMEOUT, 300)\n    curl.setopt(pycurl.NOSIGNAL, 1)",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:1-48"
+    },
+    "71": {
+        "file_id": 13,
+        "content": "This code defines a function to convert file size units, retrieve the file size using different units (KB, MB, GB), and uses pycurl library to probe the file size from a URL.",
+        "type": "comment"
+    },
+    "72": {
+        "file_id": 13,
+        "content": "    curl.setopt(pycurl.NOPROGRESS, 1)\n    curl.setopt(pycurl.NOBODY, 1)\n    curl.setopt(pycurl.HEADERFUNCTION, ss.write)\n    curl.setopt(pycurl.URL, url)\n    try:\n        curl.perform()\n    except:\n        pass\n    size = None\n    if curl.errstr() == \"\" and curl.getinfo(pycurl.RESPONSE_CODE) in STATUS_OK:\n        # url_info['url'] = curl.getinfo(pycurl.EFFECTIVE_URL)\n        # url_info['file'] = os.path.split(url_info['url'])[1]\n        size = int(curl.getinfo(pycurl.CONTENT_LENGTH_DOWNLOAD))\n    else:\n        try:\n            size = int(curl.getinfo(pycurl.CONTENT_LENGTH_DOWNLOAD))\n        except:\n            pass\n        print(\"PYCURL ERROR:\", curl.errstr())\n        try:\n            print(\"RESPONSE CODE:\", curl.getinfo(pycurl.RESPONSE_CODE))\n        except:\n            print(\"FAILED TO GET RESPONSE CODE\")\n    curl.close()\n    return size\ndef pyCURLDownload(url, download_path, timeout: int = 120):\n    import pycurl\n    file_name = download_path\n    file_src = url\n    with open(file_name, \"wb\") as f:\n        cl = pycurl.Curl()",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:49-84"
+    },
+    "73": {
+        "file_id": 13,
+        "content": "The code is using the pycurl library to download a file from a URL. It sets options for the download, performs the download, checks for errors or successful response, and returns the size of the downloaded content.",
+        "type": "comment"
+    },
+    "74": {
+        "file_id": 13,
+        "content": "        cl.setopt(pycurl.URL, file_src)\n        cl.setopt(pycurl.WRITEDATA, f)\n        cl.setopt(pycurl.TIMEOUT, timeout)\n        cl.perform()\n        cl.close()\n# from retry import retry\n# @retry(tries=2)\ndef download_external():\n    import argparse\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"--url\", type=str, required=True, help=\"URL to download\")\n    parser.add_argument(\n        \"--filename\", type=str, required=True, help=\"filename to write content to\"\n    )\n    parser.add_argument(\"--config\", type=str, default=\"{}\", help=\"config json string\")\n    args = parser.parse_args()\n    import json\n    config_input = json.loads(args.config)\n    assert type(config_input) == dict\n    config = {\n        \"allow_redirects\": True,\n        \"show_progress\": True,\n        \"use_multithread\": True,\n        \"threads\": 6,\n        \"max_threads\": 100,\n        \"min_threads\": 4,\n        \"redownload\": False,\n        \"timeout\": 30,  # will that work?\n        \"size_filter\": {},  # in megabytes?\n        \"skip_verification\": True,",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:85-120"
+    },
+    "75": {
+        "file_id": 13,
+        "content": "This code defines a function `download_external` that uses the PyCurl library to download a file from a given URL and save it with a specified filename. The function also takes additional configuration options such as allowing redirects, showing progress, using multithreading, setting thread counts, and timeouts.",
+        "type": "comment"
+    },
+    "76": {
+        "file_id": 13,
+        "content": "    }\n    config.update(config_input)\n    config.update({\"external\": False})\n    download(args.url, args.filename, **config)\ndef download(\n    url,\n    filename,\n    allow_redirects=True,\n    show_progress=True,\n    use_multithread=True,\n    threads: float = 6,\n    use_proxy: bool = False,\n    max_threads=100,\n    min_threads=4,\n    redownload=False,\n    timeout=30,  # will that work?\n    size_filter: dict = {},  # in megabytes?\n    skip_verification: bool = True,\n    external: bool = True,  # set it to True in our damn project.\n):\n    if external:\n        print(\"using external downloader\")\n        import subprocess\n        commandArgs = {\n            \"allow_redirects\": allow_redirects,\n            \"show_progress\": show_progress,\n            \"use_multithread\": use_multithread,\n            \"threads\": threads,\n            \"max_threads\": max_threads,\n            \"min_threads\": min_threads,\n            \"redownload\": redownload,\n            \"timeout\": timeout,  # will that work?\n            \"size_filter\": size_filter,  # in megabytes?",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:121-156"
+    },
+    "77": {
+        "file_id": 13,
+        "content": "Function for downloading a file with various options, including the ability to use an external downloader if specified.",
+        "type": "comment"
+    },
+    "78": {
+        "file_id": 13,
+        "content": "            \"skip_verification\": skip_verification,\n            \"external\": False,\n        }\n        import json\n        commandArgs = json.dumps(commandArgs)\n        try:\n            result = subprocess.run(\n                [\n                    \"python3\",\n                    \"-m\",\n                    \"lazero.network.downloader\",\n                    \"--url\",\n                    url,\n                    \"--filename\",\n                    filename,\n                    \"--config\",\n                    commandArgs,\n                ],\n                shell=False,\n                timeout=timeout,\n            )\n            return result.returncode == 0 and os.path.exists(\n                filename\n            )  # check if this succeeds\n        except:\n            print(\"downloader timeout\")\n            return False\n    if skip_verification:\n        import requests_skip_verify\n        requests_skip_verify.set(True)\n    if not use_proxy:\n        os.environ[\"http_proxy\"] = \"\"\n        os.environ[\"https_proxy\"] = \"\"\n    min_size_filter = size_filter.get(\"min\", None)",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:157-191"
+    },
+    "79": {
+        "file_id": 13,
+        "content": "This code is running a subprocess to download a file using the lazero network downloader. It passes arguments such as URL, filename, and command options in a JSON-formatted string. If skip_verification is True, it skips SSL verification during the download process. If use_proxy is False, it clears the http and https proxies from the environment variables. It also applies a min size filter if provided.",
+        "type": "comment"
+    },
+    "80": {
+        "file_id": 13,
+        "content": "    max_size_filter = size_filter.get(\"max\", None)\n    use_requests = True\n    # try:\n    with requests.get(\n        url,\n        stream=True,\n        allow_redirects=allow_redirects,\n        timeout=timeout,\n        verify=skip_verification,\n    ) as response:\n        total = response.headers.get(\"content-length\")\n        # except:\n        #     use_requests = False\n        # import traceback\n        # traceback.print_exc()\n        # print(\"unknown requests error. might be open files limit\")\n        # total = pyCURLFileSizeProbe(url)\n        if not redownload:\n            if os.path.exists(filename):\n                if total:\n                    filesize = os.path.getsize(filename)\n                    if filesize == total:\n                        return True\n                else:\n                    return True\n        basename = os.path.basename(filename)\n        one_megabyte = 1024**2\n        if total is None:\n            if min_size_filter or max_size_filter:\n                print(\n                    \"Not downloading since don't know how to filter file size without server response\"",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:192-225"
+    },
+    "81": {
+        "file_id": 13,
+        "content": "This code checks the file size without actually downloading the file. It gets the maximum and minimum size filters from a dictionary, then attempts to get the total content length of the URL using requests module. If redownload is not set and the file already exists, it compares its size with the total content length if it's available. If there's no server response (total is None), and either min_size or max_size filters are present, it prints a message indicating that it can't filter the file size without server response.",
+        "type": "comment"
+    },
+    "82": {
+        "file_id": 13,
+        "content": "                )\n                return False\n        else:\n            total = int(total)\n            size = unitConvertor(total, sizeUnit.MB)\n            size = float(size)\n            if min_size_filter:\n                if size < min_size_filter:\n                    print(\"Min size filter is %.5f MB\" % min_size_filter)\n                    print(\"File Size is %.5f MB\" % size)\n                    print(\"Not downloading since filtered by min size filter\")\n                    return False\n            if max_size_filter:\n                if size > max_size_filter:\n                    print(\"Max size filter is %.5f MB\" % max_size_filter)\n                    print(\"File Size is %.5f MB\" % size)\n                    print(\"Not downloading since filtered by max size filter\")\n                    return False\n        try:\n            # main download section.\n            if total is None:\n                if use_requests:\n                    with open(filename, \"wb\") as f:\n                        print(\"Downloading %s\" % filename)",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:226-249"
+    },
+    "83": {
+        "file_id": 13,
+        "content": "Checks if file size meets min or max size filter before downloading.",
+        "type": "comment"
+    },
+    "84": {
+        "file_id": 13,
+        "content": "                        f.write(response.content)\n                else:\n                    pyCURLDownload(url, filename, timeout=timeout)\n            else:\n                print(\"Downloading %s of size %.5f MB\" % (basename, size))\n                print(\"Saving at %s\" % filename)\n                if use_multithread:\n                    if threads == 0:\n                        threads = 6\n                    if threads < 0:\n                        # print(\"TOTAL\", total)\n                        # print(\"ONE_MEGABYTE\", one_megabyte)\n                        # print(\"-THREADS\", -threads)\n                        a = one_megabyte * (-threads)\n                        # print(\"ONE_MEGABYTE*(-THREADS)\", a)\n                        b = total / a\n                        # print(\"TOTAL/A\",b)\n                        c = round(b)\n                        # print(\"ROUND(B)\", c)\n                        threads = c\n                    threads = int(threads)\n                    threads = min(max_threads, max(min_threads, threads))",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:250-271"
+    },
+    "85": {
+        "file_id": 13,
+        "content": "This code segment handles the process of downloading files. If the file is already present in the desired location, it calls a function to resume the download. Otherwise, it prints progress information and sets up thread management for the download process. The threads are dynamically adjusted based on the file size and other settings.",
+        "type": "comment"
+    },
+    "86": {
+        "file_id": 13,
+        "content": "                    print(\"using %d threads\" % threads)\n                    import multithread\n                    download_object = multithread.Downloader(\n                        url,\n                        filename,\n                        progress_bar=show_progress,\n                        threads=threads,\n                        aiohttp_args={\n                            \"method\": \"GET\",\n                            \"allow_redirects\": allow_redirects,\n                            \"timeout\": timeout,\n                            \"verify_ssl\": skip_verification,\n                            \"ssl\": skip_verification if not skip_verification else None,\n                        },\n                    )\n                    try:\n                        import time\n                        time.sleep(0.1)  # wtf?\n                        download_object.start()\n                        time.sleep(0.1)  # wtf?\n                        # it might have issue.\n                    except:\n                        import traceback",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:272-296"
+    },
+    "87": {
+        "file_id": 13,
+        "content": "Scheduling a 0.1 second delay before and after starting the downloader thread.",
+        "type": "comment"
+    },
+    "88": {
+        "file_id": 13,
+        "content": "                        traceback.print_exc()\n                        print(\"error when using multithread download\")\n                        import asyncio\n                        asyncio.set_event_loop(asyncio.new_event_loop())\n                        pyCURLDownload(url, filename, timeout=timeout)\n                else:\n                    if use_requests:\n                        with open(filename, \"wb\") as f:\n                            if show_progress:\n                                for data in tqdm(\n                                    response.iter_content(\n                                        chunk_size=max(int(total / 1000), 1024 * 1024)\n                                    )\n                                ):\n                                    f.write(data)\n                            else:\n                                f.write(response.content)\n                    else:\n                        pyCURLDownload(url, filename)\n                print(\"Finished downloading %s of size %.2f MB\" % (basename, size))",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:298-318"
+    },
+    "89": {
+        "file_id": 13,
+        "content": "Handles multithread downloads, falling back to asyncio and pyCURLDownload if an error occurs.\nUses requests or pyCURLDownload based on config settings.\nDisplays progress using tqdm if show_progress is True.",
+        "type": "comment"
+    },
+    "90": {
+        "file_id": 13,
+        "content": "                print(\"Saved at %s\" % filename)\n            return True\n        except:\n            import traceback\n            traceback.print_exc()\n            print(\"Failed to download file %s\" % filename)\n            print(\"File URL: %s\" % url)\n            return False\nif __name__ == \"__main__\":\n    download_external()",
+        "type": "code",
+        "location": "/lazero/network/downloader.py:319-331"
+    },
+    "91": {
+        "file_id": 13,
+        "content": "Trying to download a file and printing success or failure message.",
+        "type": "comment"
+    },
+    "92": {
+        "file_id": 14,
+        "content": "/lazero/network/progressbar/client.py",
+        "type": "filepath"
+    },
+    "93": {
+        "file_id": 14,
+        "content": "The code utilizes requests library to define a class for network progress bar communication, initializes server and updates progress using HTTP GET requests, but may encounter an error during the update process.",
+        "type": "summary"
+    },
+    "94": {
+        "file_id": 14,
+        "content": "import requests\nclass netProgressbar:\n    def __init__(self, port = 8576, timeout=1,message = 'progressbar server'):\n        from lazero.network import waitForServerUp\n        self.port = port\n        self.message = message\n        self.timeout=timeout\n        waitForServerUp(port=port, message=message)\n    def reset(self, total:int):\n        try:\n            with requests.get('http://localhost:{}/reset'.format(self.port),proxies=None,params = {'total':total}, timeout=self.timeout) as conn:\n                print(\"connection status:\", conn)\n        except:\n            import traceback\n            traceback.print_exc()\n            print(\"error when resetting netProgressbar\")\n    def update(self,progress:int=1, info=\"\"):\n        info = str(info)\n        try:\n            with requests.get('http://localhost:8576/update',proxies=None, params={'progress':progress,'info':info}, timeout=self.timeout) as conn:\n                print(\"connection status:\", conn)\n        except:\n            import traceback\n            traceback.print_exc()",
+        "type": "code",
+        "location": "/lazero/network/progressbar/client.py:1-25"
+    },
+    "95": {
+        "file_id": 14,
+        "content": "Imports requests and defines a class for network progress bar communication. Initializes server, resets, and updates progress with HTTP GET requests.",
+        "type": "comment"
+    },
+    "96": {
+        "file_id": 14,
+        "content": "            print(\"error when updating netProgressbar\")",
+        "type": "code",
+        "location": "/lazero/network/progressbar/client.py:26-26"
+    },
+    "97": {
+        "file_id": 14,
+        "content": "This code prints an error message indicating an issue while updating the network progress bar.",
+        "type": "comment"
+    },
+    "98": {
+        "file_id": 15,
+        "content": "/lazero/network/progressbar/server.py",
+        "type": "filepath"
+    },
+    "99": {
+        "file_id": 15,
+        "content": "The comments describe a progress bar endpoint in FastAPI, supporting opening, closing, and updating through '/open', '/update', and '/close' routes.",
+        "type": "summary"
+    }
+}

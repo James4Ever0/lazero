@@ -1,0 +1,10 @@
+{
+    "summary": "Launches signal_2.sh, checks for non-zero exit code, and outputs \"shit\" if encountered.",
+    "details": [
+        {
+            "comment": "Launches signal_2.sh, checks for non-zero exit code, and outputs \"shit\" if encountered.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/test_exit.sh\":0-2",
+            "content": "# bash  signal_2.sh\necho hello\nif [ $? -ne 0 ]; then echo shit; fi"
+        }
+    ]
+}

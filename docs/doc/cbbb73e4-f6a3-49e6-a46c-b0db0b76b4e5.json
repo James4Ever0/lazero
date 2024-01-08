@@ -1,0 +1,10 @@
+{
+    "summary": "Code walks through directories and prints file paths.",
+    "details": [
+        {
+            "comment": "Code walks through directories and prints file paths.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_walk_dirs.py\":0-15",
+            "content": "import os\nfrom test_commons import *\nif __name__ == \"__main__\":\n    for (root, dirs, files) in os.walk('.', topdown=True):\n        print(\"The root is: \")\n        print(root)\n        print(\"The directories are: \")\n        print(dirs)\n        print(\"The files are: \")\n        # print(files)\n        for fileName in files:\n            relativeFilePath = os.path.join(root, fileName)\n            absoluteFilePath = os.path.abspath(relativeFilePath)\n            print(absoluteFilePath)\n        print('--------------------------------')"
+        }
+    ]
+}

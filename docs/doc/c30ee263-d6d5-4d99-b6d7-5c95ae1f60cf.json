@@ -1,0 +1,15 @@
+{
+    "summary": "The code sets up a Python package \"lazero\" using setuptools, specifying version, author, description, and dependencies. It is alpha status for education audience, supports Python 2 & 3 on POSIX Linux & MacOS X, and now includes support for Microsoft Windows.",
+    "details": [
+        {
+            "comment": "This code is setting up a Python package named \"lazero\" using setuptools. It specifies the package version, author information, and description. It also includes an entry point for running the package as a console script called 'lazero'. The package can be installed with additional dependencies specified in install_requires. It is classified as alpha status, education audience, supports Python 2 and 3, and runs on POSIX Linux and MacOS X.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/setup.py\":0-30",
+            "content": "from setuptools import setup, find_packages\nVERSION = '0.0.1' \nDESCRIPTION = 'lazero'\nLONG_DESCRIPTION = 'AGI package'\n# Setting up\nsetup(\n       # the name must match the folder name 'verysimplemodule'\n        name=\"lazero\", \n        version=VERSION,\n        author=\"Jason Dsouza\",\n        author_email=\"<youremail@email.com>\",\n        description=DESCRIPTION,\n        long_description=LONG_DESCRIPTION,\n        packages=find_packages(),\n        install_requires=[], # add any additional packages that \n        # needs to be installed along with your package. Eg: 'caer'\n        entry_points ={\n            'console_scripts': [\n                'lazero = lazero.__main__:main'\n            ]\n        },\n        keywords=['python', 'first package'],\n        classifiers= [\n            \"Development Status :: 3 - Alpha\",\n            \"Intended Audience :: Education\",\n            \"Programming Language :: Python :: 2\",\n            \"Programming Language :: Python :: 3\",\n            \"Operating System :: POSIX :: Linux\",\n            \"Operating System :: MacOS :: MacOS X\","
+        },
+        {
+            "comment": "This code is specifying the operating system as \"Microsoft Windows\" in the setup process.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/setup.py\":31-33",
+            "content": "            \"Operating System :: Microsoft :: Windows\",\n        ]\n)"
+        }
+    ]
+}

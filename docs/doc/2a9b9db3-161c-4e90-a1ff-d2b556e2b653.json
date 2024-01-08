@@ -1,0 +1,10 @@
+{
+    "summary": "Removing previous build and related files, changing directory, uninstalling lazero, then reinstalling it.",
+    "details": [
+        {
+            "comment": "Removing previous build and related files, changing directory, uninstalling lazero, then reinstalling it.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/install.sh\":0-4",
+            "content": "rm -rf build\nrm -rf lazero.egg-info\ncd ..\nyes | pip3 uninstall lazero\npip3 install ./lazero "
+        }
+    ]
+}

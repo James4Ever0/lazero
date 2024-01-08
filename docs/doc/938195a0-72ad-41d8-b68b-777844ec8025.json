@@ -1,0 +1,10 @@
+{
+    "summary": "Testing search index functionality by running the main indexer on the provided directory.",
+    "details": [
+        {
+            "comment": "Testing search index functionality by running the main indexer on the provided directory.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_search_index.py\":0-4",
+            "content": "from test_commons import *\nfrom lazero.search.api import mainIndexer\ndirectory = \"/root/Desktop/works/lazero/tests/test_search_documents\" # a directory with two documents in total.\nmainIndexer(directory)"
+        }
+    ]
+}

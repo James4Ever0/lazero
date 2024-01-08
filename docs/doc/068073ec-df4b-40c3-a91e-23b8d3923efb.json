@@ -1,0 +1,10 @@
+{
+    "summary": "Testing 100 keys' values from the database and printing their indexes and values.",
+    "details": [
+        {
+            "comment": "Testing 100 keys' values from the database and printing their indexes and values.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_view_db_search.py\":0-6",
+            "content": "from test_commons import *\nfrom lazero.search.api import getValueByKeyFromDatabase\nfrom lazero.utils.logger import sprint\nfor index in range(100):\n    value = getValueByKeyFromDatabase(str(index)+\"_content\").decode(\"utf8\")\n    print(\"INDEX:\", index)\n    sprint('VALUE:', value)"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a function named 'txtaiIndexer' which indexes a directory using the TxtAI library, and saves the index. The function takes the directory path as input along with optional parameters for the output directory, removing existing indices, and debugging. The code also creates a progress bar for iteration if debug is enabled.",
+    "details": [
+        {
+            "comment": "This code defines a function named 'txtaiIndexer' which indexes a directory using the TxtAI library, and saves the index. The function takes the directory path as input along with optional parameters for the output directory, removing existing indices, and debugging. The code also creates a progress bar for iteration if debug is enabled.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/search/txtai/index.py\":0-22",
+            "content": "import progressbar\nimport shutil\nimport os\nfrom lazero.search.api import lazeroCachePath\nfrom lazero.search.index import indexFilesInDirectory\nfrom lazero.search.txtai.model import embeddings\ndef txtaiIndexer(\n    directory,\n    indexDirectory=os.path.join(lazeroCachePath, \"txtai_index\"),\n    removeExists=True,\n    debug=False,\n):\n    iterator = indexFilesInDirectory(directory, removeExists=removeExists)\n    if debug:\n        iterator = progressbar.progressbar(iterator)\n    if os.path.exists(indexDirectory) and removeExists:\n        shutil.rmtree(indexDirectory)\n    print(\"txtai indexing directory %s at %s\" % (directory, indexDirectory))\n    embeddings.index((uid, text, None) for uid, text in enumerate(iterator))\n    embeddings.save(indexDirectory)\n    print(\"txtai index saved\")"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Importing necessary modules and running the \"run\" function from the terminal_interface module in lazero.",
+    "details": [
+        {
+            "comment": "Importing necessary modules and running the \"run\" function from the terminal_interface module in lazero.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/tests/test_search.py\":0-4",
+            "content": "# import os\n# os.chdir('..')\nfrom test_commons import *\nfrom lazero.search.terminal_interface import run\nrun()"
+        }
+    ]
+}

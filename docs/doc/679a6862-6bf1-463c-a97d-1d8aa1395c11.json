@@ -1,0 +1,15 @@
+{
+    "summary": "The code includes functions for flattening unhashable lists, creating custom iterators, and handling nested generators, allowing users to manipulate and transform data structures in Python. It also repeats a process based on 'repeat' value until reaching a specified limit or stopping due to exceptions.",
+    "details": [
+        {
+            "comment": "The code defines functions for flattening unhashable lists, generating new iterators from existing ones with customizable wrappers, and handling nested generator objects. These functions provide ways to manipulate and transform data structures in Python.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/utils/tools.py\":0-42",
+            "content": "def flattenUnhashableList(list):\n    return [x for x in flattenUnhashableListGenerator(list)]\ndef flattenUnhashableListGenerator(mList):\n    for elem in mList:\n        if type(elem) not in [list, tuple]:\n            yield elem\n        else:\n            for elem2 in flattenUnhashableListGenerator(elem):\n                yield elem2\ndef generatorUnwrap(generator, level=1):\n    assert type(level) == int\n    assert level >= 0\n    if level == 0:\n        yield generator\n    else:\n        for x in generator:\n            yield generatorUnwrap(x, level=level - 1)\nfrom typing import Callable\ndef iteratorWrapper(\n    iterator,\n    init_repeat: int = 0,\n    repeat: int = 0,\n    max_iter: int = -1,\n    before_yield: Callable = lambda: None,\n    after_yield: Callable = lambda: None,\n    before_next: Callable = lambda: None,\n    after_next: Callable = lambda: None,\n):\n    # we use yield here.\n    before_next()\n    next_data = iterator.__next__()\n    after_next()\n    if init_repeat > 0:\n        for _ in range(init_repeat):\n            before_yield()"
+        },
+        {
+            "comment": "Yields 'next_data' and calls related functions, repeating based on provided 'repeat' value until a StopIteration exception is raised or 'max_iter' limit is reached.",
+            "location": "\"/media/root/Toshiba XG3/works/lazero/docs/src/lazero/utils/tools.py\":43-66",
+            "content": "            yield next_data\n            after_yield()\n    yield_counter = 0\n    while True:\n        if repeat < 0:\n            while True:\n                before_yield()\n                yield next_data\n                after_yield()\n        else:\n            for _ in range(1 + repeat):\n                before_yield()\n                yield next_data\n                after_yield()\n            try:\n                before_next()\n                next_data = iterator.__next__()\n                after_next()\n            except StopIteration:\n                break\n            yield_counter += 1\n            if max_iter >= 0:\n                if yield_counter >= max_iter:\n                    break"
+        }
+    ]
+}
