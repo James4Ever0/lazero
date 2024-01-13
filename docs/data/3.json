@@ -1,369 +1,369 @@
 {
     "300": {
         "file_id": 32,
-        "content": "            score = hit.score\n            if score < epsilon:\n                score = lastScore / 2\n            if hitIndex == 0:\n                maxScore = score\n            lastScore = score\n            normalized_score = (score / maxScore) * weight\n            index = hit[\"index\"]\n            yield index, normalized_score\n            # path = hit['path']\n            # we need some unified interface to process this shit.\n# from lazero.search.whoosh.api import getValueByKeyFromDatabase\nimport os\nfrom lazero.search.api import lazeroCachePath\nfrom lazero.search.search import updateDataDictWithLineIndexNormalizedScoreAndDivisor\ndef whooshSearch(\n    query,\n    indexDirectory,\n    search_fields:tuple=(\"path_m1\", \"path_m2\", \"path_m3\", \"path_m4\", \"content\"),\n    indexname=\"article_index\",\n    epsilon=1e-3,\n    limit=100,\n    filter_filepath=None,\n    weight=0.7,  # do not mark our top hit as '100% certain'\n    withOriginalLine=True,  # this is default behavior of indexer. you still need to retrieve this flag from tinydb.",
-        "type": "code",
-        "location": "/lazero/search/whoosh/search.py:58-86"
-    },
-    "301": {
-        "file_id": 32,
-        "content": "This code performs a search using the Whoosh library in Python. It takes a query, an index directory, and a list of search fields as input parameters. The code iterates over search hits, calculates normalized scores based on hit scores, and yields the index and normalized score. Additionally, it allows for optional filtering by file path and adjusts the hit score if it's below a certain epsilon value to prevent assigning '100% certain' status. The code also uses a weight parameter to balance different search fields and an option to include original line information from the tinydb database.",
-        "type": "comment"
-    },
-    "302": {
-        "file_id": 32,
-        "content": "    tinydbDatabasePath=os.path.join(lazeroCachePath, \"index.json\"),\n    dataDict={},  # for using with txtai\n):  # will multiplex the thing.\n    divisor = 4 + int(withOriginalLine)\n    fourProcessedLines = list(getFourVersionsOfProcessedLine(query))\n    for search_query_processed in (\n        [query] if withOriginalLine else []\n    ) + fourProcessedLines:\n        for index, normalized_score in whooshSearchSingle(\n            search_query_processed,\n            indexDirectory,\n            search_fields=search_fields,\n            indexname=indexname,\n            limit=limit,\n            weight=weight,\n            epsilon=epsilon,\n            filter_filepath=filter_filepath,\n        ):\n            dataDict = updateDataDictWithLineIndexNormalizedScoreAndDivisor(\n                dataDict,\n                index,\n                normalized_score,\n                divisor,\n                tinydbDatabasePath=tinydbDatabasePath,\n            )\n    # you decide what to do with dataDict later.\n    return dataDict",
-        "type": "code",
-        "location": "/lazero/search/whoosh/search.py:87-114"
-    },
-    "303": {
-        "file_id": 32,
-        "content": "This function performs a search query using Whoosh and retrieves the results, then updates a dictionary with line index, normalized score, and divisor for each version of the processed query.",
-        "type": "comment"
-    },
-    "304": {
-        "file_id": 33,
-        "content": "/lazero/utils/__init__.py",
-        "type": "filepath"
-    },
-    "305": {
-        "file_id": 33,
-        "content": "Importing various utility functions from different modules in lazero's utils package.",
-        "type": "summary"
-    },
-    "306": {
-        "file_id": 33,
-        "content": "from lazero.utils.inspectors import *\nfrom lazero.utils.logger import *\nfrom lazero.utils.tools import *\nfrom lazero.utils.importers import *\nfrom lazero.utils.mathlib import *",
-        "type": "code",
-        "location": "/lazero/utils/__init__.py:1-5"
-    },
-    "307": {
-        "file_id": 33,
-        "content": "Importing various utility functions from different modules in lazero's utils package.",
-        "type": "comment"
-    },
-    "308": {
-        "file_id": 34,
-        "content": "/lazero/utils/importers.py",
-        "type": "filepath"
-    },
-    "309": {
-        "file_id": 34,
-        "content": "Initializing a function to set the OpenCV library path for Python3.9 site-packages, checking if there's only one .so file and inserting it into sys.path.",
-        "type": "summary"
-    },
-    "310": {
-        "file_id": 34,
-        "content": "def cv2_custom_build_init(site_packages_path=\"/usr/local/lib/python3.9/site-packages\"):\n    import pathlib, sys\n    site_path = pathlib.Path(site_packages_path)\n    cv2_libs_dir = (\n        site_path / \"cv2\" / f\"python-{sys.version_info.major}.{sys.version_info.minor}\"\n    )\n    print(cv2_libs_dir)\n    cv2_libs = sorted(cv2_libs_dir.glob(\"*.so\"))\n    if len(cv2_libs) == 1:\n        print(\"INSERTING:\", cv2_libs[0].parent)\n        sys.path.insert(1, str(cv2_libs[0].parent))",
-        "type": "code",
-        "location": "/lazero/utils/importers.py:1-11"
-    },
-    "311": {
-        "file_id": 34,
-        "content": "Initializing a function to set the OpenCV library path for Python3.9 site-packages, checking if there's only one .so file and inserting it into sys.path.",
-        "type": "comment"
-    },
-    "312": {
-        "file_id": 35,
-        "content": "/lazero/utils/inspectors.py",
-        "type": "filepath"
-    },
-    "313": {
-        "file_id": 35,
-        "content": "This function inspects an object by checking if it has a \"__dict__\" attribute. If so, it uses pprint to print its variables. Otherwise, it iterates through the keys of the object, evaluating each key as code and printing the result, while also handling any exceptions that may occur.",
-        "type": "summary"
-    },
-    "314": {
-        "file_id": 35,
         "content": "def inspectObject(obj):\n    keys = dir(obj)\n    if \"__dict__\" in keys:\n        import pprint\n        pprint.pprint(vars(obj))\n    else:\n        for key in keys:\n            code = \"obj.{}\".format(key)\n            try:\n                subObj = eval(code)\n                print(code, subObj)\n            except:\n                import traceback\n                traceback.print_exc()\n                print(\"ERROR WHEN PRINTING {}\".format(code))\n            print(\"_\"*30)",
         "type": "code",
         "location": "/lazero/utils/inspectors.py:1-16"
     },
-    "315": {
-        "file_id": 35,
+    "301": {
+        "file_id": 32,
         "content": "This function inspects an object by checking if it has a \"__dict__\" attribute. If so, it uses pprint to print its variables. Otherwise, it iterates through the keys of the object, evaluating each key as code and printing the result, while also handling any exceptions that may occur.",
         "type": "comment"
     },
-    "316": {
-        "file_id": 36,
+    "302": {
+        "file_id": 33,
         "content": "/lazero/utils/json.py",
         "type": "filepath"
     },
-    "317": {
-        "file_id": 36,
+    "303": {
+        "file_id": 33,
         "content": "The code provides functions for manipulating and updating JSON objects, handling tuple values, and converting JSON to lists while allowing the removal of specific instances based on a given condition.",
         "type": "summary"
     },
-    "318": {
-        "file_id": 36,
+    "304": {
+        "file_id": 33,
         "content": "from reloading import reloading\nimport json\n# it's json-like object, not json serializable object!\n@reloading\ndef jsonWalk(jsonObj, location=[]):\n    # this is not tuple. better convert it first?\n    # mlocation = copy.deepcopy(location)\n    if type(jsonObj) == dict:\n        for key in jsonObj:\n            content = jsonObj[key]\n            if type(content) not in [dict, list, tuple]:\n                yield location + [key], content\n            else:\n                # you really ok with this?\n                for mkey, mcontent in jsonWalk(content, location + [key]):\n                    yield mkey, mcontent\n    elif type(jsonObj) in [\n        list,\n        tuple,\n    ]:  # this is not pure JSON. we only have list and dicts.\n        for key, content in enumerate(jsonObj):\n            # content = jsonObj[key]\n            if type(content) not in [dict, list, tuple]:\n                yield location + [key], content\n            else:\n                for mkey, mcontent in jsonWalk(content, location + [key]):\n                    yield mkey, mcontent",
         "type": "code",
         "location": "/lazero/utils/json.py:1-30"
     },
-    "319": {
-        "file_id": 36,
+    "305": {
+        "file_id": 33,
         "content": "This function recursively traverses a json-like object, yielding keys and values as it goes. It handles both dictionaries and lists, but does not deeply copy the location list, which could cause issues if the original location list is modified elsewhere in the code.",
         "type": "comment"
     },
-    "320": {
-        "file_id": 36,
+    "306": {
+        "file_id": 33,
         "content": "    else:\n        raise Exception(\"Not a JSON compatible object: {}\".format(type(jsonObj)))\n@reloading\ndef jsonWalk2(jsonObj):\n    jsonObj = jsonify(jsonObj)\n    return jsonWalk(jsonObj)\n@reloading\ndef jsonLocate(jsonObj, location=[]):\n    # print(\"object:\",jsonObj)\n    # print(\"location:\",location)\n    if location != []:\n        # try:\n        return jsonLocate(jsonObj[location[0]], location[1:])\n        # except:\n        #     breakpoint()\n    return jsonObj\n@reloading\ndef jsonUpdate(jsonObj, location=[], update_content=None):\n    if location != []:\n        if type(jsonObj) == dict:\n            target = {\n                location[0]: jsonUpdate(\n                    jsonObj[location[0]],\n                    location=location[1:],\n                    update_content=update_content,\n                )\n            }\n            # print(\"keys:\", location)\n            # print(\"JSONOBJ:\", jsonObj)\n            # print(\"update target:\", target)\n            jsonObj.update(target)\n            return jsonObj\n        elif type(jsonObj) == list:",
         "type": "code",
         "location": "/lazero/utils/json.py:31-69"
     },
-    "321": {
-        "file_id": 36,
+    "307": {
+        "file_id": 33,
         "content": "This code defines several functions for manipulating JSON objects. The `jsonWalk2` function converts a non-JSON object to a JSON format using the `jsonify` function, then calls another function (not shown) called `jsonWalk`. \nThe `jsonLocate` function recursively searches through a JSON object based on provided locations until it reaches the target location or runs out of locations. It returns the value at that location if found. \nThe `jsonUpdate` function updates a value in a JSON object, either within a dictionary or list structure, based on the provided location and update content. If the location is not empty, it recursively calls itself until it reaches the target location, then updates the corresponding value.",
         "type": "comment"
     },
-    "322": {
-        "file_id": 36,
+    "308": {
+        "file_id": 33,
         "content": "            target = jsonUpdate(\n                jsonObj[location[0]],\n                location=location[1:],\n                update_content=update_content,\n            )\n            # print(\"keys:\", location)\n            # print(\"JSONOBJ:\", jsonObj)\n            # print(\"override target:\", target)\n            jsonObj[location[0]] = target\n            return jsonObj\n        else:\n            raise Exception(\"Unsupported JSON update target type:\", type(jsonObj))\n    return update_content\n@reloading\ndef jsonDeleteObject(jsonObj, location: list):\n    assert len(location) > 0\n    obj = jsonObj\n    # print(location, obj)\n    for key in location[:-1]:\n        obj = obj[key]\n    del obj[location[-1]]\n    return jsonObj\n# how to reload module directly, so we can include this function as well?\nimport typing\n# what the fuck is going on here?\n# ImportError: cannot import name 'jsonDeleteAllinstances' from 'lazero.utils.json' (/root/Desktop/works/lazero/lazero/utils/json.py)\n# how to reload module actually, making from <module> import <object> work?",
         "type": "code",
         "location": "/lazero/utils/json.py:70-101"
     },
-    "323": {
-        "file_id": 36,
+    "309": {
+        "file_id": 33,
         "content": "Code for jsonUpdate():\n- Updates a JSON object with the given location and content.\n- Raises an exception if the target type is unsupported.\n\nCode for jsonDeleteObject():\n- Deletes an object from a JSON object at the specified location.",
         "type": "comment"
     },
-    "324": {
-        "file_id": 36,
+    "310": {
+        "file_id": 33,
         "content": "@reloading\ndef jsonDeleteAllInstances(\n    jsonObj, isInstance: typing.Callable[[typing.Any], bool], copy=True\n):\n    if copy:\n        jsonObj2 = jsonObj.copy()\n    else:\n        jsonObj2 = jsonObj\n    candidates = []\n    for key, value in jsonWalk(jsonObj2):\n        if isInstance(value):\n            # delete that thing! but how to delete these things once for all?\n            candidates.append(key)\n    candidates.sort(key=lambda x: -x[-1] if type(x[-1]) == int else 1)\n    for candidate in candidates:\n        jsonObj2 = jsonDeleteObject(jsonObj, candidate)\n    return jsonObj2\n@reloading\ndef jsonTupleToList(jsonObj2, copy=True):\n    if copy:\n        jsonObj = jsonObj2.copy()\n    else:\n        jsonObj = jsonObj2\n    candidates = []\n    for key, value in jsonWalk(jsonObj):\n        if type(value) == tuple:\n            candidates.append(key)\n    for candidate in candidates:\n        data = jsonLocate(jsonObj, candidate)\n        data = list(data)\n        jsonObj = jsonUpdate(jsonObj, candidate, data)\n    return jsonObj\n@reloading",
         "type": "code",
         "location": "/lazero/utils/json.py:104-140"
     },
-    "325": {
-        "file_id": 36,
+    "311": {
+        "file_id": 33,
         "content": "The code consists of three functions: jsonDeleteAllInstances, jsonTupleToList and reloading.\njsonDeleteAllInstances takes a JSON object, checks if the value is an instance of what is specified by 'isInstance' function, and adds the key to candidates list.\njsonTupleToList iterates through the same jsonObj2 and checks for tuple values. If found, it changes that tuple into a list and updates the original jsonObj.\nAll three functions use a decorator called reloading.",
         "type": "comment"
     },
-    "326": {
-        "file_id": 36,
+    "312": {
+        "file_id": 33,
         "content": "def jsonify(\n    jsonObj, copy=True, refine=False, isInstance=lambda obj: obj == ...\n):  # remove ellipsis\n    jsonObj2 = jsonTupleToList(jsonObj, copy=copy)\n    jsonObj2 = jsonDeleteAllInstances(jsonObj2, isInstance, copy=copy)\n    if refine:\n        return json.loads(json.dumps(jsonObj2))\n    else:\n        return jsonObj2",
         "type": "code",
         "location": "/lazero/utils/json.py:141-149"
     },
-    "327": {
-        "file_id": 36,
+    "313": {
+        "file_id": 33,
         "content": "Converts JSON object to list, removes instances based on given condition and returns refined or original JSON list.",
         "type": "comment"
     },
-    "328": {
-        "file_id": 37,
+    "314": {
+        "file_id": 34,
         "content": "/lazero/utils/logger.py",
         "type": "filepath"
     },
-    "329": {
-        "file_id": 37,
+    "315": {
+        "file_id": 34,
         "content": "This code defines two functions, \"sprint\" and \"traceError\". The \"sprint\" function prints its arguments with a line of underscores for separation. The \"traceError\" function uses the \"traceback\" module to print an error message and then calls the \"sprint\" function to print the message again. If the \"_breakpoint\" parameter is True, it also returns the result of the \"breakpoint()\" function (but \"breakpoint\" is not defined in this code).",
         "type": "summary"
     },
-    "330": {
-        "file_id": 37,
+    "316": {
+        "file_id": 34,
         "content": "def sprint(*args, **kwargs):\n    print(*args, **kwargs)\n    print(\"_\"*30)\ndef traceError(errorMsg:str=\"error!\", _breakpoint:bool=False):\n    import traceback\n    traceback.print_exc()\n    sprint(errorMsg)\n    if _breakpoint:\n        return breakpoint()",
         "type": "code",
         "location": "/lazero/utils/logger.py:1-10"
     },
-    "331": {
-        "file_id": 37,
+    "317": {
+        "file_id": 34,
         "content": "This code defines two functions, \"sprint\" and \"traceError\". The \"sprint\" function prints its arguments with a line of underscores for separation. The \"traceError\" function uses the \"traceback\" module to print an error message and then calls the \"sprint\" function to print the message again. If the \"_breakpoint\" parameter is True, it also returns the result of the \"breakpoint()\" function (but \"breakpoint\" is not defined in this code).",
         "type": "comment"
     },
-    "332": {
-        "file_id": 38,
+    "318": {
+        "file_id": 35,
         "content": "/lazero/utils/mathlib.py",
         "type": "filepath"
     },
-    "333": {
-        "file_id": 38,
+    "319": {
+        "file_id": 35,
         "content": "The code features data processing functions, interval tuple merging, dictionary range consolidation, and time span sorting, with additional capabilities for handling coordinates, Bezier curves, and calculating max cursor average in a window.",
         "type": "summary"
     },
-    "334": {
-        "file_id": 38,
+    "320": {
+        "file_id": 35,
         "content": "# not overriding math.\n# do some ranged stuff here...\nfrom itertools import groupby\ndef extract_span(mlist, target=0):\n    counter = 0\n    spanList = []\n    target_list = [(a, len(list(b))) for a, b in groupby(mlist)]\n    for a, b in target_list:\n        nextCounter = counter + b\n        if a == target:\n            spanList.append((counter, nextCounter))\n        counter = nextCounter\n    return spanList\ndef convoluted(array, k=2, pad=0):  # simple convolution. no tail.\n    pad_size = k - 1\n    new_array = [pad] * pad_size + array\n    result = []\n    for i in range(len(array)):\n        sliced = new_array[i : i + k]\n        value = sum(sliced) / k\n        result.append(value)\n    return result\ndef getTruncatedNormalDistribution(std, mean, start, end, evaluate=False):\n    # std, mean = gaussian_args[\"std\"], gaussian_args[\"mean\"]\n    assert start < end\n    assert std > 0\n    scale, loc = std, mean\n    myclip_a, myclip_b = start, end\n    from scipy.stats import truncnorm\n    a, b = (myclip_a - loc) / scale, (myclip_b - loc) / scale",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:1-35"
     },
-    "335": {
-        "file_id": 38,
+    "321": {
+        "file_id": 35,
         "content": "- Defines functions for range extraction, convolution, and truncated normal distribution.\n- Uses itertools groupby for range extraction.\n- Convolution applies a simple moving average without considering tail values.\n- Truncated normal distribution uses scipy's truncnorm function with assertions to validate input.",
         "type": "comment"
     },
-    "336": {
-        "file_id": 38,
+    "322": {
+        "file_id": 35,
         "content": "    randVar = truncnorm(a, b)\n    randomFunction = lambda: randVar.rvs(1)[0] * scale + loc\n    if evaluate:\n        return randomFunction()\n    return randomFunction\nfrom pykalman import KalmanFilter\nimport numpy as np\ndef checkMinMaxDict(value, minMaxDict, getMinMaxVal=False):\n    try:\n        assert [x for x in minMaxDict.keys() if x not in [\"min\", \"max\"]] == []\n    except:\n        print(\"PARAMETERS DUMP:\", value, minMaxDict, getMinMaxVal)\n        breakpoint()\n    try:\n        minVal = minMaxDict.get(\"min\", value)\n        maxVal = minMaxDict.get(\"max\", value)\n        if minVal != value and maxVal != value:\n            assert minVal < maxVal\n        flag = value <= maxVal and value >= minVal\n        if getMinMaxVal:\n            return flag, (minVal, maxVal)\n        else:\n            return flag\n    except:\n        import traceback\n        traceback.print_exc()\n        print(\"WTF IS GOING ON WITH CHECK_MIN_MAX_DICT\")\n        # breakpoint()\n        return False  # usually we have issue getting the number. it is not a number.",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:36-70"
     },
-    "337": {
-        "file_id": 38,
+    "323": {
+        "file_id": 35,
         "content": "This code snippet defines a function `checkMinMaxDict` that takes in a value and a dictionary `minMaxDict` with keys \"min\" and \"max\". It checks if the value is within the specified minimum and maximum values. If the `evaluate` flag is set, it returns a randomly generated value based on the `minMaxDict`, otherwise it just returns the function for evaluation. The code also includes error handling to ensure correct usage of the dictionary and handles non-numeric values.",
         "type": "comment"
     },
-    "338": {
-        "file_id": 38,
+    "324": {
+        "file_id": 35,
         "content": "def superMean(mList: list, default=0):\n    if len(mList) == 0:\n        return default\n    return np.mean(mList)\ndef superMax(mList: list, default=0):\n    if len(mList) == 0:\n        return default\n    return max(mList)\ndef superMin(mList: list, default=0):\n    if len(mList) == 0:\n        return default\n    return min(mList)\ndef uniq(mList, ordered=True, random=False):\n    if ordered:\n        result = []\n        for elem in mList:\n            if elem not in result:\n                result.append(elem)\n    else:\n        result = list(set(mList))\n    if random:\n        import random\n        random.shuffle(result)\n    return result\ndef get1DArrayEMA(mArray, N=5):\n    weights = np.exp(np.linspace(0, 1, N))\n    weights = weights / np.sum(weights)\n    ema = np.convolve(weights, mArray, mode=\"valid\")\n    return ema\ndef Kalman1D(observations, damping=0.2):\n    # To return the smoothed time series data\n    observation_covariance = damping\n    initial_value_guess = observations[0]\n    transition_matrix = 1\n    transition_covariance = 0.1",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:73-118"
     },
-    "339": {
-        "file_id": 38,
+    "325": {
+        "file_id": 35,
         "content": "- superMean: calculates mean of a list, returns default value if list is empty\n- superMax: calculates maximum value of a list, returns default value if list is empty\n- superMin: calculates minimum value of a list, returns default value if list is empty\n- uniq: returns unique elements in the list, preserving order (if ordered=True) or not\n- get1DArrayEMA: applies exponential moving average to 1D array using given weights and window size\n- Kalman1D: performs Kalman smoothing on a time series data with damping factor",
         "type": "comment"
     },
-    "340": {
-        "file_id": 38,
+    "326": {
+        "file_id": 35,
         "content": "    # initial_value_guess # wtf is this shit?\n    kf = KalmanFilter(\n        initial_state_mean=initial_value_guess,\n        initial_state_covariance=observation_covariance,\n        observation_covariance=observation_covariance,\n        transition_covariance=transition_covariance,\n        transition_matrices=transition_matrix,\n    )\n    pred_state, state_cov = kf.smooth(observations)\n    return pred_state\ndef getContinualNonSympyMergeResult(inputMSetCandidates):\n    # basically the same example.\n    # assume no overlapping here.\n    import sympy\n    def unionToTupleList(myUnion):\n        unionBoundaries = list(myUnion.boundary)\n        unionBoundaries.sort()\n        leftBoundaries = unionBoundaries[::2]\n        rightBoundaries = unionBoundaries[1::2]\n        return list(zip(leftBoundaries, rightBoundaries))\n    def tupleSetToUncertain(mSet):\n        mUncertain = None\n        for start, end in mSet:\n            if mUncertain is None:\n                mUncertain = sympy.Interval(start, end)\n            else:\n                mUncertain += sympy.Interval(start, end)",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:119-149"
     },
-    "341": {
-        "file_id": 38,
+    "327": {
+        "file_id": 35,
         "content": "The code initializes a KalmanFilter object with given parameters and then uses it to perform smooth filtering on observations. Finally, it returns the predicted state. The other function converts a set of intervals (mSet) into a single uncertain interval using Sympy library.",
         "type": "comment"
     },
-    "342": {
-        "file_id": 38,
+    "328": {
+        "file_id": 35,
         "content": "        typeUncertain = type(mUncertain)\n        return mUncertain, typeUncertain\n    def mergeOverlappedInIntervalTupleList(intervalTupleList):\n        mUncertain, _ = tupleSetToUncertain(intervalTupleList)\n        mUncertainBoundaryList = list(mUncertain.boundary)\n        mUncertainBoundaryList.sort()\n        mergedIntervalTupleList = list(\n            zip(mUncertainBoundaryList[::2], mUncertainBoundaryList[1::2])\n        )\n        return mergedIntervalTupleList\n    # mSet = mergeOverlappedInIntervalTupleList([(0, 1), (2, 3)])\n    # mSet2 = mergeOverlappedInIntervalTupleList([(0.5, 1.5), (1.6, 2.5)])\n    # print(\"MSET\", mSet)\n    # print(\"MSET2\", mSet2)\n    mSetCandidates = [\n        mergeOverlappedInIntervalTupleList(x) for x in inputMSetCandidates\n    ]\n    mSetUnified = [x for y in mSetCandidates for x in y]\n    leftBoundaryList = set([x[0] for x in mSetUnified])\n    rightBoundaryList = set([x[1] for x in mSetUnified])\n    # they may freaking overlap.\n    # if want nearby-merge strategy, simply just e",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:150-175"
     },
-    "343": {
-        "file_id": 38,
+    "329": {
+        "file_id": 35,
         "content": "This code defines a function `mergeOverlappedInIntervalTupleList` that takes a list of interval tuples and merges any overlapping intervals. It then applies this function to each element in the `inputMSetCandidates` list, resulting in a unified set of merged intervals stored in `mSetUnified`. The left and right boundaries of these merged intervals are extracted into separate sets.",
         "type": "comment"
     },
-    "344": {
-        "file_id": 38,
+    "330": {
+        "file_id": 35,
         "content": "xpand all intervals, merge them with union and shrink the individual intervals inside union respectively.\n    markers = {\n        \"enter\": {k: [] for k in leftBoundaryList},\n        \"exit\": {k: [] for k in rightBoundaryList},\n    }\n    for index, mSetCandidate in enumerate(mSetCandidates):\n        leftBoundaryListOfCandidate = [x[0] for x in mSetCandidate]\n        rightBoundaryListOfCandidate = [x[1] for x in mSetCandidate]\n        for leftBoundaryOfCandidate in leftBoundaryListOfCandidate:\n            markers[\"enter\"][leftBoundaryOfCandidate].append(index)  # remap this thing!\n        for rightBoundaryOfCandidate in rightBoundaryListOfCandidate:\n            markers[\"exit\"][rightBoundaryOfCandidate].append(index)  # remap this thing!\n    # now, iterate through the boundaries of mSetUnified.\n    unifiedBoundaryList = leftBoundaryList.union(\n        rightBoundaryList\n    )  # call me a set instead of a list please? now we must sort this thing\n    unifiedBoundaryList = list(unifiedBoundaryList)\n    unifiedBoundaryList.sort()",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:175-195"
     },
-    "345": {
-        "file_id": 38,
+    "331": {
+        "file_id": 35,
         "content": "Markers are assigned to intervals for enter and exit points.\nIterates through candidates' left and right boundaries, adding indices to their respective markers.",
         "type": "comment"
     },
-    "346": {
-        "file_id": 38,
+    "332": {
+        "file_id": 35,
         "content": "    unifiedBoundaryMarks = {}\n    finalMappings = {}\n    # print(\"MARKERS\", markers)\n    # breakpoint()\n    for index, boundary in enumerate(unifiedBoundaryList):\n        previousMark = unifiedBoundaryMarks.get(index - 1, [])\n        enterList = markers[\"enter\"].get(boundary, [])\n        exitList = markers[\"exit\"].get(boundary, [])\n        currentMark = set(previousMark + enterList).difference(set(exitList))\n        currentMark = list(currentMark)\n        unifiedBoundaryMarks.update({index: currentMark})\n        # now, handle the change? or not?\n        # let's just deal those empty ones, shall we?\n        if previousMark == []:  # inside it is empty range.\n            # elif currentMark == []:\n            if index == 0:\n                continue  # just the start, no need to note this down.\n            else:\n                finalMappings.update(\n                    {\n                        \"empty\": finalMappings.get(\"empty\", [])\n                        + [(unifiedBoundaryList[index - 1], boundary)]\n                    }",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:197-219"
     },
-    "347": {
-        "file_id": 38,
+    "333": {
+        "file_id": 35,
         "content": "This code processes a list of unified boundaries and their corresponding markers. It checks for empty ranges between boundaries, and adds them to the finalMappings dictionary if they are not the first boundary in the list.",
         "type": "comment"
     },
-    "348": {
-        "file_id": 38,
+    "334": {
+        "file_id": 35,
         "content": "                )\n            # the end of previous mark! this interval belongs to previousMark\n        else:\n            key = previousMark.copy()\n            key.sort()\n            key = tuple(key)\n            finalMappings.update(\n                {\n                    key: finalMappings.get(key, [])\n                    + [(unifiedBoundaryList[index - 1], boundary)]\n                }\n            )\n            # also the end of previous mark! belongs to previousMark.\n    ### NOW THE FINAL OUTPUT ###\n    finalCats = {}\n    for key, value in finalMappings.items():\n        # value is an array containing subInterval tuples.\n        value = mergeOverlappedInIntervalTupleList(value)\n        valueCorrected = [(mStart, mEnd) for mStart, mEnd in value if mStart < mEnd]\n        finalCats.update({key: valueCorrected})\n    # print(\"______________FINAL CATS______________\")\n    # print(finalCats)\n    return finalCats\ndef getContinualMappedNonSympyMergeResult(mRangesDict, concatSymbol=\"|\", noEmpty=True):\n    mKeyMaps = list(mRangesDict.keys())",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:220-248"
     },
-    "349": {
-        "file_id": 38,
+    "335": {
+        "file_id": 35,
         "content": "Iterating through key mappings in the dictionary, sorting and updating finalMappings if they overlap.\nMerging overlapping intervals in a list of sub-interval tuples.\nReturning finalCats with merged and corrected intervals.",
         "type": "comment"
     },
-    "350": {
-        "file_id": 38,
+    "336": {
+        "file_id": 35,
         "content": "    mSetCandidates = [mRangesDict[key] for key in mKeyMaps]\n    # the next step will automatically merge all overlapped candidates.\n    finalCats = getContinualNonSympyMergeResult(mSetCandidates)\n    finalCatsMapped = {\n        concatSymbol.join([mKeyMaps[k] for k in mTuple]): finalCats[mTuple]\n        for mTuple in finalCats.keys()\n        if type(mTuple) == tuple\n    }\n    if not noEmpty:\n        finalCatsMapped.update(\n            {k: finalCats[k] for k in finalCats.keys() if type(k) != tuple}\n        )\n    return finalCatsMapped\n    # default not to output empty set?\ndef getContinualMappedNonSympyMergeResultWithRangedEmpty(\n    mRangesDict, start, end, concatSymbol=\"|\"\n):\n    import uuid\n    emptySetName = str(uuid.uuid4())\n    newRangesDict = mRangesDict.copy()\n    newRangesDict.update({emptySetName: [(start, end)]})\n    newRangesDict = getContinualMappedNonSympyMergeResult(\n        newRangesDict, concatSymbol=\"|\", noEmpty=True\n    )\n    newRangesDict = {\n        key: [\n            (mStart, mEnd)\n            for mStart, mEnd in newRangesDict[key]",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:249-279"
     },
-    "351": {
-        "file_id": 38,
+    "337": {
+        "file_id": 35,
         "content": "This function takes a dictionary of ranges, and merges overlapping ranges into larger continual ranges. It also handles empty sets if specified.",
         "type": "comment"
     },
-    "352": {
-        "file_id": 38,
+    "338": {
+        "file_id": 35,
         "content": "            if mStart >= start and mEnd <= end and mStart < mEnd\n        ]\n        for key in newRangesDict.keys()\n    }\n    newRangesDict = {\n        key: newRangesDict[key]\n        for key in newRangesDict.keys()\n        if newRangesDict[key] != []\n    }\n    finalNewRangesDict = {}\n    for key in newRangesDict.keys():\n        mergedEmptySetName = \"{}{}\".format(concatSymbol, emptySetName)\n        if mergedEmptySetName in key:\n            newKey = key.replace(mergedEmptySetName, \"\")\n            finalNewRangesDict.update({newKey: newRangesDict[key]})\n        elif key == emptySetName:\n            finalNewRangesDict.update({\"empty\": newRangesDict[key]})\n        else:\n            finalNewRangesDict.update({key: newRangesDict[key]})\n    return finalNewRangesDict\ndef mergedRangesToSequential(renderDict):\n    renderList = []\n    for renderCommandString in renderDict.keys():\n        commandTimeSpans = renderDict[renderCommandString].copy()\n        # commandTimeSpan.sort(key=lambda x: x[0])\n        for commandTimeSpan in commandTimeSpans:",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:280-307"
     },
-    "353": {
-        "file_id": 38,
+    "339": {
+        "file_id": 35,
         "content": "The code is filtering and organizing a dictionary of time spans, likely for rendering purposes. It first removes any empty range values from the newRangesDict. Then it checks if each key contains a specific string format (mergedEmptySetName) and replaces that portion of the key with an updated name. If a key matches the emptySetName, it renames it to \"empty\". Finally, it updates the finalNewRangesDict with the modified keys and their corresponding values. This function is then called within the mergedRangesToSequential function, which appears to be sorting command time spans for rendering.",
         "type": "comment"
     },
-    "354": {
-        "file_id": 38,
+    "340": {
+        "file_id": 35,
         "content": "            mStart, mEnd = commandTimeSpan\n            if mStart < mEnd:\n                renderList.append([renderCommandString, commandTimeSpan].copy())\n    renderList.sort(key=lambda x: x[1][0])\n    return renderList\n    # for renderCommandString, commandTimeSpan in renderList:\n    #     print(renderCommandString, commandTimeSpan)\n    # so this is arranged as such:\n    # [(renderCommandString, commandTimeSpan), ...]\ndef sequentialToMergedRanges(sequence):\n    mergedRanges = {}\n    for commandString, commandTimeSpan in sequence:\n        mergedRanges.update(\n            {commandString: mergedRanges.get(commandString, []) + [commandTimeSpan]}\n        )\n    mergedRanges = getContinualMappedNonSympyMergeResult(mergedRanges)\n    return mergedRanges\nimport bezier\ndef bezierCurve(start=(0, 0), end=(1, 1), skew=0):\n    # skew: (-0.5,0.5) otherwise this shit will look ugly.\n    assert skew >= -0.5\n    assert skew <= 0.5\n    x_start, y_start = start\n    x_end, y_end = end\n    x_diff = x_end - x_start\n    y_diff = y_end - y_start",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:308-339"
     },
-    "355": {
-        "file_id": 38,
+    "341": {
+        "file_id": 35,
         "content": "This code contains functions for working with coordinates, time spans and Bezier curves. It includes a function to convert a sequential list of commands into merged ranges, another one to create Bezier curves with optional skewing, and some assertions for validating inputs.",
         "type": "comment"
     },
-    "356": {
-        "file_id": 38,
+    "342": {
+        "file_id": 35,
         "content": "    nodes1 = np.asfortranarray(\n        [\n            [x_start, x_diff * (0.5 + skew), x_end],\n            [y_start, y_diff * (0.5 - skew), y_end],\n        ]\n    )\n    curve1 = bezier.Curve(nodes1, degree=2)\n    curve_params = {\"x_start\": x_start, \"x_diff\": x_diff, \"x_end\": x_end}\n    return curve1, curve_params\ndef evaluateBezierCurve(input_value: float, curve, curve_params: dict):\n    x_start = curve_params[\"x_start\"]\n    x_end = curve_params[\"x_end\"]\n    assert x_start <= input_value\n    assert x_end >= input_value\n    x_diff = curve_params[\"x_diff\"]\n    s = (input_value - x_start) / x_diff\n    points = curve.evaluate(s)\n    # we only get the single point.\n    point = points.T[0]\n    x, y = point\n    result = y\n    return result\ndef multiParameterExponentialNetwork(\n    *args,\n    input_bias=0.05,\n    curve_function=bezierCurve,\n    curve_function_kwargs={\"start\": (0, 0), \"end\": (1, 1), \"skew\": 0},\n    evaluate_function=evaluateBezierCurve\n):\n    curve, curve_params = curve_function(**curve_function_kwargs)\n    value = evaluate_function(input_bias, curve, curve_params)",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:340-374"
     },
-    "357": {
-        "file_id": 38,
+    "343": {
+        "file_id": 35,
         "content": "This code defines a function called \"multiParameterExponentialNetwork\" that takes several arguments and uses a Bezier curve to evaluate an input value. It returns the y-coordinate of the evaluated point on the curve. The function uses predefined parameters for the curve's start, end, skew, and evaluation method.",
         "type": "comment"
     },
-    "358": {
-        "file_id": 38,
+    "344": {
+        "file_id": 35,
         "content": "    for index, input_value in enumerate(args):\n        apply_list = [input_value] * (index + 1)\n        for apply_item in apply_list:\n            value += (1 - value) * evaluate_function(apply_item, curve, curve_params)\n    return value\ndef getCursorOfMaxAverageInWindow(\n    referenceData, windowSize, dataDuration, superSampleRate=8\n):\n    assert windowSize < dataDuration\n    # we supersample this reference data?\n    fp = referenceData\n    xp = np.linspace(0, dataDuration, len(fp))\n    interpolated_xp = np.linspace(0, dataDuration, len(fp) * superSampleRate)\n    fp = np.array(fp)\n    interpolated_fp = []\n    for x in interpolated_xp:\n        interpolated_value = np.interp(x, xp, fp)\n        interpolated_fp.append(interpolated_value)\n    interpolated_fp = np.array(interpolated_fp)\n    moving_sum_span = 0\n    for index, value in enumerate(interpolated_xp):\n        if value - windowSize >= 0:\n            break\n        moving_sum_span = index\n    moving_sum_span += 1\n    moving_sum = np.convolve(interpolated_fp, np.ones(moving_sum_span), \"valid\")",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:375-403"
     },
-    "359": {
-        "file_id": 38,
+    "345": {
+        "file_id": 35,
         "content": "Code calculates the cursor of maximum average in a window for interpolated data. It supersamples the reference data, performs linear interpolation on supersampled data, calculates moving sum by convolving with ones array, and finds the index where the moving sum exceeds the window size to get the cursor of max average in the window.",
         "type": "comment"
     },
-    "360": {
-        "file_id": 38,
+    "346": {
+        "file_id": 35,
         "content": "    max_index = np.argmax(moving_sum)\n    cursor = interpolated_fp[max_index]\n    cursor = min(dataDuration - windowSize, cursor)\n    return cursor",
         "type": "code",
         "location": "/lazero/utils/mathlib.py:404-407"
     },
-    "361": {
-        "file_id": 38,
+    "347": {
+        "file_id": 35,
         "content": "Calculates index of maximum value in moving sum array. Clamps cursor to maximum possible value based on dataDuration and windowSize. Returns the clamped cursor as result.",
         "type": "comment"
     },
-    "362": {
-        "file_id": 39,
+    "348": {
+        "file_id": 36,
         "content": "/lazero/utils/tools.py",
         "type": "filepath"
     },
-    "363": {
-        "file_id": 39,
+    "349": {
+        "file_id": 36,
         "content": "The code includes functions for flattening unhashable lists, creating custom iterators, and handling nested generators, allowing users to manipulate and transform data structures in Python. It also repeats a process based on 'repeat' value until reaching a specified limit or stopping due to exceptions.",
         "type": "summary"
     },
-    "364": {
-        "file_id": 39,
+    "350": {
+        "file_id": 36,
         "content": "def flattenUnhashableList(list):\n    return [x for x in flattenUnhashableListGenerator(list)]\ndef flattenUnhashableListGenerator(mList):\n    for elem in mList:\n        if type(elem) not in [list, tuple]:\n            yield elem\n        else:\n            for elem2 in flattenUnhashableListGenerator(elem):\n                yield elem2\ndef generatorUnwrap(generator, level=1):\n    assert type(level) == int\n    assert level >= 0\n    if level == 0:\n        yield generator\n    else:\n        for x in generator:\n            yield generatorUnwrap(x, level=level - 1)\nfrom typing import Callable\ndef iteratorWrapper(\n    iterator,\n    init_repeat: int = 0,\n    repeat: int = 0,\n    max_iter: int = -1,\n    before_yield: Callable = lambda: None,\n    after_yield: Callable = lambda: None,\n    before_next: Callable = lambda: None,\n    after_next: Callable = lambda: None,\n):\n    # we use yield here.\n    before_next()\n    next_data = iterator.__next__()\n    after_next()\n    if init_repeat > 0:\n        for _ in range(init_repeat):\n            before_yield()",
         "type": "code",
         "location": "/lazero/utils/tools.py:1-43"
     },
-    "365": {
-        "file_id": 39,
+    "351": {
+        "file_id": 36,
         "content": "The code defines functions for flattening unhashable lists, generating new iterators from existing ones with customizable wrappers, and handling nested generator objects. These functions provide ways to manipulate and transform data structures in Python.",
         "type": "comment"
     },
-    "366": {
-        "file_id": 39,
+    "352": {
+        "file_id": 36,
         "content": "            yield next_data\n            after_yield()\n    yield_counter = 0\n    while True:\n        if repeat < 0:\n            while True:\n                before_yield()\n                yield next_data\n                after_yield()\n        else:\n            for _ in range(1 + repeat):\n                before_yield()\n                yield next_data\n                after_yield()\n            try:\n                before_next()\n                next_data = iterator.__next__()\n                after_next()\n            except StopIteration:\n                break\n            yield_counter += 1\n            if max_iter >= 0:\n                if yield_counter >= max_iter:\n                    break",
         "type": "code",
         "location": "/lazero/utils/tools.py:44-67"
     },
+    "353": {
+        "file_id": 36,
+        "content": "Yields 'next_data' and calls related functions, repeating based on provided 'repeat' value until a StopIteration exception is raised or 'max_iter' limit is reached.",
+        "type": "comment"
+    },
+    "354": {
+        "file_id": 37,
+        "content": "/setup.py",
+        "type": "filepath"
+    },
+    "355": {
+        "file_id": 37,
+        "content": "The code sets up a Python package \"lazero\" using setuptools, specifying version, author, description, and dependencies. It is alpha status for education audience, supports Python 2 & 3 on POSIX Linux & MacOS X, and now includes support for Microsoft Windows.",
+        "type": "summary"
+    },
+    "356": {
+        "file_id": 37,
+        "content": "from setuptools import setup, find_packages\nVERSION = '0.0.1' \nDESCRIPTION = 'lazero'\nLONG_DESCRIPTION = 'AGI package'\n# Setting up\nsetup(\n       # the name must match the folder name 'verysimplemodule'\n        name=\"lazero\", \n        version=VERSION,\n        author=\"Jason Dsouza\",\n        author_email=\"<youremail@email.com>\",\n        description=DESCRIPTION,\n        long_description=LONG_DESCRIPTION,\n        packages=find_packages(),\n        install_requires=[], # add any additional packages that \n        # needs to be installed along with your package. Eg: 'caer'\n        entry_points ={\n            'console_scripts': [\n                'lazero = lazero.__main__:main'\n            ]\n        },\n        keywords=['python', 'first package'],\n        classifiers= [\n            \"Development Status :: 3 - Alpha\",\n            \"Intended Audience :: Education\",\n            \"Programming Language :: Python :: 2\",\n            \"Programming Language :: Python :: 3\",\n            \"Operating System :: POSIX :: Linux\",\n            \"Operating System :: MacOS :: MacOS X\",",
+        "type": "code",
+        "location": "/setup.py:1-31"
+    },
+    "357": {
+        "file_id": 37,
+        "content": "This code is setting up a Python package named \"lazero\" using setuptools. It specifies the package version, author information, and description. It also includes an entry point for running the package as a console script called 'lazero'. The package can be installed with additional dependencies specified in install_requires. It is classified as alpha status, education audience, supports Python 2 and 3, and runs on POSIX Linux and MacOS X.",
+        "type": "comment"
+    },
+    "358": {
+        "file_id": 37,
+        "content": "            \"Operating System :: Microsoft :: Windows\",\n        ]\n)",
+        "type": "code",
+        "location": "/setup.py:32-34"
+    },
+    "359": {
+        "file_id": 37,
+        "content": "This code is specifying the operating system as \"Microsoft Windows\" in the setup process.",
+        "type": "comment"
+    },
+    "360": {
+        "file_id": 38,
+        "content": "/signal_2.sh",
+        "type": "filepath"
+    },
+    "361": {
+        "file_id": 38,
+        "content": "Exits the script with a status code of 2.",
+        "type": "summary"
+    },
+    "362": {
+        "file_id": 38,
+        "content": "exit 2",
+        "type": "code",
+        "location": "/signal_2.sh:1-1"
+    },
+    "363": {
+        "file_id": 38,
+        "content": "Exits the script with a status code of 2.",
+        "type": "comment"
+    },
+    "364": {
+        "file_id": 39,
+        "content": "/test_exit.sh",
+        "type": "filepath"
+    },
+    "365": {
+        "file_id": 39,
+        "content": "Launches signal_2.sh, checks for non-zero exit code, and outputs \"shit\" if encountered.",
+        "type": "summary"
+    },
+    "366": {
+        "file_id": 39,
+        "content": "# bash  signal_2.sh\necho hello\nif [ $? -ne 0 ]; then echo shit; fi",
+        "type": "code",
+        "location": "/test_exit.sh:1-3"
+    },
     "367": {
         "file_id": 39,
-        "content": "Yields 'next_data' and calls related functions, repeating based on provided 'repeat' value until a StopIteration exception is raised or 'max_iter' limit is reached.",
+        "content": "Launches signal_2.sh, checks for non-zero exit code, and outputs \"shit\" if encountered.",
         "type": "comment"
     },
     "368": {

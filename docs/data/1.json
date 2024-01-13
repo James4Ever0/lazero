@@ -1,543 +1,543 @@
 {
     "100": {
-        "file_id": 15,
-        "content": "# try to update progressbar via network.\nfrom fastapi import FastAPI\napp = FastAPI()\nfrom tqdm import tqdm\nt = None\n@app.get('/')\ndef hello():\n    return 'progressbar server'\n# not routing this to network.\ndef close_progressbar():\n    global t\n    if t is not None:\n        try:\n            t.close()\n            return {'msg':'success'}\n        except:\n            import traceback\n            traceback.print_exc()\n            print('error closing progressbar')\n            return {'msg':'error closing progressbar'}\n@app.get('/reset')\ndef reset(total: int, name:str='random task'): # pass the iteration count\n    global t\n    close_progressbar()\n    print('processing:', name)\n    t = tqdm(total=total)\n    return {'msg':'success'}\n@app.get('/update')\ndef update_progressbar(progress: int=1, info:str=\"\"):\n    global t\n    if info !=\"\":\n        print('update info:', info)\n    if t is not None:\n        try:\n            t.clear()\n            t.update(progress)\n            return {'msg':'success'}\n        except:\n            import traceback",
-        "type": "code",
-        "location": "/lazero/network/progressbar/server.py:1-46"
-    },
-    "101": {
-        "file_id": 15,
-        "content": "1. Server endpoint for the progress bar\n2. Defines functions for opening, closing, and updating the progress bar\n3. Sets up a FastAPI application\n4. Handles resetting the progress bar on \"/reset\" route\n5. Updates progress on \"/update\" route",
-        "type": "comment"
-    },
-    "102": {
-        "file_id": 15,
-        "content": "            traceback.print_exc()\n            print(\"error when updating progessbar\")\n            return {'msg':'error when updating progessbar'}\n    else:\n        print('no progressbar available')\n        return {'msg':'no progressbar available'}\n@app.get('/close')\ndef close():\n    close_progressbar()\n    return {'msg':'success'}",
-        "type": "code",
-        "location": "/lazero/network/progressbar/server.py:47-58"
-    },
-    "103": {
-        "file_id": 15,
-        "content": "Handles progressbar update requests and closes the progressbar upon '/close' request.",
-        "type": "comment"
-    },
-    "104": {
-        "file_id": 16,
-        "content": "/lazero/network/proxy/clash.py",
-        "type": "filepath"
-    },
-    "105": {
-        "file_id": 16,
-        "content": "The code imports modules, fetches a proxy list, tests proxies' speeds and validates responses, sorts by delay, defines a function to test proxies and return results, and creates a context manager class for proxy config mode.",
-        "type": "summary"
-    },
-    "106": {
-        "file_id": 16,
-        "content": "# from faulthandler import disable\nfrom xmlrpc.client import MAXINT\nfrom lazero.network.asyncio import concurrentGet\nimport os\nimport json\nfrom typing import Literal, Union\n# from pprint import pprint\nos.environ[\"http_proxy\"] = \"\"\nos.environ[\"https_proxy\"] = \"\"\nlocalhost = \"http://127.0.0.1\"\nlocalhostWithPort = lambda port: \"{}:{}\".format(localhost, port)\nimport requests\n# so, how do you get the proxy list and test the speed for deepl.com?\n# if you really want to fall back, just change the proxy config.\ndef getProxyList(\n    port: int = 9911,\n    debug=False,\n    disallowed_types=[\"URLTest\", \"Reject\", \"Selector\", \"Direct\", \"Fallback\"],\n):  # default do not return proxy groups. only standalone proxies.\n    clashUrl = localhostWithPort(port) + \"/proxies\"  # this will reduce one layer of \"/\"\n    if debug:\n        print(clashUrl)\n    r = requests.get(clashUrl)\n    # return r.content\n    proxyInfo = r.json()\n    # pprint(proxyInfo)\n    proxyList = []\n    for proxyName, proxy in proxyInfo[\"proxies\"].items():\n        proxyType = proxy[\"type\"]",
-        "type": "code",
-        "location": "/lazero/network/proxy/clash.py:1-32"
-    },
-    "107": {
-        "file_id": 16,
-        "content": "This code imports necessary modules and defines a function \"getProxyList\" to fetch the proxy list from a specified URL (localhost) and retrieve proxy information in JSON format.",
-        "type": "comment"
-    },
-    "108": {
-        "file_id": 16,
-        "content": "        # print(proxyType)\n        if proxyType not in disallowed_types:\n            proxyList.append(proxyName)\n    # proxyList = [key for key in proxyInfo[\"proxies\"].keys()]\n    return proxyList\ndef testProxyList(\n    proxyList,\n    port: int = 9911,\n    url=\"https://deepl.com\",\n    # debug=False,\n    timeout: int = 3000,  # in miliseconds?\n    valid=True,  # only return those with valid delay values.\n):  # test the speed for given url\n    # first, generate the proper list of requests.\n    params = {\"timeout\": timeout, \"url\": url}\n    url_list = [\n        localhostWithPort(port) + \"/proxies/{}/delay\".format(proxyName)\n        for proxyName in proxyList\n    ]\n    delayList = concurrentGet(url_list, processor=lambda x: x.json(), params=params)\n    validProxyDelayList = []\n    proxyDelayList = zip(delayList, proxyList)\n    for delayDict, proxyName in proxyDelayList:\n        info = {\"name\": proxyName}\n        if \"delay\" in delayDict.keys():  # we only get those with valid responses.\n            # delay = delayDict[\"delay\"]",
-        "type": "code",
-        "location": "/lazero/network/proxy/clash.py:33-60"
-    },
-    "109": {
-        "file_id": 16,
-        "content": "This code defines a function `testProxyList` that tests the speed of a given URL using a list of proxies. It first generates a list of requests for each proxy in the given list and then uses `concurrentGet` to retrieve delay values for each proxy. If a valid delay is found, it adds the proxy's name to the `validProxyDelayList`.",
-        "type": "comment"
-    },
-    "110": {
-        "file_id": 16,
-        "content": "            info.update(delayDict)\n            validProxyDelayList.append(info)\n        elif valid == False:\n            info.update({\"delay\": MAXINT})  # remove these first, please?\n            validProxyDelayList.append(info)\n    validProxyDelayList.sort(key=lambda x: x[\"delay\"])\n    return validProxyDelayList\ndef setProxyWithSelector(\n    proxyName, selector=\"GLOBAL\", port: int = 9911, debug=False\n):  # how to make sure it will use 'GLOBAL'? it needs to be done with the config.\n    if debug:\n        print(\"select proxy %s with selector %s\" % (proxyName, selector))\n    clashUrl = localhostWithPort(port) + \"/proxies/{}\".format(selector)\n    r = requests.put(\n        clashUrl, data=json.dumps({\"name\": proxyName}, ensure_ascii=False).encode()\n    )\n    try:\n        assert r.status_code == 204\n    except:\n        import traceback\n        traceback.print_exc()\n        try:\n            print(r.content)\n            print(\"error code:\", r.status_code)\n        except:\n            ...\n        print(\"error when setting proxy %s with selector %s\" % (proxyName, selector))",
-        "type": "code",
-        "location": "/lazero/network/proxy/clash.py:61-90"
-    },
-    "111": {
-        "file_id": 16,
-        "content": "This code defines a function `setProxyWithSelector` which takes parameters for the proxy name, selector type (defaulting to \"GLOBAL\"), port number (defaulting to 9911), and a debug flag. It creates a URL for the specified selector and sends a PUT request with the proxy name as data. If the request returns status code 204, the function continues; otherwise, it prints an error message. The `validProxyDelayList` function sorts a list of dictionaries based on their \"delay\" key.",
-        "type": "comment"
-    },
-    "112": {
-        "file_id": 16,
-        "content": "def setProxyConfig(\n    port: int = 9911,\n    http_port: Union[None, int] = None,\n    mode: Literal[\n        \"Global\", \"Rule\", \"Direct\", None\n    ] = None,  # currently this mode is configured as 'rule' so everything related to 'deepl' will be redirected.\n):\n    # https://clash.gitbook.io/doc/restful-api/config\n    # sure you can patch more things but that's enough for now.\n    clashUrl = localhostWithPort(port) + \"/configs\"\n    configs = {}\n    if http_port:\n        configs.update({\"port\": http_port})\n    if mode:\n        configs.update({\"mode\": mode})\n    r = requests.patch(clashUrl, data=json.dumps(configs, ensure_ascii=False).encode())\n    assert r.status_code == 204\ndef getConnectionGateway(\n    port: int = 9911,\n):  # get the clash local http proxy connection port.\n    clashUrl = localhostWithPort(port) + \"/configs\"\n    r = requests.get(clashUrl)\n    configs = r.json()\n    http_port = configs[\"port\"]\n    gateway = localhostWithPort(http_port)\n    return gateway\ndef getTestedProxyList(\n    port: int = 9911,\n    debug=False,",
-        "type": "code",
-        "location": "/lazero/network/proxy/clash.py:93-125"
-    },
-    "113": {
-        "file_id": 16,
-        "content": "92-105: Define function setProxyConfig with optional arguments for port, http_port and mode.\n\n106-108: URL for Clash config endpoint construction based on port number.\n\n109-124: Patch the Clash configuration with optional arguments.",
-        "type": "comment"
-    },
-    "114": {
-        "file_id": 16,
+        "file_id": 13,
         "content": "    disallowed_types=[\"URLTest\", \"Reject\", \"Selector\", \"Direct\", \"Fallback\"],\n    url=\"https://deepl.com\",\n    timeout: int = 5000,  # in miliseconds?\n    valid=True,\n):\n    proxyList = getProxyList(debug=debug, port=port, disallowed_types=disallowed_types)\n    # pprint.pprint(result)\n    validProxyDelayList = testProxyList(\n        proxyList, timeout=timeout, url=url, valid=valid\n    )\n    return validProxyDelayList\nfrom contextlib import AbstractContextManager\nclass clashProxyStateManager(AbstractContextManager):\n    def __init__(\n        self,\n        enter: Literal[\"Global\", \"Rule\", \"Direct\", None],\n        exit: Literal[\"Global\", \"Rule\", \"Direct\", None],\n        port=9911,\n    ):\n        self.enter = enter\n        self.exit = exit\n        self.port = port\n    def __enter__(self):\n        setProxyConfig(port=self.port, mode=self.enter)\n    def __exit__(self, exctype, excinst, exctb):\n        setProxyConfig(port=self.port, mode=self.exit)\n        return",
         "type": "code",
         "location": "/lazero/network/proxy/clash.py:126-158"
     },
-    "115": {
-        "file_id": 16,
+    "101": {
+        "file_id": 13,
         "content": "This code defines a function that tests a list of proxies and returns valid ones with their delay times. It also creates a context manager class to manage the proxy config mode.",
         "type": "comment"
     },
-    "116": {
-        "file_id": 17,
+    "102": {
+        "file_id": 14,
         "content": "/lazero/program/__init__.py",
         "type": "filepath"
     },
-    "117": {
-        "file_id": 17,
+    "103": {
+        "file_id": 14,
         "content": "Imports all modules from lazero.program.threading.",
         "type": "summary"
     },
-    "118": {
-        "file_id": 17,
+    "104": {
+        "file_id": 14,
         "content": "from lazero.program.threading import *",
         "type": "code",
         "location": "/lazero/program/__init__.py:1-1"
     },
-    "119": {
-        "file_id": 17,
+    "105": {
+        "file_id": 14,
         "content": "Imports all modules from lazero.program.threading.",
         "type": "comment"
     },
-    "120": {
-        "file_id": 18,
+    "106": {
+        "file_id": 15,
         "content": "/lazero/program/functools.py",
         "type": "filepath"
     },
-    "121": {
-        "file_id": 18,
+    "107": {
+        "file_id": 15,
         "content": "The code features a context manager for temporary directory changes, exception handling and formatting functions using autopep8 and black. It also includes decorators for pickling functions with debug mode, handles inputs, processes function arguments, extracts lines for execution, provides exception-handling functions for debugging and pause, an iterator for temporary directories, and a retry decorator with optional delay.",
         "type": "summary"
     },
-    "122": {
-        "file_id": 18,
+    "108": {
+        "file_id": 15,
         "content": "# print package name of this 'lazero.program.functools' package, please?\n# print('PATH', __path__)\n# print('NAME', __name__)\n# # lazero.program.functools\n# def someFunction():\n#     print('NAME', __name__)\n# lazero.program.functools\n# it is the same!\n# what about let's call it elsewhere?\n## reserved keyword: __pickled_arguments__\nfrom typing import Literal, Union\nimport argparse\nimport os\nimport pickle\nimport dill\nfrom contextlib import AbstractContextManager\nimport subprocess\nfrom lazero.filesystem.temp import tmpfile\nimport uuid\nclass workingDirectoryManager(AbstractContextManager):\n    def __init__(\n        self,\n        workingDirectory: Union[str, None],\n    ):\n        self.currentWorkingDirectory = os.path.abspath(os.curdir)\n        self.workingDirectory = workingDirectory\n    def __enter__(self):\n        if self.workingDirectory:\n            assert os.path.isabs(self.workingDirectory)\n            os.chdir(self.workingDirectory)\n    def __exit__(self, exctype, excinst, exctb):\n        if self.workingDirectory:\n            os.chdir(self.currentWorkingDirectory)",
         "type": "code",
         "location": "/lazero/program/functools.py:1-37"
     },
-    "123": {
-        "file_id": 18,
+    "109": {
+        "file_id": 15,
         "content": "This code defines a context manager class called workingDirectoryManager that allows temporarily changing the current working directory. It initializes with an optional argument for the new working directory, and in the `__enter__` method, it checks if a new working directory is provided, changes the current working directory to the provided path (if available), and asserts that the new directory is an absolute path. In the `__exit__` method, it restores the original current working directory before exiting the context manager. The code also imports various modules and classes for different purposes such as handling file paths, creating temporary files, generating unique identifiers, and executing subprocesses.",
         "type": "comment"
     },
-    "124": {
-        "file_id": 18,
+    "110": {
+        "file_id": 15,
         "content": "def pickledFunction(\n    packageName,\n    workingDirectory: Union[None, str] = None,\n    debug=False,\n    backend: Literal[\"dill\", \"pickle\"] = \"dill\",\n):\n    # this decorator is used inside a specific INSTALLED package like pyjom. if you want to use it for non-installed package, better set the working directory for this decorator.\n    backendMap = {\"dill\": dill, \"pickle\": pickle}\n    currentBackend = backendMap[backend]\n    if debug:\n        print(\"package name: %s\" % packageName)\n    def inner(func):\n        funcName = func.__name__\n        argumentFlag = \"--{}\".format(funcName)\n        if debug:\n            print(\"function name: %s\" % funcName)\n        if (\n            packageName == \"__main__\"\n        ):  # this will accept nothing as argument or keyword arguments\n            parser = argparse.ArgumentParser()\n            parser.add_argument(argumentFlag, type=str, default=\"\")\n            parsed_args = parser.parse_args()\n            picklePath = parsed_args.__dict__[funcName]\n            if picklePath == \"\":",
         "type": "code",
         "location": "/lazero/program/functools.py:40-64"
     },
-    "125": {
-        "file_id": 18,
+    "111": {
+        "file_id": 15,
         "content": "Decorator for pickling package functions using dill or pickle, debug mode prints function names and package name.",
         "type": "comment"
     },
-    "126": {
-        "file_id": 18,
+    "112": {
+        "file_id": 15,
         "content": "                ...\n            elif os.path.exists(picklePath):\n                with open(picklePath, \"rb\") as f:\n                    pickledArguments = currentBackend.load(f)\n                args = pickledArguments[\"args\"]\n                kwargs = pickledArguments[\"kwargs\"]\n                if debug:\n                    print(\"function args: %s\" % args)\n                    print(\"function kwargs: %s\" % kwargs)\n                result = func(*args, **kwargs)\n                with open(picklePath, \"wb\") as f:\n                    currentBackend.dump(result, f)\n                if debug:\n                    print(\"function result: %s\" % result)\n            else:\n                raise Exception(\"nonexistant pickle path:\", picklePath.__repr__())\n        else:\n            # if workingDirectory:\n            def wrapper(*args, **kwargs):\n                pickledArguments = {}\n                pickledArguments[\"args\"] = args\n                pickledArguments[\"kwargs\"] = kwargs\n                # you need to get current working directory first.",
         "type": "code",
         "location": "/lazero/program/functools.py:65-87"
     },
-    "127": {
-        "file_id": 18,
+    "113": {
+        "file_id": 15,
         "content": "Checks if the pickle file with the function arguments exists, loads the arguments and returns the function result. If not found, raises an exception with a message indicating the nonexistent pickle path. If no working directory is provided, defines a wrapper function to store the function arguments in a pickle file for later use.",
         "type": "comment"
     },
-    "128": {
-        "file_id": 18,
+    "114": {
+        "file_id": 15,
         "content": "                # also you need a context manager to deal with problems, being able to get back to current working directory no matter what.\n                pickleFileName = \"{}.{}\".format(\n                    str(uuid.uuid4()).replace(\"-\", \"_\"), backend\n                )\n                pickleFilePath = os.path.join(\n                    \"/dev/shm/pickledFunctionParameters\", pickleFileName\n                )\n                with tmpfile(pickleFilePath):\n                    with open(pickleFilePath, \"wb\") as f:\n                        currentBackend.dump(pickledArguments, f)\n                        if debug:\n                            print(\"arguments dumped to %s\" % pickleFilePath)\n                    with workingDirectoryManager(\n                        workingDirectory\n                    ):  # this parameter could be None.\n                        commandArguments = [\n                            \"python3\",\n                            \"-m\",\n                            packageName,\n                            argumentFlag,",
         "type": "code",
         "location": "/lazero/program/functools.py:88-107"
     },
-    "129": {
-        "file_id": 18,
+    "115": {
+        "file_id": 15,
         "content": "Creating a temporary file, picking arguments to function and dumping them, changing working directory.",
         "type": "comment"
     },
-    "130": {
-        "file_id": 18,
+    "116": {
+        "file_id": 15,
         "content": "                            pickleFilePath,\n                        ]\n                        result = subprocess.run(\n                            commandArguments,\n                            shell=False,\n                        )\n                        assert result.returncode == 0\n                        if debug:\n                            print(\"subprocess execution done\")\n                    with open(pickleFilePath, \"rb\") as f:\n                        return currentBackend.load(f)\n            return wrapper\n        return lambda: None  # a symbolic function.\n    return inner\n# import dill\nfrom contextlib import suppress\nimport traceback\ndef skipException(\n    debug_flag=False,\n    breakpoint_flag=False,\n    delayAfterException: int = 3,\n    defaultReturn=None,\n    global_variables: dict = {},\n    local_variables: dict = {},\n):\n    def wrapper(func):\n        globals().update(global_variables)\n        locals().update(local_variables)\n        # myExec = lambda command, myGlobals, myLocals: exec(command) # new way of merging dicts in python 3.9, more 'functional'?",
         "type": "code",
         "location": "/lazero/program/functools.py:108-142"
     },
-    "131": {
-        "file_id": 18,
+    "117": {
+        "file_id": 15,
         "content": "This code defines a function called \"skipException\" that takes in various parameters like debug_flag, breakpoint_flag, delayAfterException, defaultReturn, global_variables, and local_variables. It then returns a wrapper function that can be used to execute another function while handling exceptions. The wrapper function updates the global and local variable dictionaries with the provided values before executing the target function.",
         "type": "comment"
     },
-    "132": {
-        "file_id": 18,
+    "118": {
+        "file_id": 15,
         "content": "        def space_counter(line):\n            counter = 0\n            for x in line:\n                if x == \" \":\n                    counter += 1\n                else:\n                    break\n            return counter\n        def remove_extra_return(code):\n            while True:\n                if \"\\n\\n\" in code:\n                    code = code.replace(\"\\n\\n\", \"\\n\")\n                else:\n                    break\n            return code\n        def isEmptyLine(line):\n            emptyChars = [\"\\n\", \"\\t\", \"\\r\", \" \"]\n            length = len(line)\n            emptyCounts = 0\n            for char in line:\n                if char in emptyChars:\n                    emptyCounts += 1\n            return emptyCounts == length\n        def getCodeBlocks(lines):\n            mBlocks = []\n            current_block = lines[0]\n            lines = lines + [\"\"]\n            keywords = [\" \", \"def \", \"async \", \"with \", \"class \", \"@\"]\n            # keywords = [\" \", \"def\", \"async def\", \"with\", \"async with\",\"class\", \"@\"]\n            for line in lines[1:]:",
         "type": "code",
         "location": "/lazero/program/functools.py:143-175"
     },
-    "133": {
-        "file_id": 18,
+    "119": {
+        "file_id": 15,
         "content": "Code contains several functions for handling lines and code blocks. It includes a space counter function, a remove extra return function, an empty line checker, and a code block getter.",
         "type": "comment"
     },
-    "134": {
-        "file_id": 18,
+    "120": {
+        "file_id": 15,
         "content": "                if sum([line.startswith(keyword) for keyword in keywords]):\n                    current_block += \"\\n\"\n                    current_block += line\n                else:\n                    mBlocks.append(current_block)\n                    current_block = line\n            return mBlocks\n        def getExtendedLines(splited_code):\n            splited_code = [x.rstrip() for x in splited_code]\n            splited_code = \"\\n\".join(splited_code).replace(\"\\\\\\n\", \"\")\n            splited_code = remove_extra_return(splited_code)\n            splited_code = splited_code.split(\"\\n\")\n            return splited_code\n        def reformatCode(func_code, MAXINT=10000000000, debug=False):\n            # with open(\"test.py\", \"r\") as f:\n            code = func_code\n            # need binary data.\n            code_encoded = code.encode(\"utf-8\")\n            import subprocess\n            command = (\n                \"autopep8 --max-line-length {MAXINT} - | black -l {MAXINT} -C -\".format(\n                    MAXINT=MAXINT",
         "type": "code",
         "location": "/lazero/program/functools.py:176-202"
     },
-    "135": {
-        "file_id": 18,
+    "121": {
+        "file_id": 15,
         "content": "This code defines functions to format Python code using \"autopep8\" and \"black\". It first splits the input code into lines, removes extra returns, and then uses these formatting tools to reformat the code while setting a maximum line length. The code also accepts optional arguments for debugging and setting the maximum line length.",
         "type": "comment"
     },
-    "136": {
-        "file_id": 18,
+    "122": {
+        "file_id": 15,
         "content": "                )\n            )\n            commandLine = [\"bash\", \"-c\", command]\n            result = subprocess.run(\n                commandLine, input=code_encoded, capture_output=True\n            )\n            try:\n                assert result.returncode == 0\n                code_formatted = result.stdout.decode(\"utf-8\")\n            except:\n                if debug:\n                    import traceback\n                    traceback.print_exc()\n                    print(\"STDOUT\", result.stdout)\n                    print(\"STDERR\", result.stderr)\n                code_formatted = code\n            if debug:\n                print(code_formatted)\n            return code_formatted\n        def new_func(*args, **kwargs):\n            func_name = func.__name__\n            func_code = dill.source.getsource(func)\n            # reformat the func code via our dearly autopep8-black formatter.\n            func_code = reformatCode(func_code, debug=debug_flag)\n            if debug_flag:\n                print(\"########## FUNCTION CODE #########\")",
         "type": "code",
         "location": "/lazero/program/functools.py:203-230"
     },
-    "137": {
-        "file_id": 18,
+    "123": {
+        "file_id": 15,
         "content": "This code is running a subprocess to execute a command, then checking the return code. If successful (return code 0), it retrieves the formatted output from the command execution and returns it. If there's an error or debug mode is on, it handles exceptions by printing the standard output and standard error streams along with a stack trace. If the function code needs reformatting, it uses a specific function to reformat the code before returning it. Additionally, this code defines a new_func that retrieves the original function's name and source code, reformats it if necessary, and returns it.",
         "type": "comment"
     },
-    "138": {
-        "file_id": 18,
+    "124": {
+        "file_id": 15,
         "content": "                print(\n                    func_code\n                )  # do not use chained decorator since doing so will definitely fail everything?\n                print(\"########## FUNCTION CODE #########\")\n                print(\"########## FUNCTION #########\")\n            # print(func_code)\n            func_code = remove_extra_return(func_code)\n            splited_code = func_code.split(\"\\n\")\n            splited_code = getExtendedLines(splited_code)\n            # index 0: decorator\n            # index 1: function name\n            # no recursion support. may work inside another undecorated function.\n            try:\n                assert splited_code[0].strip().startswith(\"@skipException\")\n            except:\n                raise Exception(\"Do not nesting the use of @skipException decorator\")\n            function_definition = splited_code[1]\n            function_args = function_definition[:-1].replace(\n                \"def {}\".format(func_name), \"\"\n            )\n            if debug_flag:\n                print(\"FUNCTION ARGS:\", function_args)",
         "type": "code",
         "location": "/lazero/program/functools.py:231-252"
     },
-    "139": {
-        "file_id": 18,
+    "125": {
+        "file_id": 15,
         "content": "This code is responsible for handling the case where a function is decorated with @skipException decorator, preventing any recursive calls within the same context. It checks if the first line of the function's code starts with \"@skipException\", and if not, raises an exception indicating improper nesting of the decorator. The code then extracts the function definition, strips off the decorator and function name, and stores the remaining arguments in a variable for further processing. If debugging is enabled, it prints out the function's arguments.",
         "type": "comment"
     },
-    "140": {
-        "file_id": 18,
+    "126": {
+        "file_id": 15,
         "content": "            kwdefaults = func.__defaults__\n            pass_kwargs = {}\n            if \"=\" in function_args:\n                assert kwdefaults != None\n                arg_remains = function_args.split(\"=\")[0]\n                kwarg_remains = function_args.replace(arg_remains, \"\")\n                kwarg_extra_names = [\n                    content.split(\",\")[-1].strip()\n                    for index, content in enumerate(kwarg_remains.split(\"=\"))\n                    if index % 2 == 1\n                ]\n                mfunctionArgsPrimitive = arg_remains.replace(\"(\", \"\").split(\",\")\n                kwarg_names = [mfunctionArgsPrimitive[-1].strip()] + kwarg_extra_names\n                mfunctionArgs = mfunctionArgsPrimitive[:-1]\n                if debug_flag:\n                    print(\"PASSED KEYWORD ARGS:\", kwargs)\n                    print(\"KWARG NAMES:\", kwarg_names)\n                for key, value in zip(kwarg_names, kwdefaults):\n                    pass_kwargs.update({key: value})\n                for key in kwargs.keys():",
         "type": "code",
         "location": "/lazero/program/functools.py:253-273"
     },
-    "141": {
-        "file_id": 18,
+    "127": {
+        "file_id": 15,
         "content": "The code is parsing the function arguments and splitting them into positional and keyword arguments. It then updates a dictionary with default values for the keyword arguments if they are present in the function call. This allows the function to handle cases where the user provides default values or additional keyword arguments beyond what the function expects.",
         "type": "comment"
     },
-    "142": {
-        "file_id": 18,
+    "128": {
+        "file_id": 15,
         "content": "                    assert key in kwarg_names\n                    pass_kwargs[key] = kwargs[key]\n            else:\n                assert kwdefaults == None\n                mfunctionArgs = (\n                    function_args.replace(\"(\", \"\").replace(\")\", \"\").split(\",\")\n                )\n            mfunctionArgs = [x.strip() for x in mfunctionArgs]\n            mfunctionArgs = [x for x in mfunctionArgs if not isEmptyLine(x)]\n            if debug_flag:\n                print(\"POSITIONAL ARGS:\", mfunctionArgs)\n            assert len(args) == len(mfunctionArgs)\n            for key, value in zip(mfunctionArgs, args):\n                exec(\"{} = {}\".format(key, value))\n            if kwdefaults is not None:\n                for key, value in pass_kwargs.items():\n                    exec(\"{} = {}\".format(key, value))\n            actualCode = splited_code[2:]\n            actualCode = [x for x in actualCode if not isEmptyLine(x)]\n            minIndent = min([space_counter(line) for line in actualCode])\n            # split the code into different sections.",
         "type": "code",
         "location": "/lazero/program/functools.py:274-295"
     },
-    "143": {
-        "file_id": 18,
+    "129": {
+        "file_id": 15,
         "content": "Checking and setting positional arguments from input string, and preparing code for execution.",
         "type": "comment"
     },
-    "144": {
-        "file_id": 18,
+    "130": {
+        "file_id": 15,
         "content": "            if debug_flag:\n                print(minIndent)\n            newLines = [line[minIndent:] for line in actualCode]\n            codeBlocks = getCodeBlocks(newLines)\n            for block in codeBlocks:\n                no_exception = False\n                if debug_flag:\n                    print(\"##########CODEBLOCK##########\")\n                    print(block)\n                    print(\"##########CODEBLOCK##########\")\n                if block.startswith(\"return \"):\n                    returnName = \"var_\" + str(uuid.uuid4()).replace(\"-\", \"_\")\n                    block = \"{} = {}\".format(returnName, block[len(\"return \") :])\n                    exec(block)\n                    value = locals().get(returnName)\n                    return value\n                elif block == \"return\":\n                    return\n                elif not debug_flag:\n                    with suppress(Exception):\n                        exec(block)\n                        no_exception = True\n                else:\n                    try:",
         "type": "code",
         "location": "/lazero/program/functools.py:296-319"
     },
-    "145": {
-        "file_id": 18,
+    "131": {
+        "file_id": 15,
         "content": "This code extracts and processes lines from the actual code, then iterates through the extracted blocks. If a block starts with \"return\", it assigns the return value to a temporary variable, executes it, and returns the value. If debug_flag is on, it prints a separator before printing each code block. If debug_flag is off but a block raises an exception, it suppresses it.",
         "type": "comment"
     },
-    "146": {
-        "file_id": 18,
+    "132": {
+        "file_id": 15,
         "content": "                        exec(block)  # return outside of function?\n                        no_exception = True\n                    except:\n                        traceback.print_exc()\n                        if breakpoint_flag:\n                            breakpoint()\n                if not no_exception:\n                    print(\"##########DELAY AFTER EXCEPTION##########\")\n                    import time\n                    time.sleep(delayAfterException)\n                    print(\"##########DELAY AFTER EXCEPTION##########\")\n            if debug_flag:\n                print(\"########## FUNCTION #########\")\n            return defaultReturn\n        return new_func\n    return wrapper\ndef skipExceptionVerbose(func):\n    return skipException(debug_flag=True)(func)\ndef skipExceptionBreakpoint(func):\n    return skipException(breakpoint_flag=True)(func)\ndef skipExceptionDebug(func):\n    return skipException(breakpoint_flag=True, debug_flag=True)(func)\n# breakpoint()\nfrom lazero.filesystem.temp import tmpdir\nfrom typing import Union",
         "type": "code",
         "location": "/lazero/program/functools.py:320-355"
     },
-    "147": {
-        "file_id": 18,
+    "133": {
+        "file_id": 15,
         "content": "This code defines functions that wrap another function, handling exceptions and allowing for debugging or breakpoint pausing. The wrapped function is executed within a try-except block to catch any exceptions. If an exception occurs, it prints the traceback (if a breakpoint flag is set) or simply waits with a delay (if a delayAfterException value is specified). Additionally, if a debug flag is set, it prints the function name and arguments before executing. The code also imports some functions and classes from other modules.",
         "type": "comment"
     },
-    "148": {
-        "file_id": 18,
+    "134": {
+        "file_id": 15,
         "content": "from contextlib import nullcontext\nfrom types import GeneratorType\n# generators create generators. that's it.\ndef iterateWithTempDirectory(\n    tempdir: Union[str, None] = None, targetType=GeneratorType\n):\n    # iterate is some added keyword.\n    if tempdir is None:\n        contextManager = lambda: nullcontext()\n    else:\n        contextManager = lambda: tmpdir(tempdir)\n    def inner(func):\n        def wrapper(  # default to be auto. otherwise why you use this?\n            generatorMaybe, iterate: Literal[False, True, \"auto\"] = \"auto\", **kwargs\n        ):  # this wrapper will void function input signatures maybe? anyway let's do it!\n            if iterate == \"auto\":\n                iterate = type(generatorMaybe) == targetType\n            def iterator(generatorMaybe, **kwargs):\n                for elem in generatorMaybe:\n                    with contextManager():\n                        yield func(elem, **kwargs)\n            if iterate:\n                return iterator(generatorMaybe, **kwargs)\n            else:",
         "type": "code",
         "location": "/lazero/program/functools.py:356-383"
     },
-    "149": {
-        "file_id": 18,
+    "135": {
+        "file_id": 15,
         "content": "This code defines a function `iterateWithTempDirectory` which takes a temporary directory path and returns an iterator function. If no tempdir is provided, it returns a context manager that does nothing (nullcontext). If a tempdir is provided, it returns a context manager that creates a temporary directory using the `tmpdir` function from the `pytest_timeout` module. The outer function wraps another function and returns an iterator that yields the results of calling the wrapped function on each element of a generator-like object. If the optional `iterate` parameter is set to False, it skips iteration over the generator-like object.",
         "type": "comment"
     },
-    "150": {
-        "file_id": 18,
+    "136": {
+        "file_id": 15,
         "content": "                with contextManager():\n                    return func(generatorMaybe, **kwargs)\n        return wrapper\n    return inner\nimport time\ndef suppressException(\n    showException=True,\n    defaultReturn=None,\n    tries: int = 1,\n    delay: float = 3,\n    debug: bool = True,\n):\n    if tries < 1:\n        tries = 1\n    def inner(func):\n        def wrapper(*args, **kwargs):\n            for index in range(tries):\n                if debug:\n                    print(\"try times: %d\" % index)\n                try:\n                    return func(*args, **kwargs)\n                except:\n                    if showException:\n                        traceback.print_exc()\n                    time.sleep(delay)\n            return defaultReturn\n        return wrapper\n    return inner",
         "type": "code",
         "location": "/lazero/program/functools.py:384-420"
     },
-    "151": {
-        "file_id": 18,
+    "137": {
+        "file_id": 15,
         "content": "Function decorator that retries a function multiple times in case of an exception, with optional delay between retries and print statements for debugging.",
         "type": "comment"
     },
-    "152": {
-        "file_id": 19,
+    "138": {
+        "file_id": 16,
         "content": "/lazero/program/subprocess.py",
         "type": "filepath"
     },
-    "153": {
-        "file_id": 19,
+    "139": {
+        "file_id": 16,
         "content": "This function runs a command with specified options and returns the output as JSON if successful, or an empty dictionary and error information if not.",
         "type": "summary"
     },
-    "154": {
-        "file_id": 19,
+    "140": {
+        "file_id": 16,
         "content": "from typing import Union\nimport json, subprocess, traceback\ndef runCommandGetJson(\n    commandLine: list[str],\n    timeout: int = 5,\n    debug: bool = False,\n    shell: bool = False,\n    workingDirectory: Union[str, None] = None,\n):\n    try:\n        result = subprocess.run(\n            commandLine,\n            timeout=timeout,\n            capture_output=True,\n            shell=shell,\n            cwd=workingDirectory,\n        )\n        assert result.returncode == 0\n        stdout = result.stdout\n        stdout = stdout.decode(\"utf-8\")\n        output = json.loads(stdout)\n        return True, output\n    except:\n        if debug:\n            traceback.print_exc()\n    return False, {}",
         "type": "code",
         "location": "/lazero/program/subprocess.py:1-29"
     },
-    "155": {
-        "file_id": 19,
+    "141": {
+        "file_id": 16,
         "content": "This function runs a command with specified options and returns the output as JSON if successful, or an empty dictionary and error information if not.",
         "type": "comment"
     },
-    "156": {
-        "file_id": 20,
+    "142": {
+        "file_id": 17,
         "content": "/lazero/program/threading.py",
         "type": "filepath"
     },
-    "157": {
-        "file_id": 20,
+    "143": {
+        "file_id": 17,
         "content": "Code imports the threading module and defines two functions, startThread and asyncThread. StartThread creates a new thread with target function, arguments, and keyword arguments, while daemon is set to False. AsyncThread wraps a function to create a new thread using startThread, allowing for asynchronous execution. The code also includes some comments discussing the naming issue and the location of related function-related stuff.",
         "type": "summary"
     },
-    "158": {
-        "file_id": 20,
+    "144": {
+        "file_id": 17,
         "content": "import threading\ndef startThread(target, args=(), kwargs={}):\n    thread = threading.Thread(target=target, args=args, kwargs=kwargs, daemon=False)\n    thread.start()\ndef asyncThread(func):\n    def new_func(*args, **kwargs):\n        startThread(func, args=args, kwargs=kwargs)\n    return new_func\n# from lazero.program.functools import someFunction\n# someFunction()\n# lazero.program.functools\n# the name still won't change! fuck.\n# how to get the function related stuff?",
         "type": "code",
         "location": "/lazero/program/threading.py:2-17"
     },
-    "159": {
-        "file_id": 20,
+    "145": {
+        "file_id": 17,
         "content": "Code imports the threading module and defines two functions, startThread and asyncThread. StartThread creates a new thread with target function, arguments, and keyword arguments, while daemon is set to False. AsyncThread wraps a function to create a new thread using startThread, allowing for asynchronous execution. The code also includes some comments discussing the naming issue and the location of related function-related stuff.",
         "type": "comment"
     },
-    "160": {
-        "file_id": 21,
+    "146": {
+        "file_id": 18,
         "content": "/lazero/search/api.py",
         "type": "filepath"
     },
-    "161": {
-        "file_id": 21,
+    "147": {
+        "file_id": 18,
         "content": "The code utilizes Python's os.path module to retrieve absolute file paths from a directory, stores key-value pairs in a database, and uses Whoosh and Txtai libraries to create/update indexes.",
         "type": "summary"
     },
-    "162": {
-        "file_id": 21,
+    "148": {
+        "file_id": 18,
         "content": "# this must be able to retrieve original file and linenumber based on index.\n# but which database?\n# get our 'home' directory first!\nimport os\ndef listFilesInDirectory(directory, debug=False):\n    assert os.path.exists(directory)\n    assert os.path.isabs(directory)\n    # we assume this is plain directory with no further files?\n    # we need absolute paths.\n    filepaths = []\n    for (root, dirs, files) in os.walk(directory, topdown=True):\n        if debug:\n            print(\"The root is: \")\n            print(root)\n            print(\"The directories are: \")\n            print(dirs)\n            print(\"The files are: \")\n            # print(files)\n        for fileName in files:\n            relativeFilePath = os.path.join(root, fileName)\n            absoluteFilePath = os.path.abspath(relativeFilePath)\n            # yield absoluteFilePath\n            filepaths.append(absoluteFilePath)\n            if debug:\n                print(absoluteFilePath)\n        if debug:\n            print(\"--------------------------------\")\n    filepaths.sort()  # make it deterministic.",
         "type": "code",
         "location": "/lazero/search/api.py:1-32"
     },
-    "163": {
-        "file_id": 21,
+    "149": {
+        "file_id": 18,
         "content": "This code retrieves a list of absolute file paths from a specified directory. It checks if the given directory exists and is an absolute path, then walks through the directory tree (top-down) and collects all file names. For each file, it converts the relative path to an absolute one and adds it to the list. The resulting list is sorted for determinism.",
         "type": "comment"
     },
-    "164": {
-        "file_id": 21,
+    "150": {
+        "file_id": 18,
         "content": "    for filepath in filepaths:\n        yield filepath\nfrom lazero.filesystem.env import getHomeDirectory\nlazeroCachePath = os.path.join(getHomeDirectory(), \".lazero\")\nif not os.path.exists(lazeroCachePath):\n    os.mkdir(lazeroCachePath)\n# what database you want to use? better test them first!\n# really want anything related to database? what should you store?\n# the index-to-file-with-linenumber mapping which txtai does not have.\n# question: do you want to use graph database?\nfrom unqlite import UnQLite\nimport progressbar\n# binary?\n# i plan to store and retrieve the value twice.\ndef storeKeyValuePairsToDatabase(\n    data, databasePath=os.path.join(lazeroCachePath, \"lazero_search.db\"), debug=False\n):\n    db = UnQLite(databasePath)\n    if debug:\n        print(\"storing data to database: %s\" % databasePath)\n    with db.transaction():\n        iterator = data\n        if debug:\n            iterator = progressbar.progressbar(iterator)\n        for key, value in iterator:\n            db[key] = value\ndef getValueByKeyFromDatabase(",
         "type": "code",
         "location": "/lazero/search/api.py:33-65"
     },
-    "165": {
-        "file_id": 21,
+    "151": {
+        "file_id": 18,
         "content": "Code reads and writes key-value pairs to a database.\n\nStorage location: \"lazero/lazero/search/api.py\":65-93\nCode:\n```\n    key = input(\"key: \")\n    value = input(\"value: \")\n    storeKeyValuePairsToDatabase(\n        [(key, value)], databasePath=os.path.join(lazeroCachePath, \"lazero_search.db\"), debug=True\n    )\n    return getValueByKeyFromDatabase(key, databasePath=os.path.join(lazeroCachePath, \"lazero_search.db\"))\n```",
         "type": "comment"
     },
-    "166": {
-        "file_id": 21,
+    "152": {
+        "file_id": 18,
         "content": "    key, databasePath=os.path.join(lazeroCachePath, \"lazero_search.db\")\n):\n    db = UnQLite(databasePath)\n    return db[key]\nimport json\ndef getLineStartEndInFileByConvLineIndexOriginalFromDatabase(line_index_original: int):\n    start_end_json_string = getValueByKeyFromDatabase(str(line_index_original)).decode(\n        \"utf-8\"\n    )\n    start_end_json = json.loads(start_end_json_string)\n    start, end = start_end_json\n    return start, end\ndef mainIndexer(\n    directory,\n    indexDirectories={\n        \"whoosh\": os.path.join(lazeroCachePath, \"whoosh_index\"),\n        \"txtai\": os.path.join(lazeroCachePath, \"txtai_index\"),\n    },\n):\n    from lazero.search.txtai.index import txtaiIndexer\n    from lazero.search.whoosh.index import whooshIndexer\n    assert os.path.exists(directory)\n    assert os.path.isdir(directory)\n    assert os.path.isabs(directory)\n    removeExists = True  # we don't want to create duplicates on the tinydb\n    indexers = {\"txtai\": txtaiIndexer, \"whoosh\": whooshIndexer}\n    for indexerName, indexDirectory in indexDirectories.items():",
         "type": "code",
         "location": "/lazero/search/api.py:66-99"
     },
-    "167": {
-        "file_id": 21,
+    "153": {
+        "file_id": 18,
         "content": "This code defines a function `getLineStartEndInFileByConvLineIndexOriginalFromDatabase` that retrieves the start and end line numbers of a specific line index from a database. The `mainIndexer` function takes a directory path and a dictionary of index directories, and uses two additional functions to create indexes using different libraries (Whoosh and Txtai).\n\nThe `getValueByKeyFromDatabase` function retrieves the value corresponding to a given key from a database, assuming the values are stored as JSON-encoded strings. The `mainIndexer` function asserts that the provided directory exists, is a directory, and has an absolute path. It then iterates over each indexer in the `indexDirectories` dictionary, creating or updating indexes using the corresponding indexing functions (`txtaiIndexer` and `whooshIndexer`).",
         "type": "comment"
     },
-    "168": {
-        "file_id": 21,
+    "154": {
+        "file_id": 18,
         "content": "        indexer = indexers[indexerName]\n        indexer(directory, indexDirectory=indexDirectory, removeExists=removeExists)",
         "type": "code",
         "location": "/lazero/search/api.py:100-101"
     },
-    "169": {
-        "file_id": 21,
+    "155": {
+        "file_id": 18,
         "content": "Setting indexer from the list of available indexers and calling its method with provided directory, indexDirectory, and removeExists parameters.",
         "type": "comment"
     },
-    "170": {
-        "file_id": 22,
+    "156": {
+        "file_id": 19,
         "content": "/lazero/search/index.py",
         "type": "filepath"
     },
-    "171": {
-        "file_id": 22,
+    "157": {
+        "file_id": 19,
         "content": "The code imports modules for querying a TinyDB database, initializes Query object and TinyDB instance with a specific path, includes functions for retrieving file paths, line ranges, configuration values, indexing files in a directory, creating a temporary index mapping, combines line ranges and original content for each group, removes duplicates, stores the result in the database, and iterates over changed lines, yielding them with or without file path based on condition.",
         "type": "summary"
     },
-    "172": {
-        "file_id": 22,
+    "158": {
+        "file_id": 19,
         "content": "import os\nfrom lazero.search.api import (\n    lazeroCachePath,\n    listFilesInDirectory,\n    storeKeyValuePairsToDatabase,\n)\nfrom lazero.search.preprocessing import (\n    getLineWiseAndListOfCleanedMergedConvGroupWithLineIndexMappingFromStringReadFromFile,\n    getFourVersionOfLineInListOfCleanedMergedConvGroupWithLineIndexMapping,\n)\nimport tinydb\nimport json\nfrom tinydb import Query\nfrom functools import lru_cache\n@lru_cache(maxsize=1)\ndef tinydbQueryBootstrap(databasePath=os.path.join(lazeroCachePath, \"index.json\")):\n    User = Query()\n    if not os.path.exists(databasePath):\n        raise Exception(\"Could not find tinydb database path:\", databasePath)\n    database = tinydb.TinyDB(databasePath)\n    return User, database\ndef retrieveFilePathFromLineIndex(\n    line_index, databasePath=os.path.join(lazeroCachePath, \"index.json\")\n):\n    # line index need not to be normalized.\n    User, database = tinydbQueryBootstrap(databasePath)\n    results = database.search((User.start <= line_index) & (User.end >= line_index))\n    path = results[0][\"path\"]",
         "type": "code",
         "location": "/lazero/search/index.py:1-35"
     },
-    "173": {
-        "file_id": 22,
+    "159": {
+        "file_id": 19,
         "content": "Imports necessary modules and functions for querying the tinydb database using line index. \nCreates a cached function `tinydbQueryBootstrap` to initialize Query object and TinyDB instance with a specific database path.\nRetrieves file path based on given line index from the initialized TinyDB database.",
         "type": "comment"
     },
-    "174": {
-        "file_id": 22,
+    "160": {
+        "file_id": 19,
         "content": "    return path\ndef retrieveLineRangeFromFilePath(\n    filepath, databasePath=os.path.join(lazeroCachePath, \"index.json\")\n):\n    # line index need not to be normalized.\n    User, database = tinydbQueryBootstrap(databasePath)\n    results = database.search((User.path == filepath))\n    data = results[0]\n    start, end = data[\"start\"], data[\"end\"]\n    return start, end  # inclusive.\ndef retrieveConfig(name, databasePath=os.path.join(lazeroCachePath, \"index.json\")):\n    User, database = tinydbQueryBootstrap(databasePath)\n    results = database.search((User.name == name))\n    data = results[0]\n    value = data[\"value\"]\n    return value\nimport progressbar\ndef checkEndsWithinAllowedExtensions(filepath, allowedExtensions: list):\n    for ext in allowedExtensions:\n        if filepath.endswith(ext):\n            return True\n    return False\ndef indexFilesInDirectory(\n    directory,\n    databasePath=os.path.join(lazeroCachePath, \"index.json\"),\n    removeExists=True,\n    withFileName=False,\n    withOriginalLine=True,\n    allowedExtensions=[\".md\", \".txt\", \".html\"],",
         "type": "code",
         "location": "/lazero/search/index.py:36-75"
     },
-    "175": {
-        "file_id": 22,
+    "161": {
+        "file_id": 19,
         "content": "Line 35-74 of \"lazero/lazero/search/index.py\" contains functions for indexing and retrieving file paths, line ranges, and configuration values from a database.\n\n- retrieveLineRangeFromFilePath: returns the start and end (inclusive) lines of a given filepath from the database\n- retrieveConfig: returns the value of a specific configuration name from the database\n- checkEndsWithinAllowedExtensions: checks if a filepath ends with any of the allowed extensions and returns True/False\n- indexFilesInDirectory: recursively indexes files in a directory, updating or creating entries in the database based on the provided parameters",
         "type": "comment"
     },
-    "176": {
-        "file_id": 22,
+    "162": {
+        "file_id": 19,
         "content": "):\n    # we make this process atomic. if the path exists then we will remove it.\n    if os.path.exists(databasePath) and removeExists:\n        os.remove(databasePath)\n    database = tinydb.TinyDB(databasePath)\n    database.insert({\"name\": \"withOriginalLine\", \"value\": withOriginalLine})\n    counter = 0\n    divisor = 4 + int(withOriginalLine)\n    # you need to ignore .git directory.\n    for absoluteFilePath in progressbar.progressbar(\n        [\n            x\n            for x in listFilesInDirectory(directory)\n            if \"/.git/\" not in x\n            and checkEndsWithinAllowedExtensions(x, allowedExtensions)\n        ]\n    ):\n        temp_processed_line_index_mapping = []\n        try:\n            with open(absoluteFilePath, \"r\", encoding=\"utf8\") as f:\n                data = f.read()\n        except:\n            # there's PNG in the path.\n            continue\n        (\n            linewise,\n            listOfCleanedMergedConvGroupWithLineIndexMapping,\n        ) = getLineWiseAndListOfCleanedMergedConvGroupWithLineIndexMappingFromStringReadFromFile(",
         "type": "code",
         "location": "/lazero/search/index.py:76-103"
     },
-    "177": {
-        "file_id": 22,
+    "163": {
+        "file_id": 19,
         "content": "Code comments:\n1. Atomically remove existing path and create a new database if it exists and removeExists is True.\n2. Insert \"name\" and \"value\" into the created database.\n3. Iterate through files in directory, excluding .git and checking allowed extensions.\n4. Read file data and handle any exceptions (e.g., PNG in path).",
         "type": "comment"
     },
-    "178": {
-        "file_id": 22,
+    "164": {
+        "file_id": 19,
         "content": "            data\n        )\n        total_length = (\n            len(listOfCleanedMergedConvGroupWithLineIndexMapping) * divisor\n        )  # because we use the original line.\n        # total_length = len(linewise) * divisor # because we use the original line.\n        # total_length = len(linewise) * divisor # because we use the original line.\n        # index >= start and index <= end\n        start = counter\n        end = counter + total_length - 1\n        counter += total_length\n        database.insert({\"path\": absoluteFilePath, \"start\": start, \"end\": end})\n        # shall we change the end index into something inclusive? you need to minus one.\n        # print(len(listOfCleanedMergedConvGroupWithLineIndexMapping))\n        # 1421 vs 13235: 9.31\n        # print('total_length:',total_length)\n        # breakpoint()\n        for index in range(total_length):\n            if index % divisor != 0:\n                continue\n            line_range = listOfCleanedMergedConvGroupWithLineIndexMapping[\n                index // divisor",
         "type": "code",
         "location": "/lazero/search/index.py:104-126"
     },
-    "179": {
-        "file_id": 22,
+    "165": {
+        "file_id": 19,
         "content": "Storing file path, start and end indices in the database for each group of lines with the same conversation id.",
         "type": "comment"
     },
-    "180": {
-        "file_id": 22,
+    "166": {
+        "file_id": 19,
         "content": "            ][\"line_range\"]\n            mIndex = start + index\n            temp_processed_line_index_mapping.append(\n                (str(mIndex // divisor), json.dumps(line_range))\n            )\n            # mIndex2 = start/divisor + index\n            temp_processed_line_index_mapping.append(  # here's how we store the original conv_group content\n                (\n                    str(mIndex // divisor) + \"_content\",\n                    listOfCleanedMergedConvGroupWithLineIndexMapping[index // divisor][\n                        \"conv_group_merged\"\n                    ],\n                )\n            )\n        temp_processed_line_index_mapping = list(set(temp_processed_line_index_mapping))\n        storeKeyValuePairsToDatabase(temp_processed_line_index_mapping)\n        for (\n            changed_lines\n        ) in getFourVersionOfLineInListOfCleanedMergedConvGroupWithLineIndexMapping(\n            listOfCleanedMergedConvGroupWithLineIndexMapping,\n            withOriginalLine=withOriginalLine,\n        ):\n            # you may yield them one by one.",
         "type": "code",
         "location": "/lazero/search/index.py:127-150"
     },
-    "181": {
-        "file_id": 22,
+    "167": {
+        "file_id": 19,
         "content": "This code creates a temporary processed line index mapping, combines line ranges and original conv_group content for each group, removes duplicates, then stores the result in the database. It also retrieves changed lines from the list of cleaned merged conv groups with line index mappings.",
         "type": "comment"
     },
-    "182": {
-        "file_id": 22,
+    "168": {
+        "file_id": 19,
         "content": "            for changed_line in changed_lines:\n                if withFileName:\n                    yield changed_line, absoluteFilePath\n                else:\n                    yield changed_line",
         "type": "code",
         "location": "/lazero/search/index.py:151-155"
     },
-    "183": {
-        "file_id": 22,
+    "169": {
+        "file_id": 19,
         "content": "Iterating over changed lines, yielding each line with or without file path depending on condition.",
         "type": "comment"
     },
-    "184": {
-        "file_id": 23,
+    "170": {
+        "file_id": 20,
         "content": "/lazero/search/postprocessing.py",
         "type": "filepath"
     },
-    "185": {
-        "file_id": 23,
+    "171": {
+        "file_id": 20,
         "content": "The code consists of four functions, two for text processing and two for text highlighting. It performs post-processing on search results, potentially highlighting relevant keywords using the \"rich\" library and logs additional information if debug is enabled.",
         "type": "summary"
     },
-    "186": {
-        "file_id": 23,
+    "172": {
+        "file_id": 20,
         "content": "# we offer highlight service here. are you sure it will show up in that line? without newline or anything? i mean in the file viewer, not the list view.\n# you decide not to remove stopwords?\n# it does not affect my highlighting process anyway.\n# the order matters!\nfrom lazero.search.preprocessing import getWordsWithoutPunctuation, porterStemmer\n# circular import? python does not work for this!\ndef englishTextToOriginalAndStemmedWordPairs(text):\n    global porterStemmer\n    doc = getWordsWithoutPunctuation(text)\n    # doc = englishNLP(text) # we just want splited words.\n    originalAndStemmedWordPairs = []\n    for original_word in doc:\n        # original_word = token.text\n        stemmed_word = porterStemmer.stem(original_word)\n        originalAndStemmedWordPairs.append((original_word, stemmed_word))\n    return originalAndStemmedWordPairs\ndef englishTextToStemmedWords(text):\n    originalAndStemmedWordPairs = englishTextToOriginalAndStemmedWordPairs(text)\n    stemmedWords = [\n        stemmed_word for original_word, stemmed_word in originalAndStemmedWordPairs",
         "type": "code",
         "location": "/lazero/search/postprocessing.py:1-28"
     },
-    "187": {
-        "file_id": 23,
+    "173": {
+        "file_id": 20,
         "content": "The code defines two functions, `englishTextToOriginalAndStemmedWordPairs` and `englishTextToStemmedWords`. The first function takes in a text, removes punctuation, stems each word using Porter Stemmer algorithm, and returns a list of tuples containing the original word and its stemmed form. The second function calls the first function to convert the input text into a list of stemmed words only.",
         "type": "comment"
     },
-    "188": {
-        "file_id": 23,
+    "174": {
+        "file_id": 20,
         "content": "    ]\n    return stemmedWords\n# it needs 'query'\n# do it in batch or do it in series.\n# query =\n# answers =\n# queryStemmedWords = englishTextToStemmedWords(query) # we use this as input, not the query itself.\n# named as such, but this process is universal, not just for english.\n# maybe we don't have to invent this shit again.\ndef getHighlightSetFromQueryStemmedWordsAndAnswer(queryStemmedWords, answer):\n    highlightSet = set()\n    answerOriginalAndStemmedWordPairs = englishTextToOriginalAndStemmedWordPairs(answer)\n    for original_word, stemmed_word in answerOriginalAndStemmedWordPairs:\n        if stemmed_word in queryStemmedWords:\n            highlightSet.add(\n                original_word\n            )  # just original_word is enough. remember to deduplicate.\n    return highlightSet\ndef getHighlightedAnswerFromQueryStemmedWordsAndAnswer(\n    queryStemmedWords, answer, debug=False\n):\n    # parse and stem both query and answer, check for commondities.\n    # sentence -> [(original_word, stemmed_word), ...]\n    # we need to show these highlights! fuck.",
         "type": "code",
         "location": "/lazero/search/postprocessing.py:29-57"
     },
-    "189": {
-        "file_id": 23,
+    "175": {
+        "file_id": 20,
         "content": "This code defines two functions: `getHighlightSetFromQueryStemmedWordsAndAnswer` and `getHighlightedAnswerFromQueryStemmedWordsAndAnswer`. The first function takes query stemmed words and an answer as input, and returns a set of original words from the answer that match any of the query stemmed words. The second function performs similar operations but also returns the highlighted answer if the `debug` parameter is set to True. Both functions are related to text processing and highlighting relevant parts of the answer based on query stemmed words.",
         "type": "comment"
     },
-    "190": {
-        "file_id": 23,
+    "176": {
+        "file_id": 20,
         "content": "    if debug:\n        from lazero.utils.logger import sprint\n        # sprint(\"QUERY:\", query)\n        sprint(\"QUERY KEYWORDS STEMMED:\", queryStemmedWords)\n    from rich.text import Text\n    text = Text(answer,style='white')\n    # text = Text(answer, style=\"gray\")  # there is no style applied.\n    highlightSet = getHighlightSetFromQueryStemmedWordsAndAnswer(\n        queryStemmedWords, answer\n    )\n    text.highlight_words(\n        highlightSet, style=\"yellow\"\n    )  # but we should not highlight individual letters right?\n    if debug:\n        from rich.console import Console\n        console = Console()\n        console.print(text)\n    return text",
         "type": "code",
         "location": "/lazero/search/postprocessing.py:58-79"
     },
-    "191": {
-        "file_id": 23,
+    "177": {
+        "file_id": 20,
         "content": "This code performs post-processing on search results, potentially highlighting relevant keywords in the answer and displaying it using the \"rich\" library. If debug is enabled, it logs additional information for troubleshooting.",
         "type": "comment"
     },
-    "192": {
-        "file_id": 24,
+    "178": {
+        "file_id": 21,
         "content": "/lazero/search/preprocessing.py",
         "type": "filepath"
     },
-    "193": {
-        "file_id": 24,
+    "179": {
+        "file_id": 21,
         "content": "The code preprocesses text data, formats lines, and performs windowed convolution or extracts excerpts using a convolver. It then iterates through cleaned conversation groups, generating four processed line versions and yielding them if withOriginalLine is true, or only the processed lines otherwise.",
         "type": "summary"
     },
-    "194": {
-        "file_id": 24,
+    "180": {
+        "file_id": 21,
         "content": "def removeDuplicates(line, chars=[\" \", \"\\t\"], maxConsecutiveLength=1):\n    for char in chars:\n        minUnallowedConsecutiveLength = maxConsecutiveLength + 1\n        while True:\n            if char * minUnallowedConsecutiveLength in line:\n                line = line.replace(\n                    char * minUnallowedConsecutiveLength, char * maxConsecutiveLength\n                )\n            else:\n                break\n    return line\ndef stripChars(line, chars=[\" \", \"\\t\"]):\n    while True:\n        flag = False\n        for char in chars:\n            if line.startswith(char) or line.endswith(char):\n                line = line.strip(char)\n                flag = True\n        if not flag:\n            break\n    return line\ndef standardLineCleaner(line):\n    line = removeDuplicates(line)\n    line = stripChars(line)\n    return line\ndef getLineWiseAndListOfCleanedMergedConvGroupWithLineIndexMappingFromStringReadFromFile(\n    data, char_per_group=30, group_per_conv_group=3, step_group_for_conv=2\n):\n    # data is the whole string read from file",
         "type": "code",
         "location": "/lazero/search/preprocessing.py:1-35"
     },
-    "195": {
-        "file_id": 24,
+    "181": {
+        "file_id": 21,
         "content": "This code defines several functions for preprocessing text data, including removing duplicate characters and stripping certain characters. The final function takes a string read from a file and returns line-wise cleaned and merged conversation groups with a line index mapping.",
         "type": "comment"
     },
-    "196": {
-        "file_id": 24,
+    "182": {
+        "file_id": 21,
         "content": "    data = data.replace(\"\\r\\n\", \"\\n\")\n    # the original data, shall be used as reference. save it somewhere, like database.\n    linewise = data.split(\"\\n\")  # there won't be \"\\n\" in the line.\n    # instead of 1. just to make sure these conv groups overlap.\n    assert step_group_for_conv >= 1\n    assert (\n        step_group_for_conv <= group_per_conv_group\n    )  # at least there is no gap, though when equal there will be no overlapping.\n    assert group_per_conv_group >= 1\n    assert char_per_group >= 1\n    # rule to add space: if there's \"-\" ending, remove the \"-\" then directly concat with another line.\n    # if not, then make sure there's one space between two lines.\n    # create char index to line index mapping.\n    newContent = \"\"\n    newContentCharIndexToLineIndexDict = {}\n    alphabets = \"abcdefghijklmnopqrstuvwxyz\"\n    alphabets += \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n    import string\n    english_punctuation = string.punctuation\n    for lineNumber, line in enumerate(linewise):\n        line_cleaned = standardLineCleaner(line)",
         "type": "code",
         "location": "/lazero/search/preprocessing.py:37-63"
     },
-    "197": {
-        "file_id": 24,
+    "183": {
+        "file_id": 21,
         "content": "The code cleans the input data, splits it into lines, and creates a mapping between characters and their corresponding line numbers. It also checks for certain conditions like group sizes and applies formatting rules to create a new content with potential overlapping groups.",
         "type": "comment"
     },
-    "198": {
-        "file_id": 24,
+    "184": {
+        "file_id": 21,
         "content": "        # for zero length line (after cleaned), we skip without doing anything.\n        if len(line_cleaned) == 0:\n            continue\n        # print(\"{}:\".format(lineNumber), line_cleaned)\n        # this process will never decrease the length of the line.\n        # i guess the symbol is different somehow. the hyphen is not avaliable on keyboard.\n        if line_cleaned.endswith(\"-\") or line_cleaned.endswith(\"‐\"):\n            line_cleaned = line_cleaned[:-1]\n        elif line_cleaned[-1] in alphabets + english_punctuation:\n            line_cleaned += \" \"\n        # we shall get the length again, cause we have processed this thing.\n        lineCleanedLength = len(line_cleaned)\n        newContentLength = len(newContent)\n        mDict = {\n            newContentLength + index: lineNumber for index in range(lineCleanedLength)\n        }\n        newContent += line_cleaned\n        newContentCharIndexToLineIndexDict.update(\n            mDict\n        )  # this shall be the most memory intensive object. delete it after use.",
         "type": "code",
         "location": "/lazero/search/preprocessing.py:64-83"
     },
-    "199": {
-        "file_id": 24,
+    "185": {
+        "file_id": 21,
         "content": "This code checks if a line is zero length, and if so, it skips without doing anything. If the line ends with a hyphen or has an alphabet character at the end, it modifies the line accordingly. It then updates a dictionary mapping content length to line index for each character in the modified line. Finally, it appends the modified line to newContent and updates the newContentCharIndexToLineIndexDict.",
         "type": "comment"
+    },
+    "186": {
+        "file_id": 21,
+        "content": "    # now, how to do convolution, or the windowed conv-like excerpt creation?\n    # print(\"MAX KEY:\", max(list(newContentCharIndexToLineIndexDict.keys())))\n    # MAX KEY: 85783\n    # which is smaller than:\n    # KeyError: 85830\n    # so it is obvious that we need the smaller 'endIndex', by using min(endIndex, newContentLength)\n    # breakpoint()\n    newContentLength = len(newContent)\n    startIndex = 0\n    listOfCleanedMergedConvGroupWithLineIndexMapping = []\n    # maybe you want to merge the fetched 'cleanedMergedConvGroup' according to 'lineIndexMapping', but that's another story.\n    # you can use the mathlib, from pyjom.\n    # i think the mathlib should be embedded to lazero. pyjom's mathlib can be grabbed from there.\n    while True:\n        if startIndex >= newContentLength:  # does not break? wtf?\n            break\n        endIndexOffset = group_per_conv_group * char_per_group\n        endIndex = startIndex + endIndexOffset\n        endIndex = min(endIndex, newContentLength - 1)\n        # if endIndex <= startIndex:  # failsafe.",
+        "type": "code",
+        "location": "/lazero/search/preprocessing.py:85-105"
+    },
+    "187": {
+        "file_id": 21,
+        "content": "This code performs windowed convolution or extracts excerpts from a given text using a convolver. It checks for the appropriate end index by comparing it with the newContent length and creates a list of cleaned merged conv groups with line index mapping.",
+        "type": "comment"
+    },
+    "188": {
+        "file_id": 21,
+        "content": "        #     continue\n        # the append process.\n        lineIndexStart = newContentCharIndexToLineIndexDict[\n            startIndex\n        ]  # maybe not just one line?\n        lineIndexEnd = newContentCharIndexToLineIndexDict[endIndex]  # key error? wtf?\n        lineIndicesTuple = (lineIndexStart, lineIndexEnd)\n        mElem = {\n            \"conv_group_merged\": newContent[startIndex:endIndex],\n            \"line_range\": lineIndicesTuple,\n        }\n        listOfCleanedMergedConvGroupWithLineIndexMapping.append(\n            mElem\n        )  # this shall be the thing that we need. just maybe.\n        # add to startIndex.\n        startIndex += step_group_for_conv * char_per_group\n    del newContentCharIndexToLineIndexDict\n    return linewise, listOfCleanedMergedConvGroupWithLineIndexMapping\n# now we have to process the 'listOfCleanedMergedConvGroupWithLineIndexMapping' list, make each line into 4 corresponding processed line.\n# no original line! original line is noisy.\n# that is not original line. we need something other than that.",
+        "type": "code",
+        "location": "/lazero/search/preprocessing.py:106-130"
+    },
+    "189": {
+        "file_id": 21,
+        "content": "Appending cleaned merged conv groups with line index mapping to list, adjusting startIndex, removing dict.",
+        "type": "comment"
+    },
+    "190": {
+        "file_id": 21,
+        "content": "# hint: we do not want to store all these shit in our tiny little memory. we want it 'IN DATABASE'\n# from lazero.search.postprocessing import porterStemmer\nfrom nltk.stem import PorterStemmer\nporterStemmer = PorterStemmer()  # whill automatically get lower case.\nimport wordninja\nimport string\nfrom zhon.hanzi import punctuation as chinese_punctuation\nimport jieba\ndef getWordsWithoutPunctuation(line):\n    chinese_and_english_punctuation = set(\n        list(string.punctuation + chinese_punctuation)\n    )\n    line = line.replace(\"\\n\", \" \")\n    for punctuation in chinese_and_english_punctuation:\n        line = line.replace(punctuation, \" \")\n    cleaned_line = standardLineCleaner(line)\n    # now use what?\n    # split with what first?\n    # wordninja. split words.\n    # nope. we use jieba first.\n    jieba_cutted_words = jieba.lcut(cleaned_line)  # remove whitespace!\n    final_words = []\n    for word in jieba_cutted_words:\n        strip_word = word.strip()\n        if len(strip_word) == 0:\n            # we should only keep the splited words.",
+        "type": "code",
+        "location": "/lazero/search/preprocessing.py:132-161"
+    },
+    "191": {
+        "file_id": 21,
+        "content": "This function removes punctuation from a line of text, cleans the resulting string, and then uses Jieba to segment the cleaned text into individual words. The final words are stored in a list and returned.",
+        "type": "comment"
+    },
+    "192": {
+        "file_id": 21,
+        "content": "            continue\n        else:\n            final_words.append(word)\n    return final_words\ndef getFourVersionsOfProcessedLine(line, debug=False):\n    global porterStemmer\n    # from nltk.stem import PorterStemmer\n    stemmer = porterStemmer\n    final_words = getWordsWithoutPunctuation(line)\n    final_cutted_words = []\n    for word in final_words:\n        ninja_cutted_word = wordninja.split(word)\n        if len(ninja_cutted_word) == 0:\n            # we shall keep the original word.\n            final_cutted_words.append(word)\n        else:\n            final_cutted_words.extend(ninja_cutted_word)\n    # now 'stem' words use nltk.\n    final_stemmed_words = [stemmer.stem(word) for word in final_words]\n    final_cutted_stemmed_words = [stemmer.stem(word) for word in final_cutted_words]\n    # finally, join all things with space, for whatever reason.\n    final_line = \" \".join(final_words)  # for our dearly transformer\n    final_cutted_line = \" \".join(final_cutted_words)  # for our dearly whoosh\n    final_stemmed_line = \" \".join(final_stemmed_words)  # for our dearly whoosh",
+        "type": "code",
+        "location": "/lazero/search/preprocessing.py:162-188"
+    },
+    "193": {
+        "file_id": 21,
+        "content": "1. Extract words from line without punctuation\n2. Split each word into cutted version\n3. If no cutted version, keep the original word\n4. Stem all original words using PorterStemmer\n5. Join all results (words, cutted versions, stemmed versions) with space for further processing",
+        "type": "comment"
+    },
+    "194": {
+        "file_id": 21,
+        "content": "    final_cutted_stemmed_line = \" \".join(\n        final_cutted_stemmed_words\n    )  # for our dearly whoosh\n    # how to use these four things?\n    # use them all for all search engines? that will increase our index size significantly!\n    # problem is, both query and data need to be processed somehow. but how?\n    # you want to use different split methods at the same time, or one at a time?\n    # you want to score them right? mostly in whoosh!\n    if debug:\n        from lazero.utils.logger import sprint\n        print(\"final_line\")\n        sprint(final_line)\n        print(\"final_cutted_line\")\n        sprint(final_cutted_line)\n        print(\"final_stemmed_line\")\n        sprint(final_stemmed_line)\n        print(\"final_cutted_stemmed_line\")\n        sprint(final_cutted_stemmed_line)\n    return final_line, final_cutted_line, final_stemmed_line, final_cutted_stemmed_line\ndef getFourVersionOfLineInListOfCleanedMergedConvGroupWithLineIndexMapping(\n    listOfCleanedMergedConvGroupWithLineIndexMapping, withOriginalLine=False",
+        "type": "code",
+        "location": "/lazero/search/preprocessing.py:189-215"
+    },
+    "195": {
+        "file_id": 21,
+        "content": "The code is generating four different versions of a line by cutting, stemming, and combining the words. It then returns these versions as well as the original line (optional). This can be used to process both query and data for search engines but may increase index size significantly. The debug mode prints the final line, cutted line, stemmed line, and cutted-stemmed line.",
+        "type": "comment"
+    },
+    "196": {
+        "file_id": 21,
+        "content": "):\n    for elem in listOfCleanedMergedConvGroupWithLineIndexMapping:\n        conv_group_merged = elem[\"conv_group_merged\"]\n        # what you want to yield?\n        (\n            final_line,\n            final_cutted_line,\n            final_stemmed_line,\n            final_cutted_stemmed_line,\n        ) = getFourVersionsOfProcessedLine(conv_group_merged)\n        if withOriginalLine:\n            yield conv_group_merged, final_line, final_cutted_line, final_stemmed_line, final_cutted_stemmed_line\n        else:\n            yield final_line, final_cutted_line, final_stemmed_line, final_cutted_stemmed_line\n        # yield (getFourVersionsOfProcessedLine(conv_group_merged),line_range)",
+        "type": "code",
+        "location": "/lazero/search/preprocessing.py:216-230"
+    },
+    "197": {
+        "file_id": 21,
+        "content": "This code is iterating through a list of cleaned and merged conversation groups. It calls the function \"getFourVersionsOfProcessedLine\" to generate four processed line versions (final_line, final_cutted_line, final_stemmed_line, final_cutted_stemmed_line) from each group. If withOriginalLine is true, it yields the original conversation group, along with the four processed lines. Otherwise, it only yields the four processed lines.",
+        "type": "comment"
+    },
+    "198": {
+        "file_id": 22,
+        "content": "/lazero/search/search.py",
+        "type": "filepath"
+    },
+    "199": {
+        "file_id": 22,
+        "content": "The code updates a data dictionary, searches for specific terms in index directories, retrieves and merges relevant data, calculates line scores, ranks files, and prepares for rendering.",
+        "type": "summary"
     }
 }

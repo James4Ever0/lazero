@@ -1,544 +1,542 @@
 {
     "200": {
-        "file_id": 24,
-        "content": "    # now, how to do convolution, or the windowed conv-like excerpt creation?\n    # print(\"MAX KEY:\", max(list(newContentCharIndexToLineIndexDict.keys())))\n    # MAX KEY: 85783\n    # which is smaller than:\n    # KeyError: 85830\n    # so it is obvious that we need the smaller 'endIndex', by using min(endIndex, newContentLength)\n    # breakpoint()\n    newContentLength = len(newContent)\n    startIndex = 0\n    listOfCleanedMergedConvGroupWithLineIndexMapping = []\n    # maybe you want to merge the fetched 'cleanedMergedConvGroup' according to 'lineIndexMapping', but that's another story.\n    # you can use the mathlib, from pyjom.\n    # i think the mathlib should be embedded to lazero. pyjom's mathlib can be grabbed from there.\n    while True:\n        if startIndex >= newContentLength:  # does not break? wtf?\n            break\n        endIndexOffset = group_per_conv_group * char_per_group\n        endIndex = startIndex + endIndexOffset\n        endIndex = min(endIndex, newContentLength - 1)\n        # if endIndex <= startIndex:  # failsafe.",
-        "type": "code",
-        "location": "/lazero/search/preprocessing.py:85-105"
-    },
-    "201": {
-        "file_id": 24,
-        "content": "This code performs windowed convolution or extracts excerpts from a given text using a convolver. It checks for the appropriate end index by comparing it with the newContent length and creates a list of cleaned merged conv groups with line index mapping.",
-        "type": "comment"
-    },
-    "202": {
-        "file_id": 24,
-        "content": "        #     continue\n        # the append process.\n        lineIndexStart = newContentCharIndexToLineIndexDict[\n            startIndex\n        ]  # maybe not just one line?\n        lineIndexEnd = newContentCharIndexToLineIndexDict[endIndex]  # key error? wtf?\n        lineIndicesTuple = (lineIndexStart, lineIndexEnd)\n        mElem = {\n            \"conv_group_merged\": newContent[startIndex:endIndex],\n            \"line_range\": lineIndicesTuple,\n        }\n        listOfCleanedMergedConvGroupWithLineIndexMapping.append(\n            mElem\n        )  # this shall be the thing that we need. just maybe.\n        # add to startIndex.\n        startIndex += step_group_for_conv * char_per_group\n    del newContentCharIndexToLineIndexDict\n    return linewise, listOfCleanedMergedConvGroupWithLineIndexMapping\n# now we have to process the 'listOfCleanedMergedConvGroupWithLineIndexMapping' list, make each line into 4 corresponding processed line.\n# no original line! original line is noisy.\n# that is not original line. we need something other than that.",
-        "type": "code",
-        "location": "/lazero/search/preprocessing.py:106-130"
-    },
-    "203": {
-        "file_id": 24,
-        "content": "Appending cleaned merged conv groups with line index mapping to list, adjusting startIndex, removing dict.",
-        "type": "comment"
-    },
-    "204": {
-        "file_id": 24,
-        "content": "# hint: we do not want to store all these shit in our tiny little memory. we want it 'IN DATABASE'\n# from lazero.search.postprocessing import porterStemmer\nfrom nltk.stem import PorterStemmer\nporterStemmer = PorterStemmer()  # whill automatically get lower case.\nimport wordninja\nimport string\nfrom zhon.hanzi import punctuation as chinese_punctuation\nimport jieba\ndef getWordsWithoutPunctuation(line):\n    chinese_and_english_punctuation = set(\n        list(string.punctuation + chinese_punctuation)\n    )\n    line = line.replace(\"\\n\", \" \")\n    for punctuation in chinese_and_english_punctuation:\n        line = line.replace(punctuation, \" \")\n    cleaned_line = standardLineCleaner(line)\n    # now use what?\n    # split with what first?\n    # wordninja. split words.\n    # nope. we use jieba first.\n    jieba_cutted_words = jieba.lcut(cleaned_line)  # remove whitespace!\n    final_words = []\n    for word in jieba_cutted_words:\n        strip_word = word.strip()\n        if len(strip_word) == 0:\n            # we should only keep the splited words.",
-        "type": "code",
-        "location": "/lazero/search/preprocessing.py:132-161"
-    },
-    "205": {
-        "file_id": 24,
-        "content": "This function removes punctuation from a line of text, cleans the resulting string, and then uses Jieba to segment the cleaned text into individual words. The final words are stored in a list and returned.",
-        "type": "comment"
-    },
-    "206": {
-        "file_id": 24,
-        "content": "            continue\n        else:\n            final_words.append(word)\n    return final_words\ndef getFourVersionsOfProcessedLine(line, debug=False):\n    global porterStemmer\n    # from nltk.stem import PorterStemmer\n    stemmer = porterStemmer\n    final_words = getWordsWithoutPunctuation(line)\n    final_cutted_words = []\n    for word in final_words:\n        ninja_cutted_word = wordninja.split(word)\n        if len(ninja_cutted_word) == 0:\n            # we shall keep the original word.\n            final_cutted_words.append(word)\n        else:\n            final_cutted_words.extend(ninja_cutted_word)\n    # now 'stem' words use nltk.\n    final_stemmed_words = [stemmer.stem(word) for word in final_words]\n    final_cutted_stemmed_words = [stemmer.stem(word) for word in final_cutted_words]\n    # finally, join all things with space, for whatever reason.\n    final_line = \" \".join(final_words)  # for our dearly transformer\n    final_cutted_line = \" \".join(final_cutted_words)  # for our dearly whoosh\n    final_stemmed_line = \" \".join(final_stemmed_words)  # for our dearly whoosh",
-        "type": "code",
-        "location": "/lazero/search/preprocessing.py:162-188"
-    },
-    "207": {
-        "file_id": 24,
-        "content": "1. Extract words from line without punctuation\n2. Split each word into cutted version\n3. If no cutted version, keep the original word\n4. Stem all original words using PorterStemmer\n5. Join all results (words, cutted versions, stemmed versions) with space for further processing",
-        "type": "comment"
-    },
-    "208": {
-        "file_id": 24,
-        "content": "    final_cutted_stemmed_line = \" \".join(\n        final_cutted_stemmed_words\n    )  # for our dearly whoosh\n    # how to use these four things?\n    # use them all for all search engines? that will increase our index size significantly!\n    # problem is, both query and data need to be processed somehow. but how?\n    # you want to use different split methods at the same time, or one at a time?\n    # you want to score them right? mostly in whoosh!\n    if debug:\n        from lazero.utils.logger import sprint\n        print(\"final_line\")\n        sprint(final_line)\n        print(\"final_cutted_line\")\n        sprint(final_cutted_line)\n        print(\"final_stemmed_line\")\n        sprint(final_stemmed_line)\n        print(\"final_cutted_stemmed_line\")\n        sprint(final_cutted_stemmed_line)\n    return final_line, final_cutted_line, final_stemmed_line, final_cutted_stemmed_line\ndef getFourVersionOfLineInListOfCleanedMergedConvGroupWithLineIndexMapping(\n    listOfCleanedMergedConvGroupWithLineIndexMapping, withOriginalLine=False",
-        "type": "code",
-        "location": "/lazero/search/preprocessing.py:189-215"
-    },
-    "209": {
-        "file_id": 24,
-        "content": "The code is generating four different versions of a line by cutting, stemming, and combining the words. It then returns these versions as well as the original line (optional). This can be used to process both query and data for search engines but may increase index size significantly. The debug mode prints the final line, cutted line, stemmed line, and cutted-stemmed line.",
-        "type": "comment"
-    },
-    "210": {
-        "file_id": 24,
-        "content": "):\n    for elem in listOfCleanedMergedConvGroupWithLineIndexMapping:\n        conv_group_merged = elem[\"conv_group_merged\"]\n        # what you want to yield?\n        (\n            final_line,\n            final_cutted_line,\n            final_stemmed_line,\n            final_cutted_stemmed_line,\n        ) = getFourVersionsOfProcessedLine(conv_group_merged)\n        if withOriginalLine:\n            yield conv_group_merged, final_line, final_cutted_line, final_stemmed_line, final_cutted_stemmed_line\n        else:\n            yield final_line, final_cutted_line, final_stemmed_line, final_cutted_stemmed_line\n        # yield (getFourVersionsOfProcessedLine(conv_group_merged),line_range)",
-        "type": "code",
-        "location": "/lazero/search/preprocessing.py:216-230"
-    },
-    "211": {
-        "file_id": 24,
-        "content": "This code is iterating through a list of cleaned and merged conversation groups. It calls the function \"getFourVersionsOfProcessedLine\" to generate four processed line versions (final_line, final_cutted_line, final_stemmed_line, final_cutted_stemmed_line) from each group. If withOriginalLine is true, it yields the original conversation group, along with the four processed lines. Otherwise, it only yields the four processed lines.",
-        "type": "comment"
-    },
-    "212": {
-        "file_id": 25,
-        "content": "/lazero/search/search.py",
-        "type": "filepath"
-    },
-    "213": {
-        "file_id": 25,
-        "content": "The code updates a data dictionary, searches for specific terms in index directories, retrieves and merges relevant data, calculates line scores, ranks files, and prepares for rendering.",
-        "type": "summary"
-    },
-    "214": {
-        "file_id": 25,
+        "file_id": 22,
         "content": "import os\nfrom lazero.search.api import lazeroCachePath\nfrom lazero.search.index import retrieveFilePathFromLineIndex\ndef updateDataDictWithLineIndexNormalizedScoreAndDivisor(\n    dataDict,\n    index,\n    normalized_score,\n    divisor,\n    tinydbDatabasePath=os.path.join(lazeroCachePath, \"index.json\"),\n):\n    # this thing shall be stored in \"the json based database\".\n    line_index_original, line_remainer = divmod(\n        index, divisor\n    )  # with or without original line?\n    # content = getValueByKeyFromDatabase(str(line_index)+\"_content\")\n    # it is just demonstration.\n    filepath = retrieveFilePathFromLineIndex(index, databasePath=tinydbDatabasePath)\n    filepathDataDict = dataDict.get(filepath, {})\n    filepathLineIndexOriginalDataDict = filepathDataDict.get(line_index_original, {})\n    filepathLineIndexOriginalDataDictLineRemainerScoreList = (\n        filepathLineIndexOriginalDataDict.get(line_remainer, [])\n    )  # shall you use the best score or the average score?\n    filepathLineIndexOriginalDataDictLineRemainerScoreList.append(normalized_score)",
         "type": "code",
         "location": "/lazero/search/search.py:1-27"
     },
-    "215": {
-        "file_id": 25,
+    "201": {
+        "file_id": 22,
         "content": "Updates data dictionary with line index, normalized score and divisor from the JSON-based database.",
         "type": "comment"
     },
-    "216": {
-        "file_id": 25,
+    "202": {
+        "file_id": 22,
         "content": "    filepathLineIndexOriginalDataDict.update(\n        {line_remainer: filepathLineIndexOriginalDataDictLineRemainerScoreList}\n    )\n    filepathDataDict.update({line_index_original: filepathLineIndexOriginalDataDict})\n    dataDict.update({filepath: filepathDataDict})\n    return dataDict\n# so you have both search methods in whoosh and txtai.\n# first get the config, the 'withOriginalLine' from tinydb\nfrom lazero.search.txtai.search import txtaiSearch\nfrom lazero.search.whoosh.search import whooshSearch\nfrom lazero.search.index import retrieveConfig\n# import statistics\ndef weightedMean(data, epsilon=1e-3):\n    weightTotal = sum(data) + epsilon\n    mean = sum([value**2 for value in data]) / weightTotal\n    return mean\ndef search(\n    query,\n    indexDirectories={\n        \"txtai\": os.path.join(lazeroCachePath, \"txtai_index\"),\n        \"whoosh\": os.path.join(lazeroCachePath, \"whoosh_index\"),\n    },\n    limit=100,\n    tinydbDatabasePath=os.path.join(lazeroCachePath, \"index.json\"),\n    filter_filepath=None,\n    methods={",
         "type": "code",
         "location": "/lazero/search/search.py:29-61"
     },
-    "217": {
-        "file_id": 25,
+    "203": {
+        "file_id": 22,
         "content": "This code imports the necessary functions and classes for search functionality from \"lazero.search.txtai.search\" and \"lazero.search.whoosh.search\". It then defines a function called \"search\" that takes in parameters such as query, index directories, limit, tinydbDatabasePath, and filter_filepath. The function returns the results of the search based on the specified parameters.",
         "type": "comment"
     },
-    "218": {
-        "file_id": 25,
+    "204": {
+        "file_id": 22,
         "content": "        \"subLineScore\": weightedMean,  # statistics.mean\n        \"lineScore\": max,\n        \"fileScore\": max,\n    },\n):  # so we use 'indexDirectories' alone to determine the backends.\n    assert indexDirectories != {}  # not using empty index here.\n    dataDict = {}\n    withOriginalLine = retrieveConfig(\"withOriginalLine\")  # retrieve this from tinydb.\n    if \"txtai\" in indexDirectories.keys():\n        dataDict = txtaiSearch(\n            query,\n            indexDirectories[\"txtai\"],\n            filter_filepath=filter_filepath,\n            limit=limit,\n            withOriginalLine=withOriginalLine,\n            tinydbDatabasePath=tinydbDatabasePath,\n            dataDict=dataDict,\n        )\n    if \"whoosh\" in indexDirectories.keys():\n        dataDict = whooshSearch(  # so we hide some parameters for whoosh.\n            query,\n            indexDirectories[\"whoosh\"],\n            filter_filepath=filter_filepath,\n            limit=limit,\n            withOriginalLine=withOriginalLine,\n            tinydbDatabasePath=tinydbDatabasePath,",
         "type": "code",
         "location": "/lazero/search/search.py:62-87"
     },
-    "219": {
-        "file_id": 25,
+    "205": {
+        "file_id": 22,
         "content": "This code checks if the index directories contain \"txtai\" and \"whoosh\". If \"txtai\" is present, it calls txtaiSearch function. If \"whoosh\" is present, it calls whooshSearch function. Both functions return data to 'dataDict' using query, filter_filepath, limit, withOriginalLine, and tinydbDatabasePath as parameters.",
         "type": "comment"
     },
-    "220": {
-        "file_id": 25,
+    "206": {
+        "file_id": 22,
         "content": "            dataDict=dataDict,\n        )\n    # the hard part. we need to retrieve 粗排 精排 data here.\n    # what is the structure of the dataDict?\n    # {} -> filepath -> {} -> line_index_original -> {} -> line_remainder -> [] (the score of this single line.)\n    # you also need to merge lines if you have to.\n    # for every file, show no more than three related lines.\n    # but you need to ensure that you can jump to them, just in case.\n    # no need to merge lines if they overlap.\n    fileRankList = []\n    lineRankListInFileAsDict = {}\n    lineRankListInAllFiles = []\n    for filepath, linesDict in dataDict.items():\n        lineScores = []\n        for line_index_original, subLinesDict in linesDict.items():\n            subLineScores = []\n            for line_remainer, scoreList in subLinesDict.items():\n                subLineScore = methods[\"subLineScore\"](scoreList)\n                subLineScores.append(subLineScore)\n            lineScore = methods[\"lineScore\"](subLineScores)\n            lineScores.append(lineScore)",
         "type": "code",
         "location": "/lazero/search/search.py:88-109"
     },
-    "221": {
-        "file_id": 25,
+    "207": {
+        "file_id": 22,
         "content": "This code retrieves 粗排 and 精排 data from a given dataDict. The structure of the dataDict is filepath -> {} -> line_index_original -> {} -> line_remainder -> []. It merges lines if needed, shows no more than three related lines per file, and ensures that lines can be jumped to if necessary.",
         "type": "comment"
     },
-    "222": {
-        "file_id": 25,
+    "208": {
+        "file_id": 22,
         "content": "            lineScoreWithOriginalIndex = {\n                \"line_index_original\": line_index_original,\n                \"score\": lineScore,\n            }\n            lineScreWithOriginalIndexAndFilePath = {\"filepath\": filepath}\n            lineScreWithOriginalIndexAndFilePath.update(lineScoreWithOriginalIndex)\n            lineRankListInFileAsDict.update(\n                {\n                    filepath: lineRankListInFileAsDict.get(filepath, [])\n                    + [lineScoreWithOriginalIndex]\n                }\n            )\n            lineRankListInAllFiles.append(lineScreWithOriginalIndexAndFilePath)\n        # 精排\n        lineRankListInFileAsDict[filepath].sort(key=lambda x: -x[\"score\"])\n        fileScore = methods[\"fileScore\"](lineScores)\n        fileRankList.append({\"filepath\": filepath, \"score\": fileScore})\n    # 粗排\n    fileRankList.sort(key=lambda x: -x[\"score\"])\n    lineRankListInAllFiles.sort(key=lambda x: -x[\"score\"])\n    return (\n        fileRankList,\n        lineRankListInFileAsDict,\n        lineRankListInAllFiles,  # maybe you need this shit?",
         "type": "code",
         "location": "/lazero/search/search.py:110-133"
     },
-    "223": {
-        "file_id": 25,
+    "209": {
+        "file_id": 22,
         "content": "Code is computing and storing line scores for each file. It updates a dictionary with the scores, then sorts them to obtain file and line ranks in descending order based on their scores. Finally, it returns three lists: file rank list, line rank list by file, and line rank list for all files.",
         "type": "comment"
     },
-    "224": {
-        "file_id": 25,
+    "210": {
+        "file_id": 22,
         "content": "    )\n    # ready to render this shit?\n    # you want to display score or not?\n    # as the title on panel?",
         "type": "code",
         "location": "/lazero/search/search.py:134-137"
     },
-    "225": {
-        "file_id": 25,
+    "211": {
+        "file_id": 22,
         "content": "These comments are asking if the code is ready to render, if displaying the score is desired on the panel title, and if it's ready for rendering.",
         "type": "comment"
     },
-    "226": {
-        "file_id": 26,
+    "212": {
+        "file_id": 23,
         "content": "/lazero/search/terminal_interface.py",
         "type": "filepath"
     },
-    "227": {
-        "file_id": 26,
+    "213": {
+        "file_id": 23,
         "content": "The code includes a search interface class, handling events and updating views with dynamic height and keyboard input. It fetches content, filters short contents, counts exceptions, and creates hover widgets for a terminal interface. The asynchronous `action_submit()` method performs search operations and updates the GUI interface, managing file-specific or all files search results.",
         "type": "summary"
     },
-    "228": {
-        "file_id": 26,
+    "214": {
+        "file_id": 23,
         "content": "from lazero.search.search import search  # fuck.\n# you get input when you hit enter.\nfrom rich.panel import Panel\nimport textwrap\nimport os\n# import json\n# https://github.com/Cvaniak/TextualListViewUnofficial\n# the hack\n# pip3 install git+https://github.com/Cvaniak/TextualListViewUnofficial.git\nfrom textual.app import App\nfrom textual.reactive import Reactive\nfrom textual.widget import Widget\nfrom rich.text import Text\nfrom textual.widgets import ScrollView\nfrom ck_widgets_lv import ListViewUo\nfrom textual_inputs import TextInput\nfrom lazero.search.preprocessing import removeDuplicates\nfrom lazero.search.postprocessing import (\n    englishTextToStemmedWords,\n    getHighlightedAnswerFromQueryStemmedWordsAndAnswer,\n)\nfrom .preprocessing import getFourVersionsOfProcessedLine\nclass Hover(Widget):\n    mouse_over = Reactive(False)\n    def __init__(self, *args, **kwargs):\n        self.clickFunction = kwargs.pop(\"onClick\", None)\n        self.panelStyle = kwargs.pop(\"panelStyle\", \"red\")\n        self.content = kwargs.pop(\"content\", \"\")",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:1-39"
     },
-    "229": {
-        "file_id": 26,
+    "215": {
+        "file_id": 23,
         "content": "This code imports necessary modules, defines a class called Hover (a Widget), and includes references to other functions/modules for preprocessing and postprocessing in the lazero.search package. It appears to be part of an interactive search interface.",
         "type": "comment"
     },
-    "230": {
-        "file_id": 26,
+    "216": {
+        "file_id": 23,
         "content": "        self.path = kwargs.pop(\"path\", \"\")\n        self.lineNumber = kwargs.pop(\"lineNumber\", 0)\n        self.queryStemmedWords = kwargs.pop(\"queryStemmedWords\", [])\n        # this need to be retrieved from elsewhere.\n        self.score = kwargs.pop(\"score\", 0)\n        super().__init__(*args, **kwargs)\n    def render(self) -> Panel:\n        content = self.content\n        text = getHighlightedAnswerFromQueryStemmedWordsAndAnswer(\n            self.queryStemmedWords, content\n        )\n        # we need to render this now.\n        size = os.get_terminal_size()\n        width = size.columns - 1\n        # 80 -> 1\n        # 40 -> 2\n        # 20 -> 4\n        calculatedHeight = 2 + round(80 / width)\n        return Panel(\n            # this style is strange. we should alter it in some way.\n            text,  # you need to stylize the text.\n            style=self.panelStyle,\n            height=max(3, calculatedHeight),\n            title=\"{:.3f}\".format(self.score),\n            # title=str(self.score),\n            title_align=\"right\",",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:40-66"
     },
-    "231": {
-        "file_id": 26,
+    "217": {
+        "file_id": 23,
         "content": "Creating a panel with highlighted answer and dynamic height based on terminal size",
         "type": "comment"
     },
-    "232": {
-        "file_id": 26,
+    "218": {
+        "file_id": 23,
         "content": "            subtitle=os.path.basename(self.path),\n            subtitle_align=\"left\",\n            width=width,  # better config it in some way.\n        )  # this is arguable. maybe for mobile device this will be different?\n        # calculate this height according to terminal width, and make sure it does not go lower than 3.\n    def on_enter(self) -> None:\n        self.mouse_over = True\n    def on_leave(self) -> None:\n        self.mouse_over = False\n    async def on_click(self):\n        if self.clickFunction:\n            await self.clickFunction(\n                self.path,\n                self.lineNumber,\n                update=False,  # ensure_visibility=True\n            )  # this is not normal clickFunction.\nfrom lazero.search.api import getValueByKeyFromDatabase, lazeroCachePath\n# from functools import lru_cache\nfrom lazero.search.postprocessing import getHighlightSetFromQueryStemmedWordsAndAnswer\nfrom lazero.search.api import getLineStartEndInFileByConvLineIndexOriginalFromDatabase\nclass MyApp(App):\n    # how to let me copy the text inslde? fuck?",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:67-97"
     },
-    "233": {
-        "file_id": 26,
+    "219": {
+        "file_id": 23,
         "content": "This code defines a class for a search interface in a terminal. It handles mouse events like hover, click, and calculates the height of the interface based on the terminal width. The class also interacts with other modules such as getValueByKeyFromDatabase and getLineStartEndInFileByConvLineIndexOriginalFromDatabase to retrieve data from a database.",
         "type": "comment"
     },
-    "234": {
-        "file_id": 26,
+    "220": {
+        "file_id": 23,
         "content": "    # use alt/option key.\n    index = 0\n    readerName = \"viewer\"\n    content_line_char_count = []\n    lineNumbers = []  # are you sure this is the line number you want?\n    init = True  # after init (the first search) it shall be set to false!\n    noqliteDatabasePath = os.path.join(lazeroCachePath, \"lazero_search.db\")\n    def wrapText(self, textList, width):  # the width is col-1\n        content_line_char_count = []\n        wrapped_lines = []\n        for text in textList:\n            lines = textwrap.wrap(text, width=width)\n            lineCount = len(lines)\n            if lineCount == 0:\n                lines = [\"\"]\n                lineCount = 1\n            content_line_char_count.append(lineCount)\n            wrapped_lines.extend(lines)\n        return wrapped_lines, content_line_char_count\n    async def on_key(self, event):\n        key = event.key\n        key_lower = key.lower()\n        if key_lower == \"t\":\n            # if not self.init:\n            await self.mainToggle(toggle=True)\n        elif key_lower == \"y\":",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:98-125"
     },
-    "235": {
-        "file_id": 26,
+    "221": {
+        "file_id": 23,
         "content": "This code snippet appears to be a part of a larger function, likely dealing with search functionality in a terminal interface. It defines a `wrapText` method that takes a list of text and a width (column count), and returns the wrapped lines and the number of lines for each entry in the text list. The `on_key` method handles keyboard events, responding to \"t\" and \"y\" keys by calling another function called `mainToggle`.",
         "type": "comment"
     },
-    "236": {
-        "file_id": 26,
+    "222": {
+        "file_id": 23,
         "content": "            await self.mainToggle(toggle=True, switchTextInput=False)\n        elif key_lower == \"j\":\n            await self.jumpScrollView()\n        elif key_lower == \"k\":\n            await self.jumpScrollView(reverse=True)\n        elif key_lower == \"s\":\n            await self.focusSearchView()\n    async def mainToggle(\n        self,\n        toggle=False,\n        limit: int = 100,\n        updateViewer=False,\n        updateScrollableHovers=False,\n        switchTextInput=True,\n        filepath=None,\n    ):  # you may need to adjust this thing?\n        if toggle:\n            if not self.init:\n                await self.view.action_toggle(\"side\")\n                await self.view.action_toggle(\"viewer\")\n                try:\n                    if self.body.visible:\n                        self.mainInput.subtitle = self.viewerSubtitle\n                        if switchTextInput:\n                            self.mainInput.value = self.viewerInputText\n                    elif self.scrollableHovers.visible:\n                        self.mainInput.subtitle = self.scrollableHoverSubtitle",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:126-153"
     },
-    "237": {
-        "file_id": 26,
+    "223": {
+        "file_id": 23,
         "content": "This code is defining a function that toggles various elements of the UI based on user input. It also has additional arguments to update specific views and inputs, as well as an optional filepath argument.",
         "type": "comment"
     },
-    "238": {
-        "file_id": 26,
+    "224": {
+        "file_id": 23,
         "content": "                        if switchTextInput:\n                            self.mainInput.value = self.scrollableHoverInputText\n                except:\n                    ...\n                finally:\n                    self.mainInput.refresh()\n        elif self.init:\n            self.init = False\n            await self.alterListView(limit=limit)\n            # (\n            #     self.fileRankList,\n            #     self.lineRankListInFileAsDict,\n            #     self.lineRankListInAllFiles,\n            # ) = self.scrollableHoverRanks\n            # self.mainInput.subtitle = self.scrollableHoverSubtitle\n        else:  # init starts with the first jump to viewer.\n            if self.body.visible or updateViewer:\n                await self.alterViewer(filepath, None)\n                # (\n                #     self.fileRankList,\n                #     self.lineRankListInFileAsDict,\n                #     self.lineRankListInAllFiles,\n                # ) = self.viewerRanks\n                # self.mainInput.subtitle = self.viewerSubtitle",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:154-177"
     },
-    "239": {
-        "file_id": 26,
+    "225": {
+        "file_id": 23,
         "content": "If `switchTextInput` is True, set the `mainInput` value to `scrollableHoverInputText`. Otherwise, if `init` is True, initialize it as False and call `alterListView` with a limit. If not any of above conditions, if body is visible or updateViewer is True, call `alterViewer` with filepath, None and set the ranks and subtitle accordingly.",
         "type": "comment"
     },
-    "240": {
-        "file_id": 26,
+    "226": {
+        "file_id": 23,
         "content": "            elif self.scrollableHovers.visible or updateScrollableHovers:\n                await self.alterListView(limit=limit)\n                # (\n                #     self.fileRankList,\n                #     self.lineRankListInFileAsDict,\n                #     self.lineRankListInAllFiles,\n                # ) = self.scrollableHoverRanks\n                # self.mainInput.subtitle = self.scrollableHoverSubtitle\n            # if toggle:\n    # you need to specify what to view after the toggle.\n    # the viewer. you need to update the file, the line location and other stuff.\n    async def updateSearchBoxSubtitle(self, viewer=False):\n        if not viewer:\n            self.mainInput.subtitle = \"{}/{}\".format(\n                min(self.index + 1, self.totalLineCountInViewer),\n                self.totalLineCountInViewer,\n            )\n        else:\n            score = self.viewerLineScores[self.index]\n            self.mainInput.subtitle = \"{}/{} [{:.3f}]\".format(\n                self.index + 1, len(self.lineNumbers), score",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:178-199"
     },
-    "241": {
-        "file_id": 26,
+    "227": {
+        "file_id": 23,
         "content": "Code is checking if the scrollableHovers or updateScrollableHovers condition is true, and if so, it calls a function alterListView. Then, it updates the subtitle of the mainInput depending on whether the viewer parameter is True or False.",
         "type": "comment"
     },
-    "242": {
-        "file_id": 26,
+    "228": {
+        "file_id": 23,
         "content": "            )\n        self.mainInput.refresh()\n    # @lru_cache(maxsize=1)\n    def getLineNumbersFromFilePath(self):\n        filePath = self.filepath\n        lineNumbers = []\n        viewerLineScores = []\n        # print(self.lineRankListInFileAsDict)\n        for elem in self.lineRankListInFileAsDict[filePath]:\n            line_index_original = elem[\"line_index_original\"]\n            score = elem[\"score\"]\n            viewerLineScores.append(score)\n            # start_end_json_string = getValueByKeyFromDatabase(\n            #     str(line_index_original),\n            #     databasePath=self.noqliteDatabasePath,\n            # ).decode(\"utf8\")\n            # start_end_json = json.loads(start_end_json_string)\n            # start = start_end_json[0]  # it is a list. [start, end]\n            start, _ = getLineStartEndInFileByConvLineIndexOriginalFromDatabase(\n                line_index_original\n            )\n            # start = start_end_json[\"start\"]\n            lineNumbers.append(start)\n        self.lineNumbers = lineNumbers",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:200-224"
     },
-    "243": {
-        "file_id": 26,
+    "229": {
+        "file_id": 23,
         "content": "This function retrieves line numbers from a file path and stores them in the \"lineNumbers\" variable. It also populates the \"viewerLineScores\" list with scores associated with each line index. The code uses the \"self.lineRankListInFileAsDict\" dictionary to iterate through elements containing file paths, line indexes, and scores. It then calls another function, \"getLineStartEndInFileByConvLineIndexOriginalFromDatabase\", to retrieve the start position of each line in the file based on the line index original. Finally, it assigns the retrieved line numbers to the \"lineNumbers\" attribute.",
         "type": "comment"
     },
-    "244": {
-        "file_id": 26,
+    "230": {
+        "file_id": 23,
         "content": "        self.viewerLineScores = viewerLineScores\n    async def alterViewer(self, filepath, lineNumber, update=True):\n        # print('filepath: ', filepath)\n        if self.init:\n            self.init = False\n        if filepath:\n            self.mainInput.value = self.scrollableHoverInputText\n        # if ensure_visibility:  # means clicked from listview.\n        self.viewerInputText = self.mainInput.value\n        # else:\n        if update:\n            (\n                self.fileRankList,\n                self.lineRankListInFileAsDict,\n                self.lineRankListInAllFiles,\n            ) = self.viewerRanks\n        # if there is nothing to be displayed what should you emit? i mean inside the file.\n        if filepath is not None:\n            self.filepath = filepath\n        else:\n            filepath = self.filepath\n        self.getLineNumbersFromFilePath()\n        lineNumber = lineNumber if lineNumber is not None else self.lineNumbers[0]\n        self.index = self.lineNumbers.index(\n            lineNumber",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:225-250"
     },
-    "245": {
-        "file_id": 26,
+    "231": {
+        "file_id": 23,
         "content": "This function updates the viewer's input and rankings based on a given filepath and line number. It also gets line numbers from a filepath and sets the index accordingly.",
         "type": "comment"
     },
-    "246": {
-        "file_id": 26,
+    "232": {
+        "file_id": 23,
         "content": "        )  # reset index, after every search.\n        # print(self.lineNumbers)\n        # self.contentText = contentText\n        self.totalLineCountInViewer = len(self.lineNumbers)\n        # await self.updateSearchBoxSubtitle()\n        await self.updateSearchBoxSubtitle(viewer=True)\n        self.viewerSubtitle = self.mainInput.subtitle\n        with open(filepath, \"r\") as f:\n            content = f.read()\n        # print(content)\n        await self.updateViewerContent(content)\n        await self.body.update(self.contentText)\n        if self.totalLineCountInViewer == 0:\n            return\n        self.jumpToEquivalentLineNumber(\n            self.content_line_char_count, lineNumber  # self.lineNumbers[self.index]\n        )\n        if not self.body.visible:\n            await self.mainToggle(toggle=True)\n    async def alterListView(self, limit=100, contentLengthFilter=2):\n        if not self.scrollableHovers.visible:\n            await self.view.action_toggle(\"side\")\n        # if not self.scrollableHovers.visible and not self.init:",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:251-274"
     },
-    "247": {
-        "file_id": 26,
+    "233": {
+        "file_id": 23,
         "content": "Resets index and updates total line count, updates viewer subtitle, reads content from filepath, updates viewer content, updates body visibility based on the total line count, and alters list view.",
         "type": "comment"
     },
-    "248": {
-        "file_id": 26,
+    "234": {
+        "file_id": 23,
         "content": "        #     return\n        # you shall do this for init.\n        (\n            self.fileRankList,\n            self.lineRankListInFileAsDict,\n            self.lineRankListInAllFiles,\n        ) = self.scrollableHoverRanks\n        # if self.init:\n        #     self.init = False\n        del self.scrollableHovers\n        myHoverWidgetList = []\n        exceptions = 0\n        for rank, element in enumerate(self.lineRankListInAllFiles[:limit]):\n            filepath = element[\"filepath\"]\n            line_index_original = element[\"line_index_original\"]\n            score = element[\"score\"]\n            content = getValueByKeyFromDatabase(\n                str(line_index_original) + \"_content\",\n                databasePath=self.noqliteDatabasePath,\n            ).decode(\"utf8\")\n            content = content.strip()\n            content = removeDuplicates(content)\n            if len(content) < contentLengthFilter:\n                exceptions += 1\n                continue\n            # you also need to highlight these content.\n",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:275-301"
     },
-    "249": {
-        "file_id": 26,
+    "235": {
+        "file_id": 23,
         "content": "This code initializes the search results, storing information about ranked lines from multiple files. It fetches the content for each line, filters out short contents, and adds them to a list. The exceptions counter keeps track of filtered out lines.",
         "type": "comment"
     },
-    "250": {
-        "file_id": 26,
+    "236": {
+        "file_id": 23,
         "content": "            # highlightSet = getHighlightSetFromQueryStemmedWordsAndAnswer(self.queryStemmedWords, content)\n            # highlightWords = list(highlightSet)\n            # content = Text(content, style='grey')\n            # illegal style. also i don't want this greyish color\n            # content = Text(content, style='grey')\n            # content.highlight_words(highlightWords, style='yellow')\n            start, _ = getLineStartEndInFileByConvLineIndexOriginalFromDatabase(\n                line_index_original\n            )\n            widget = Hover(\n                \"widget {}_{}_{}\".format(\n                    line_index_original, filepath, rank\n                ),  # this will be the name, but it will not be displayed\n                onClick=self.alterViewer,  # toggle what? jump to the viewer?\n                lineNumber=start,\n                score=score,\n                content=content,\n                path=filepath,\n                queryStemmedWords=self.queryStemmedWords,\n            )\n            myHoverWidgetList.append(widget)",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:301-321"
     },
-    "251": {
-        "file_id": 26,
+    "237": {
+        "file_id": 23,
         "content": "Creating a hover widget with line number and score from search results.",
         "type": "comment"
     },
-    "252": {
-        "file_id": 26,
+    "238": {
+        "file_id": 23,
         "content": "        self.mainInput.subtitle = str(\n            min(len(self.lineRankListInAllFiles) - exceptions, limit)\n        )\n        self.scrollableHoverSubtitle = self.mainInput.subtitle\n        # await self.remove(self.scrollableHovers)\n        # try:\n        self.scrollableHovers = ListViewUo(myHoverWidgetList)  # what should we update?\n        # except:\n        #     import traceback\n        #     traceback.print_exc()\n        #     breakpoint()\n        await self.view.action_toggle(\"side\")\n        await self.view.dock(self.scrollableHovers, edge=\"top\", name=\"side\")  # WTF?\n        # await self.view.action_toggle('side')\n    async def action_clearSearchView(self):\n        self.mainInput.value = \"\"\n    async def focusSearchView(self):\n        # await self.view.action_toggle('search')\n        if not self.mainInput.visible:\n            await self.view.action_toggle(\"search\")\n        await self.mainInput.focus()\n    async def jumpScrollView(self, reverse: bool = False):\n        if self.body.visible:\n            self.index += -1 if reverse else 1",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:322-349"
     },
-    "253": {
-        "file_id": 26,
+    "239": {
+        "file_id": 23,
         "content": "This code seems to handle the manipulation of a search view in an interface. It sets up a scrollable view, clears the input field, focuses on the search input, and scrolls the results list up or down depending on the direction specified.",
         "type": "comment"
     },
-    "254": {
-        "file_id": 26,
+    "240": {
+        "file_id": 23,
         "content": "            self.index %= len(self.lineNumbers)\n            # print('LINENUMBERS:',self.lineNumbers)\n            # print('INDEX',self.index)\n            self.jumpToEquivalentLineNumber(\n                self.content_line_char_count, self.lineNumbers[self.index]\n            )\n            await self.updateSearchBoxSubtitle(viewer=True)\n    async def updateViewerContent(self, content):\n        size = os.get_terminal_size()\n        columns, lines = size.columns, size.lines\n        textList = content.split(\"\\n\")\n        wrapped_lines, self.content_line_char_count = self.wrapText(\n            textList, columns - 1\n        )\n        self.wrapped_lines = wrapped_lines\n        processed_text = \"\\n\".join(wrapped_lines)\n        # but can wrapped lines be highlighted?\n        # suck it up. you can't.\n        self.contentText = Text(processed_text)\n        # highlightLine = \"will be efficient. In the example below the recursive call by _range to itself\"  # what to highlight? wtf?\n        highlightWords = set()\n        highlightLines = set()",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:350-373"
     },
-    "255": {
-        "file_id": 26,
+    "241": {
+        "file_id": 23,
         "content": "The code is updating the viewer content by splitting the input content into lines, wrapping each line to fit within a certain number of columns, and then joining the wrapped lines back together. The wrapped lines are stored in self.wrapped_lines and processed_text. The code also creates a Text object from the processed text, which likely has some highlighting functionality. Additionally, there is an attempt to find words or lines to highlight (highlightWords and highlightLines), but it's unclear what the criteria for highlighting are since the variables are set to empty sets.",
         "type": "comment"
     },
-    "256": {
-        "file_id": 26,
+    "242": {
+        "file_id": 23,
         "content": "        for element in self.lineRankListInFileAsDict[self.filepath]:\n            line_index_original = element[\"line_index_original\"]\n            line = getValueByKeyFromDatabase(\n                str(line_index_original) + \"_content\"\n            ).decode(\"utf-8\")\n            # start_end_json_string = getValueByKeyFromDatabase(str(line_index_original)).decode('utf-8')\n            # start_end_json = json.loads(start_end_json_string)\n            # start, end = start_end_json\n            start, end = getLineStartEndInFileByConvLineIndexOriginalFromDatabase(\n                line_index_original\n            )\n            wrapped_line_start = sum(self.content_line_char_count[:start])\n            wrapped_line_end = sum(self.content_line_char_count[: end + 1])\n            # for lineIndex in range(wrapped_line_start, wrapped_line_end + 1):\n            for lineIndex in range(wrapped_line_start, wrapped_line_end):\n                wrapped_line = wrapped_lines[lineIndex]\n                highlightLines.add(wrapped_line)",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:375-391"
     },
-    "257": {
-        "file_id": 26,
+    "243": {
+        "file_id": 23,
         "content": "The code is iterating through a list of line indexes and their content. For each line, it retrieves the line's start and end positions in the original file from the database. Then, it calculates the wrapped line's start and end positions based on the character count. Finally, it adds the highlighted lines to the 'highlightLines' set.",
         "type": "comment"
     },
-    "258": {
-        "file_id": 26,
+    "244": {
+        "file_id": 23,
         "content": "            highlightSet = getHighlightSetFromQueryStemmedWordsAndAnswer(\n                self.queryStemmedWords, line\n            )\n            highlightWords.update(highlightSet)\n        # highlightWord = \"recursive\"  # maybe not so right.\n        # self.contentText.highlight_words([highlightLine], style=\"red\")\n        self.contentText.highlight_words(highlightLines, style=\"red\")\n        self.contentText.highlight_words(list(highlightWords), style=\"yellow\")\n    async def on_load(self) -> None:\n        await self.bind(\"enter\", \"submit\", \"Submit\")\n        await self.bind(\"ctrl+s\", \"searchToggle\", \"searchToggle\")\n        await self.bind(\"ctrl+u\", \"clearSearchView\", \"clearSearchView\")\n        await self.bind(\"escape\", \"reset_focus\", show=False)\n        self.body = ScrollView(name=self.readerName)\n        # self.height=lines-3\n    async def on_mount(self) -> None:\n        self.mainInput = TextInput(\n            name=\"searchInput\",\n            placeholder=\"enter your query\",\n            title=\"lazero search\",  # height = 3",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:392-413"
     },
-    "259": {
-        "file_id": 26,
+    "245": {
+        "file_id": 23,
         "content": "This code is part of a terminal interface for searching content. It defines functions to handle keyboard bindings, highlight search results, and set up the main input field. The \"on_load\" function sets up various key bindings for different actions such as submitting, toggling search, clearing the view, and resetting focus. The \"on_mount\" function initializes a TextInput for user queries with placeholder text and a title.",
         "type": "comment"
     },
-    "260": {
-        "file_id": 26,
+    "246": {
+        "file_id": 23,
         "content": "        )\n        await self.view.dock(self.mainInput, edge=\"top\", size=3, name=\"search\")\n        await self.view.dock(\n            self.body, edge=\"top\", name=\"viewer\"\n        )  # remember that both 'body' and 'ListViewUo' are not visible at the start because there is nothing to display at this time.\n        # when search is performed at the first time, 'ListViewUo' shows first.\n        # search performed later depends on the visible component, if 'body' is visible then perform search inside this file, if 'ListViewUo' is visible then perform search across multiple files.\n        await self.view.action_toggle(\"viewer\")\n        self.scrollableHovers = ListViewUo([])\n        # changes happens after hitting the enter key, if the search area is cleared, then do nothing.\n        await self.view.dock(self.scrollableHovers, edge=\"top\", name=\"side\")\n        await self.view.action_toggle(\"side\")\n        # this is just init.\n        # no content for these right now.\n        # do not display them.\n    def jumpToEquivalentLineNumber(self, content_line_char_count, lineNumber):",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:414-431"
     },
-    "261": {
-        "file_id": 26,
+    "247": {
+        "file_id": 23,
         "content": "Awaiting the view docking components and toggling actions for search, viewer, and side. Initiating ListViewUo and jumping to a specific line number in the content.",
         "type": "comment"
     },
-    "262": {
-        "file_id": 26,
+    "248": {
+        "file_id": 23,
         "content": "        size = os.get_terminal_size()\n        equivalentLineCountPerLine = content_line_char_count\n        lineNumber2 = sum(equivalentLineCountPerLine[:lineNumber])\n        # lineNumber2 = max(0, lineNumber2-center)\n        context = 4  # true context, no extra bullshit. -> real line on rendered result\n        lineNumber2 = max(\n            0, lineNumber2 - 1 - context\n        )  # minus 1 to get the exact line location.\n        self.body.set_y(lineNumber2)\n    async def action_submit(\n        self,\n    ):  # limit shall be set to elsewhere, like the update method of\n        value = self.mainInput.value\n        try:\n            value = value.strip()\n        except:\n            ...\n        if not value in [\"\", None]:\n            # do something please?\n            queryStemmedWords = set()\n            for alteredValue in list(getFourVersionsOfProcessedLine(value)) + [value]:\n                for word in englishTextToStemmedWords(alteredValue):\n                    queryStemmedWords.add(word)\n            self.queryStemmedWords = queryStemmedWords",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:432-457"
     },
-    "263": {
-        "file_id": 26,
+    "249": {
+        "file_id": 23,
         "content": "This code defines a class with an asynchronous method `action_submit()`. It gets the input value, strips it, and if not empty or None, adds stemmed words from the input to a set called `queryStemmedWords`.",
         "type": "comment"
     },
-    "264": {
-        "file_id": 26,
+    "250": {
+        "file_id": 23,
         "content": "            filepath = None\n            if self.body.visible:\n                filepath = self.filepath\n            # how to handle this thing?\n            (\n                fileRankList,\n                lineRankListInFileAsDict,\n                lineRankListInAllFiles,\n            ) = search(value, filter_filepath=filepath)\n            # what to do next?\n            # notify and execute commands.\n            # all two interfaces needs to be updated. the filepath just determines which need to be displayed first.\n            if filepath:\n                self.viewerRanks = [\n                    fileRankList,\n                    lineRankListInFileAsDict,\n                    lineRankListInAllFiles,\n                ]\n                # if not self.body.visible:\n                self.viewerInputText = self.mainInput.value\n                await self.mainToggle()  # toggle what? display what?\n            else:\n                self.scrollableHoverRanks = [\n                    fileRankList,\n                    lineRankListInFileAsDict,",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:458-482"
     },
-    "265": {
-        "file_id": 26,
+    "251": {
+        "file_id": 23,
         "content": "This code appears to be a part of a larger function that is responsible for searching and displaying search results in a graphical user interface (GUI).\n\n1. If the `body` object is visible, it assigns the current `filepath` value to a variable called `filepath`. Otherwise, it leaves `filepath` as `None`. This seems to be determining whether to show file-specific or all files search results first in the GUI.\n2. It then calls a function called `search` to perform the search with an input `value`. The results returned are three lists: `fileRankList`, `lineRankListInFileAsDict`, and `lineRankListInAllFiles`. These lists contain the rankings of files and lines related to the search query.\n3. Depending on the value of `filepath`, it sets the `viewerRanks` or `scrollableHoverRanks` list for further processing in the GUI.\n4. It also updates the input text for a specific component (`self.mainInput.value`) and toggles the display of the GUI using the `await self.mainToggle()` function. This could mean switching between different views or updating the screen.\n\nOverall, this code appears to be part of a larger search functionality in a GUI environment, where it handles file-specific or all files search results and updates the interface accordingly.",
         "type": "comment"
     },
-    "266": {
-        "file_id": 26,
+    "252": {
+        "file_id": 23,
         "content": "                    lineRankListInAllFiles,\n                ]\n                # if not self.scrollableHovers.visible:\n                self.scrollableHoverInputText = self.mainInput.value\n                await self.mainToggle()\n        self.mainInput.refresh()\n    async def action_reset_focus(self):\n        if self.body.visible:\n            await self.body.focus()\n            # add extra elif later\n        elif self.scrollableHovers.visible:\n            await self.scrollableHovers.focus()\n        else:\n            await self.view.focus()\n    async def action_searchToggle(self):\n        await self.view.action_toggle(\"search\")\n        if self.mainInput.visible:\n            await self.mainInput.focus()\n        else:\n            await self.view.focus()  # deactivate the search field?\ndef run():\n    MyApp.run()",
         "type": "code",
         "location": "/lazero/search/terminal_interface.py:483-508"
     },
-    "267": {
-        "file_id": 26,
+    "253": {
+        "file_id": 23,
         "content": "- Code snippet performs search and scroll actions in a terminal interface.\n- Main input field is controlled by toggle action and receives focus when visible.\n- ScrollableHovers gain focus if the body is hidden, otherwise main view gets the focus.",
         "type": "comment"
     },
-    "268": {
-        "file_id": 27,
+    "254": {
+        "file_id": 24,
         "content": "/lazero/search/txtai/index.py",
         "type": "filepath"
     },
-    "269": {
-        "file_id": 27,
+    "255": {
+        "file_id": 24,
         "content": "This code defines a function named 'txtaiIndexer' which indexes a directory using the TxtAI library, and saves the index. The function takes the directory path as input along with optional parameters for the output directory, removing existing indices, and debugging. The code also creates a progress bar for iteration if debug is enabled.",
         "type": "summary"
     },
-    "270": {
-        "file_id": 27,
+    "256": {
+        "file_id": 24,
         "content": "import progressbar\nimport shutil\nimport os\nfrom lazero.search.api import lazeroCachePath\nfrom lazero.search.index import indexFilesInDirectory\nfrom lazero.search.txtai.model import embeddings\ndef txtaiIndexer(\n    directory,\n    indexDirectory=os.path.join(lazeroCachePath, \"txtai_index\"),\n    removeExists=True,\n    debug=False,\n):\n    iterator = indexFilesInDirectory(directory, removeExists=removeExists)\n    if debug:\n        iterator = progressbar.progressbar(iterator)\n    if os.path.exists(indexDirectory) and removeExists:\n        shutil.rmtree(indexDirectory)\n    print(\"txtai indexing directory %s at %s\" % (directory, indexDirectory))\n    embeddings.index((uid, text, None) for uid, text in enumerate(iterator))\n    embeddings.save(indexDirectory)\n    print(\"txtai index saved\")",
         "type": "code",
         "location": "/lazero/search/txtai/index.py:1-23"
     },
-    "271": {
-        "file_id": 27,
+    "257": {
+        "file_id": 24,
         "content": "This code defines a function named 'txtaiIndexer' which indexes a directory using the TxtAI library, and saves the index. The function takes the directory path as input along with optional parameters for the output directory, removing existing indices, and debugging. The code also creates a progress bar for iteration if debug is enabled.",
         "type": "comment"
     },
-    "272": {
-        "file_id": 28,
+    "258": {
+        "file_id": 25,
         "content": "/lazero/search/txtai/model.py",
         "type": "filepath"
     },
-    "273": {
-        "file_id": 28,
+    "259": {
+        "file_id": 25,
         "content": "Initializing the Embeddings class with a specific model path for sentence transformer.",
         "type": "summary"
     },
-    "274": {
-        "file_id": 28,
+    "260": {
+        "file_id": 25,
         "content": "from txtai.embeddings import Embeddings\nembeddings = Embeddings(\n    {  # this path is for alpharetta. need to change this on macos\n        \"path\": \"/root/.cache/huggingface/hub/models--sentence-transformers--distiluse-base-multilingual-cased-v1/snapshots/756c7aa7d57c27bd1c71a483367c53966465f450\"\n        # mac path:\n        # \"/Users/jamesbrown/.cache/huggingface/hub/models--sentence-transformers--distiluse-base-multilingual-cased-v1/snapshots/756c7aa7d57c27bd1c71a483367c53966465f450\"\n    }\n)",
         "type": "code",
         "location": "/lazero/search/txtai/model.py:1-9"
     },
-    "275": {
-        "file_id": 28,
+    "261": {
+        "file_id": 25,
         "content": "Initializing the Embeddings class with a specific model path for sentence transformer.",
         "type": "comment"
     },
-    "276": {
-        "file_id": 29,
+    "262": {
+        "file_id": 26,
         "content": "/lazero/search/txtai/search.py",
         "type": "filepath"
     },
-    "277": {
-        "file_id": 29,
+    "263": {
+        "file_id": 26,
         "content": "The code performs text search using TxtAI index, allowing filtering by file path and result limits. It uses the txtaiSearch method, considering the withOriginalLine divisor for scoring search results. Additionally, it iterates over search queries, updating the data dictionary with index, normalized score, and divisor.",
         "type": "summary"
     },
-    "278": {
-        "file_id": 29,
+    "264": {
+        "file_id": 26,
         "content": "from lazero.search.txtai.model import embeddings\nfrom functools import lru_cache\nimport os\nfrom ..index import retrieveLineRangeFromFilePath\nfrom ...utils.mathlib import checkMinMaxDict\n@lru_cache(maxsize=1)\ndef txtaiSearchBootstrap(indexDirectory):\n    assert os.path.exists(indexDirectory)\n    assert os.path.isabs(indexDirectory)\n    embeddings.load(indexDirectory)\n    print(\"Loaded txtaiSearchBootstrap index directory: \" + indexDirectory)\ndef txtaiSearchSingle(\n    search_query_processed,\n    indexDirectory,\n    limit=100,\n    filter_filepath=None,  # to search for specific file only.\n    # does this freaking filter work?\n):  # why don't you have filter path related to the specific file damn?\n    # maybe you can do it later on. fuck.\n    txtaiSearchBootstrap(indexDirectory)\n    uid_list_tops = embeddings.search(search_query_processed, limit)\n    if filter_filepath:\n        start, end = retrieveLineRangeFromFilePath(filter_filepath)\n        lineRangeFilter = {\"min\": start, \"max\": end}\n    for index, score in uid_list_tops:",
         "type": "code",
         "location": "/lazero/search/txtai/search.py:1-31"
     },
-    "279": {
-        "file_id": 29,
+    "265": {
+        "file_id": 26,
         "content": "Code performs text search using TxtAI index.\n- Loads TxtAI index directory and checks if it exists.\n- Performs a single text search with optional filter by file path.",
         "type": "comment"
     },
-    "280": {
-        "file_id": 29,
+    "266": {
+        "file_id": 26,
         "content": "        # uid = int(uid)\n        # where is the damn score? wtf?\n        if filter_filepath:\n            result = checkMinMaxDict(index, lineRangeFilter)\n            if not result:\n                continue  # do not use results other than the selected file.\n        # answer = data_source[uid]\n        # the uid is the raw index.\n        # print(\"{}:\".format(uid), answer)\n        # print(\"score:\", score)\n        yield index, score\nimport os\nfrom lazero.search.api import lazeroCachePath\nfrom lazero.search.search import updateDataDictWithLineIndexNormalizedScoreAndDivisor\nfrom lazero.search.preprocessing import getFourVersionsOfProcessedLine\ndef txtaiSearch(\n    query,\n    indexDirectory,\n    filter_filepath=None,\n    limit=100,\n    withOriginalLine=True,  # this is default behavior of indexer. you still need to retrieve this flag from tinydb.\n    tinydbDatabasePath=os.path.join(lazeroCachePath, \"index.json\"),\n    dataDict={},\n):\n    divisor = 4 + int(withOriginalLine)\n    fourProcessedLines = list(getFourVersionsOfProcessedLine(query))",
         "type": "code",
         "location": "/lazero/search/txtai/search.py:32-63"
     },
-    "281": {
-        "file_id": 29,
+    "267": {
+        "file_id": 26,
         "content": "This function performs a search using the txtaiSearch method. It takes a query, indexDirectory, filter_filepath (optional), limit (default 100), withOriginalLine (default True), and tinydbDatabasePath as parameters. It uses divisor based on withOriginalLine to calculate scores for search results.",
         "type": "comment"
     },
-    "282": {
-        "file_id": 29,
+    "268": {
+        "file_id": 26,
         "content": "    for search_query_processed in (\n        [query] if withOriginalLine else []\n    ) + fourProcessedLines:\n        for index, normalized_score in txtaiSearchSingle(\n            search_query_processed,\n            indexDirectory,\n            limit=limit,\n            filter_filepath=filter_filepath,\n        ):\n            dataDict = updateDataDictWithLineIndexNormalizedScoreAndDivisor(\n                dataDict,\n                index,\n                normalized_score,\n                divisor,\n                tinydbDatabasePath=tinydbDatabasePath,\n            )\n    return dataDict",
         "type": "code",
         "location": "/lazero/search/txtai/search.py:64-80"
     },
-    "283": {
-        "file_id": 29,
+    "269": {
+        "file_id": 26,
         "content": "Iterating over search queries and updating data dictionary with index, normalized score, and divisor.",
         "type": "comment"
     },
-    "284": {
-        "file_id": 30,
+    "270": {
+        "file_id": 27,
         "content": "/lazero/search/whoosh/index.py",
         "type": "filepath"
     },
-    "285": {
-        "file_id": 30,
+    "271": {
+        "file_id": 27,
         "content": "This code defines a function \"whooshIndexer\" that indexes files in a given directory using Whoosh search library. It creates or updates an index at the specified indexDirectory, removes existing index if necessary, and prints progress during indexing and completion.",
         "type": "summary"
     },
-    "286": {
-        "file_id": 30,
+    "272": {
+        "file_id": 27,
         "content": "import progressbar\nimport shutil\nimport os\nfrom lazero.search.api import lazeroCachePath\nfrom lazero.search.index import indexFilesInDirectory\nfrom lazero.search.whoosh.model import createIndexFromDataGenerator\ndef whooshIndexer(\n    directory,\n    indexDirectory=os.path.join(lazeroCachePath, \"whoosh_index\"),\n    removeExists=True,\n    debug=False,\n):\n    iterator = indexFilesInDirectory(\n        directory, removeExists=removeExists, withFileName=True\n    )\n    if debug:\n        iterator = progressbar.progressbar(iterator)\n    if os.path.exists(indexDirectory) and removeExists:\n        shutil.rmtree(indexDirectory)\n    print(\"whoosh indexing directory %s at %s\" % (directory, indexDirectory))\n    createIndexFromDataGenerator(\n        enumerate(iterator),\n        indexDirectory,\n    )\n    print(\"whoosh index saved\")",
         "type": "code",
         "location": "/lazero/search/whoosh/index.py:1-27"
     },
-    "287": {
-        "file_id": 30,
+    "273": {
+        "file_id": 27,
         "content": "This code defines a function \"whooshIndexer\" that indexes files in a given directory using Whoosh search library. It creates or updates an index at the specified indexDirectory, removes existing index if necessary, and prints progress during indexing and completion.",
         "type": "comment"
     },
-    "288": {
-        "file_id": 31,
+    "274": {
+        "file_id": 28,
         "content": "/lazero/search/whoosh/model.py",
         "type": "filepath"
     },
-    "289": {
-        "file_id": 31,
+    "275": {
+        "file_id": 28,
         "content": "Code imports modules and defines schema for Whoosh indexing, creates an index directory if needed, iterates through dataGenerator to create and write index entries with content and filePath, while creating four versions of a processed line but missing path.",
         "type": "summary"
     },
-    "290": {
-        "file_id": 31,
+    "276": {
+        "file_id": 28,
         "content": "from whoosh.fields import Schema, TEXT, STORED\nfrom jieba.analyse import ChineseAnalyzer\nanalyzer = ChineseAnalyzer()\nschema = Schema(\n    # path=TEXT(stored=True, analyzer=analyzer), # maybe this is not needed, since you will have it anyway\n    path_m1=TEXT(stored=True, analyzer=analyzer),\n    path_m2=TEXT(stored=True, analyzer=analyzer),\n    path_m3=TEXT(stored=True, analyzer=analyzer),\n    path_m4=TEXT(stored=True, analyzer=analyzer),\n    content=TEXT(stored=True, analyzer=analyzer),\n    index=STORED(),\n)\nfrom whoosh.index import create_in\nimport os\nfrom lazero.search.preprocessing import getFourVersionsOfProcessedLine\ndef createIndexFromDataGenerator(\n    dataGenerator, indexDirectory, indexname=\"article_index\"\n):\n    if not os.path.exists(indexDirectory):\n        os.mkdir(indexDirectory)\n    ix = create_in(indexDirectory, schema, indexname=indexname)\n    writer = ix.writer()\n    for (\n        index,\n        (content, filePath),\n    ) in dataGenerator:  # as required you need to pass the data in given form.",
         "type": "code",
         "location": "/lazero/search/whoosh/model.py:1-32"
     },
-    "291": {
-        "file_id": 31,
+    "277": {
+        "file_id": 28,
         "content": "This code imports necessary modules and defines a schema for Whoosh indexing. It creates an index directory if it doesn't exist, then iterates through dataGenerator to create and write index entries with given content and filePath.",
         "type": "comment"
     },
-    "292": {
-        "file_id": 31,
+    "278": {
+        "file_id": 28,
         "content": "        altered_paths = getFourVersionsOfProcessedLine(filePath)  # make it explicit.\n        path_altered = {\n            \"path_m{}\".format(index + 1): altered_paths[index] for index in range(4)\n        }\n        writer.add_document(content=content, index=index, **path_altered) # no path? really?\n        # writer.add_document(path=filePath, content=content, index=index, **path_altered)\n    writer.commit()",
         "type": "code",
         "location": "/lazero/search/whoosh/model.py:33-39"
     },
-    "293": {
-        "file_id": 31,
+    "279": {
+        "file_id": 28,
         "content": "Creates four versions of a processed line and adds them to the writer, missing a path.",
         "type": "comment"
     },
-    "294": {
-        "file_id": 32,
+    "280": {
+        "file_id": 29,
         "content": "/lazero/search/whoosh/search.py",
         "type": "filepath"
     },
-    "295": {
-        "file_id": 32,
+    "281": {
+        "file_id": 29,
         "content": "This code uses Whoosh library in Python to perform searches, considering index directory and search fields. It allows optional filtering by file path and adjusts epsilon value for hit scores. The function balances search fields using weight parameter and retrieves relevant information for each query version.",
         "type": "summary"
     },
-    "296": {
-        "file_id": 32,
+    "282": {
+        "file_id": 29,
         "content": "# from lazero.search.whoosh.model import analyzer\n# we do highligh in another way.\nfrom whoosh.index import open_dir\nfrom whoosh import qparser\nfrom whoosh.query import Term\nfrom lazero.search.preprocessing import getFourVersionsOfProcessedLine\nfrom functools import lru_cache\n@lru_cache(maxsize=1)\ndef whooshSearchBootstrap(\n    indexDirectory,\n    search_fields:tuple=(\"path_m1\", \"path_m2\", \"path_m3\", \"path_m4\", \"content\"),\n    indexname=\"article_index\",\n):\n    search_fields = list(search_fields)\n    assert os.path.exists(indexDirectory)\n    assert os.path.isabs(indexDirectory)\n    ix = open_dir(indexDirectory, indexname=indexname)\n    schema = ix.schema\n    og = qparser.OrGroup.factory(0.9)\n    mp = qparser.MultifieldParser(search_fields, schema, group=og)\n    print(\"Loaded whooshSearchBootstrap index directory: \" + indexDirectory)\n    return ix, schema, og, mp\ndef whooshSearchSingle(\n    search_query_processed,\n    indexDirectory,\n    search_fields:tuple=(\"path_m1\", \"path_m2\", \"path_m3\", \"path_m4\", \"content\"),",
         "type": "code",
         "location": "/lazero/search/whoosh/search.py:1-31"
     },
-    "297": {
-        "file_id": 32,
+    "283": {
+        "file_id": 29,
         "content": "The code imports necessary modules, defines a function for indexing search in Whoosh, and another for performing a single search query. It uses LRU cache for performance optimization and ensures the index directory exists before proceeding with the search.",
         "type": "comment"
     },
-    "298": {
-        "file_id": 32,
+    "284": {
+        "file_id": 29,
         "content": "    indexname=\"article_index\",\n    epsilon=1e-3,\n    limit=100,\n    weight=0.7,\n    filter_filepath=None,  # to search for specific file only.\n):  # remember that 'path' is not 'multiplexed'\n    # ix, schema, og, mp = whooshSearchBootstrap(indexDirectory, search_fields=search_fields,indexname=indexname)\n    # maybe they don't need some.\n    ix, _, _, mp = whooshSearchBootstrap(\n        indexDirectory, search_fields=search_fields, indexname=indexname\n    )\n    q = mp.parse(search_query_processed)\n    with ix.searcher() as s:\n        if filter_filepath:\n            allow_q = Term(\"path\", filter_filepath)\n            results = s.search(q, terms=True, limit=limit, filter=allow_q)\n        else:\n            results = s.search(q, terms=True, limit=limit)  # what fucking terms?\n        # we don't need this stuff no more.\n        # cause your index is bloated.\n        # results.fragmenter.charlimit = 100000\n        lastScore = 2\n        maxScore = 0\n        for hitIndex, hit in enumerate(results):\n            # content = hit[\"content\"] # the content is not important. we need original content, not these fake shits.",
         "type": "code",
         "location": "/lazero/search/whoosh/search.py:32-57"
     },
-    "299": {
-        "file_id": 32,
+    "285": {
+        "file_id": 29,
         "content": "This code is initializing a Whoosh search index and performing a search query. It takes an index directory, search fields, index name, and optional filter filepath as input. It then parses the search query, searches for matches using terms and optionally filters by file path, and returns the results. The code also adjusts a character limit for fragments and iterates over the search results, possibly ignoring the content field in favor of original content.",
         "type": "comment"
+    },
+    "286": {
+        "file_id": 29,
+        "content": "            score = hit.score\n            if score < epsilon:\n                score = lastScore / 2\n            if hitIndex == 0:\n                maxScore = score\n            lastScore = score\n            normalized_score = (score / maxScore) * weight\n            index = hit[\"index\"]\n            yield index, normalized_score\n            # path = hit['path']\n            # we need some unified interface to process this shit.\n# from lazero.search.whoosh.api import getValueByKeyFromDatabase\nimport os\nfrom lazero.search.api import lazeroCachePath\nfrom lazero.search.search import updateDataDictWithLineIndexNormalizedScoreAndDivisor\ndef whooshSearch(\n    query,\n    indexDirectory,\n    search_fields:tuple=(\"path_m1\", \"path_m2\", \"path_m3\", \"path_m4\", \"content\"),\n    indexname=\"article_index\",\n    epsilon=1e-3,\n    limit=100,\n    filter_filepath=None,\n    weight=0.7,  # do not mark our top hit as '100% certain'\n    withOriginalLine=True,  # this is default behavior of indexer. you still need to retrieve this flag from tinydb.",
+        "type": "code",
+        "location": "/lazero/search/whoosh/search.py:58-86"
+    },
+    "287": {
+        "file_id": 29,
+        "content": "This code performs a search using the Whoosh library in Python. It takes a query, an index directory, and a list of search fields as input parameters. The code iterates over search hits, calculates normalized scores based on hit scores, and yields the index and normalized score. Additionally, it allows for optional filtering by file path and adjusts the hit score if it's below a certain epsilon value to prevent assigning '100% certain' status. The code also uses a weight parameter to balance different search fields and an option to include original line information from the tinydb database.",
+        "type": "comment"
+    },
+    "288": {
+        "file_id": 29,
+        "content": "    tinydbDatabasePath=os.path.join(lazeroCachePath, \"index.json\"),\n    dataDict={},  # for using with txtai\n):  # will multiplex the thing.\n    divisor = 4 + int(withOriginalLine)\n    fourProcessedLines = list(getFourVersionsOfProcessedLine(query))\n    for search_query_processed in (\n        [query] if withOriginalLine else []\n    ) + fourProcessedLines:\n        for index, normalized_score in whooshSearchSingle(\n            search_query_processed,\n            indexDirectory,\n            search_fields=search_fields,\n            indexname=indexname,\n            limit=limit,\n            weight=weight,\n            epsilon=epsilon,\n            filter_filepath=filter_filepath,\n        ):\n            dataDict = updateDataDictWithLineIndexNormalizedScoreAndDivisor(\n                dataDict,\n                index,\n                normalized_score,\n                divisor,\n                tinydbDatabasePath=tinydbDatabasePath,\n            )\n    # you decide what to do with dataDict later.\n    return dataDict",
+        "type": "code",
+        "location": "/lazero/search/whoosh/search.py:87-114"
+    },
+    "289": {
+        "file_id": 29,
+        "content": "This function performs a search query using Whoosh and retrieves the results, then updates a dictionary with line index, normalized score, and divisor for each version of the processed query.",
+        "type": "comment"
+    },
+    "290": {
+        "file_id": 30,
+        "content": "/lazero/utils/__init__.py",
+        "type": "filepath"
+    },
+    "291": {
+        "file_id": 30,
+        "content": "Importing various utility functions from different modules in lazero's utils package.",
+        "type": "summary"
+    },
+    "292": {
+        "file_id": 30,
+        "content": "from lazero.utils.inspectors import *\nfrom lazero.utils.logger import *\nfrom lazero.utils.tools import *\nfrom lazero.utils.importers import *\nfrom lazero.utils.mathlib import *",
+        "type": "code",
+        "location": "/lazero/utils/__init__.py:1-5"
+    },
+    "293": {
+        "file_id": 30,
+        "content": "Importing various utility functions from different modules in lazero's utils package.",
+        "type": "comment"
+    },
+    "294": {
+        "file_id": 31,
+        "content": "/lazero/utils/importers.py",
+        "type": "filepath"
+    },
+    "295": {
+        "file_id": 31,
+        "content": "Initializing a function to set the OpenCV library path for Python3.9 site-packages, checking if there's only one .so file and inserting it into sys.path.",
+        "type": "summary"
+    },
+    "296": {
+        "file_id": 31,
+        "content": "def cv2_custom_build_init(site_packages_path=\"/usr/local/lib/python3.9/site-packages\"):\n    import pathlib, sys\n    site_path = pathlib.Path(site_packages_path)\n    cv2_libs_dir = (\n        site_path / \"cv2\" / f\"python-{sys.version_info.major}.{sys.version_info.minor}\"\n    )\n    print(cv2_libs_dir)\n    cv2_libs = sorted(cv2_libs_dir.glob(\"*.so\"))\n    if len(cv2_libs) == 1:\n        print(\"INSERTING:\", cv2_libs[0].parent)\n        sys.path.insert(1, str(cv2_libs[0].parent))",
+        "type": "code",
+        "location": "/lazero/utils/importers.py:1-11"
+    },
+    "297": {
+        "file_id": 31,
+        "content": "Initializing a function to set the OpenCV library path for Python3.9 site-packages, checking if there's only one .so file and inserting it into sys.path.",
+        "type": "comment"
+    },
+    "298": {
+        "file_id": 32,
+        "content": "/lazero/utils/inspectors.py",
+        "type": "filepath"
+    },
+    "299": {
+        "file_id": 32,
+        "content": "This function inspects an object by checking if it has a \"__dict__\" attribute. If so, it uses pprint to print its variables. Otherwise, it iterates through the keys of the object, evaluating each key as code and printing the result, while also handling any exceptions that may occur.",
+        "type": "summary"
     }
 }
